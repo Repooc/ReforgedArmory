@@ -1,0 +1,14 @@
+﻿## Interface: 30400
+## Title: |cff1784d1ElvUI|r |cFF16C3F2Wrath|rArmory
+## Author: Repooc
+## Version: 1.00
+## RequiredDeps: ElvUI
+## DefaultState: Enabled
+## X-CleanTitle: ElvUI_WrathArmory
+## X-Curse-Project-ID:
+## X-Wago-ID:
+
+Libs\Load_Libs.xml
+Core.lua
+Settings\Load_Settings.xml
+Options.lua

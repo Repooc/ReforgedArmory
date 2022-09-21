@@ -1,0 +1,6 @@
+package-as: ElvUI_WrathArmory
+manual-changelog:
+    filename: CHANGELOG.txt
+    markup-type: bbcode
+move-folders:
+    ElvUI_WrathArmory/ElvUI_WrathArmory: ElvUI_WrathArmory
