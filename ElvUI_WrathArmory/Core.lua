@@ -168,30 +168,29 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local x, y, z, justify = module:GetInspectPoints(i) --* Remember to remove the z on this line
 
 	local db = E.db.wratharmory[string.lower(which)]
-	local itemLevel, enchant = db.itemLevel, db.enchant
 
 	if i == 16 then
 		inspectItem.enchantText:ClearAllPoints()
 		inspectItem.enchantText:Point('TOPRIGHT', slot, 'BOTTOMRIGHT', 0, 3)
 	end
 
-	inspectItem.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
+	inspectItem.enchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
 	inspectItem.enchantText:SetText(slotInfo.enchantTextShort)
-	inspectItem.enchantText:SetShown(enchant.enable)
-	local enchantTextColor = (enchant.qualityColor and slotInfo.itemQualityColors) or enchant.color
+	inspectItem.enchantText:SetShown(db.enchant.enable)
+	local enchantTextColor = (db.enchant.qualityColor and slotInfo.itemQualityColors) or db.enchant.color
 	if enchantTextColor and next(enchantTextColor) then
 		inspectItem.enchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
 	end
 
 	inspectItem.iLvlText:ClearAllPoints()
-	inspectItem.iLvlText:Point('BOTTOM', inspectItem, itemLevel.xOffset, itemLevel.yOffset)
-	inspectItem.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
+	inspectItem.iLvlText:Point('BOTTOM', inspectItem, db.itemLevel.xOffset, db.itemLevel.yOffset)
+	inspectItem.iLvlText:FontTemplate(LSM:Fetch('font', db.itemLevel.font), db.itemLevel.fontSize, db.itemLevel.fontOutline)
 	inspectItem.iLvlText:SetText(slotInfo.iLvl)
-	local iLvlTextColor = (itemLevel.qualityColor and slotInfo.itemQualityColors) or itemLevel.color
+	local iLvlTextColor = (db.itemLevel.qualityColor and slotInfo.itemQualityColors) or db.itemLevel.color
 	if iLvlTextColor and next(iLvlTextColor) then
 		inspectItem.iLvlText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
 	end
-	inspectItem.iLvlText:SetShown(itemLevel.enable)
+	inspectItem.iLvlText:SetShown(db.itemLevel.enable)
 
 	if which == 'Inspect' then
 		local unit = _G.InspectFrame.unit or 'target'
