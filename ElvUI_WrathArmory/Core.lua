@@ -27,9 +27,9 @@ local function GetOptions()
 	end
 end
 
-function module:UpdateOptions(unit)
+function module:UpdateOptions(unit, gems)
 	if unit then
-		module:UpdateInspectPageFonts(unit)
+		module:UpdateInspectPageFonts(unit, gems)
 	else
 		module:UpdateInspectPageFonts('Character')
 		module:UpdateInspectPageFonts('Inspect')
@@ -224,6 +224,9 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 			backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
 			backdrop:Show()
 
+			texture:SetShown(db.gems.enable)
+			backdrop:SetShown(db.gems.enable)
+
 			gemStep = gemStep + 1
 		else
 			texture:SetTexture()
@@ -342,7 +345,7 @@ do
 	function module:UpdatePageInfo(frame, which, guid)
 		-- if not (which and frame and frame.ItemLevelText) then return end --for avgilvlstats window
 		if not which or not frame then return end
-		if which == 'Inspect' and (not frame or not frame.unit or (guid and frame:IsShown() and UnitGUID(frame.unit) ~= guid)) then return end
+		if which == 'Inspect' and (not frame or not frame.unit or (guid and guid ~= 'target' and frame:IsShown() and UnitGUID(frame.unit) ~= guid)) then return end
 
 		wipe(iLevelDB)
 
@@ -588,7 +591,7 @@ function module:SetupInspectPageInfo()
 	module:CreateSlotStrings(_G.InspectFrame, 'Inspect')
 end
 
-function module:UpdateInspectPageFonts(which)
+function module:UpdateInspectPageFonts(which, gems)
 	local frame = _G[which..'Frame']
 	if not frame then return end
 
@@ -632,6 +635,10 @@ function module:UpdateInspectPageFonts(which)
 				slot.enchantText:SetShown(enchant.enable)
 			end
 		end
+	end
+
+	if gems then
+		module:UpdatePageInfo(frame, which, unit)
 	end
 end
 
