@@ -92,8 +92,7 @@ end
 
 function module:UpdateInspectInfo(_, arg1)
 	E:Delay(0.75, function()
-		if _G.InspectFrame:IsVisible() then
-			print('Delay Firing!!')
+		if _G.InspectFrame and _G.InspectFrame:IsVisible() then
 			module:UpdatePageInfo(_G.InspectFrame, 'Inspect', arg1)
 		end
 	end)
