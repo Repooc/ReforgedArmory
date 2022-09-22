@@ -98,7 +98,9 @@ function module:UpdateInspectInfo(_, arg1)
 		end
 	end)
 	module:UpdatePageInfo(_G.InspectFrame, 'Inspect', arg1)
-	_G.InspectFrame.ItemLevelText:FontTemplate(LSM:Fetch('font', E.db.wratharmory.inspect.avgItemLevel.font), E.db.wratharmory.inspect.avgItemLevel.fontSize, E.db.wratharmory.inspect.avgItemLevel.fontOutline)
+	if _G.InspectFrame and _G.InspectFrame.ItemLevelText then
+		_G.InspectFrame.ItemLevelText:FontTemplate(LSM:Fetch('font', E.db.wratharmory.inspect.avgItemLevel.font), E.db.wratharmory.inspect.avgItemLevel.fontSize, E.db.wratharmory.inspect.avgItemLevel.fontOutline)
+	end
 end
 
 function module:UpdateCharacterInfo(event)
