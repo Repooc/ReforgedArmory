@@ -21,7 +21,8 @@ local function actionSubGroup(info, ...)
 			return E.db.wratharmory[info[#info-2]][info[#info-1]][info[#info]]
 		end
 	end
-	module:UpdateOptions()
+	local unit = info[#info-2]:gsub("^%l", string.upper)
+	module:UpdateOptions(unit)
 end
 
 

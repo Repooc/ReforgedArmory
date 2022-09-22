@@ -27,9 +27,13 @@ local function GetOptions()
 	end
 end
 
-function module:UpdateOptions()
-	module:UpdateInspectPageFonts('Character')
-	module:UpdateInspectPageFonts('Inspect')
+function module:UpdateOptions(unit)
+	if unit then
+		module:UpdateInspectPageFonts(unit)
+	else
+		module:UpdateInspectPageFonts('Character')
+		module:UpdateInspectPageFonts('Inspect')
+	end
 end
 
 local InspectItems = {
