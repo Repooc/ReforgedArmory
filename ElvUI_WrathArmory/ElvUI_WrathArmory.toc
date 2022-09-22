@@ -5,8 +5,8 @@
 ## RequiredDeps: ElvUI
 ## DefaultState: Enabled
 ## X-CleanTitle: ElvUI_WrathArmory
-## X-Curse-Project-ID:
-## X-Wago-ID:
+## X-Curse-Project-ID: 678586
+## X-Wago-ID: e56nlmG9
 
 Libs\Load_Libs.xml
 Core.lua
