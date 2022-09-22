@@ -1,6 +1,6 @@
 local _, _, _, P = unpack(ElvUI)
 
-local SharedOptions = {
+local SharedFontOptions = {
 	enable = true,
 	font = 'PT Sans Narrow',
 	fontSize = 15,
@@ -11,29 +11,27 @@ local SharedOptions = {
 	qualityColor = false,
 }
 
+local SharedGemOptions = {
+	enable = true,
+	size = 14,
+	xOffset = 0,
+	yOffset = 0,
+}
+
 P.wratharmory = {
 	character = {
 		enable = true,
-		avgItemLevel = CopyTable(SharedOptions),
-		enchant = CopyTable(SharedOptions),
-		itemLevel = CopyTable(SharedOptions),
-		gems = { --! NYI
-			enable = true,
-			size = 14,
-			xOffset = 0,
-			yOffset = 0,
-		},
+		avgItemLevel = CopyTable(SharedFontOptions),
+		enchant = CopyTable(SharedFontOptions),
+		itemLevel = CopyTable(SharedFontOptions),
+		gems = CopyTable(SharedGemOptions),
 	},
 	inspect = {
 		enable = true,
-		avgItemLevel = CopyTable(SharedOptions),
-		itemLevel = CopyTable(SharedOptions),
-		enchant = CopyTable(SharedOptions),
-		gems = { --! NYI
-			enable = true,
-			xOffset = 0,
-			yOffset = 0,
-		},
+		avgItemLevel = CopyTable(SharedFontOptions),
+		itemLevel = CopyTable(SharedFontOptions),
+		enchant = CopyTable(SharedFontOptions),
+		gems = CopyTable(SharedGemOptions),
 	},
 }
 
