@@ -105,7 +105,7 @@ function module:UpdateCharacterInfo(event)
 	if (not E.db.wratharmory.character.enable)
 	or (whileOpenEvents[event] and not _G.CharacterFrame:IsShown()) then return end
 
-	module:UpdatePageInfo(_G.CharacterFrame, 'Character', nil, event)
+	module:UpdatePageInfo(_G.CharacterFrame, 'Character')
 end
 
 function module:UpdateCharacterItemLevel()
@@ -359,11 +359,6 @@ do
 					if not waitForItems then waitForItems = true end
 					module:TryGearAgain(frame, which, i, iLevelDB, inspectItem)
 				else
-					-- if slotInfo and slotInfo.gems then
-					-- 	for d, gem in ipairs(slotInfo.gems) do
-					-- 		print(inspectItem:GetName(), d, gem)
-					-- 	end
-					-- end
 					module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 				end
 			end
