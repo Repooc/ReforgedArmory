@@ -1,5 +1,4 @@
 local E = unpack(ElvUI)
-local M = E:GetModule('Misc')
 local S = E:GetModule('Skins')
 local EP = LibStub('LibElvUIPlugin-1.0')
 local LSM = E.Libs.LSM
@@ -7,7 +6,6 @@ local LCS = E.Libs.LCS
 local AddOnName, Engine = ...
 
 local module = E:NewModule(AddOnName, 'AceHook-3.0', 'AceEvent-3.0')
-print(AddOnName, 'addonname')
 _G[AddOnName] = Engine
 
 module.Title = GetAddOnMetadata('ElvUI_WrathArmory', 'Title')
@@ -27,9 +25,9 @@ local function GetOptions()
 	end
 end
 
-function module:UpdateOptions(unit, gems)
+function module:UpdateOptions(unit, updateGems)
 	if unit then
-		module:UpdateInspectPageFonts(unit, gems)
+		module:UpdateInspectPageFonts(unit, updateGems)
 	else
 		module:UpdateInspectPageFonts('Character')
 		module:UpdateInspectPageFonts('Inspect')
@@ -61,13 +59,15 @@ local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
 }
 
-function module:CreateInspectTexture(slot, x, y)
+function module:CreateInspectTexture(slot, point, relativePoint, x, y, gemStep, spacing)
+	local prevGem = gemStep - 1
 	local texture = slot:CreateTexture()
-	texture:Point('BOTTOM', x, y)
+	-- texture:Point(point, (gemStep == 1 and slot) or slot['textureSlot'..(prevGem)], relativePoint, gemStep == 1 and x or 25, y)
+	texture:Point(point, (gemStep == 1 and slot) or slot['textureSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
 	texture:SetTexCoord(unpack(E.TexCoords))
 	texture:Size(14)
 
-	local backdrop = CreateFrame('Frame', nil, slot)
+	local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['textureSlotBackdrop'..prevGem])
 	backdrop:SetTemplate(nil, nil, true)
 	backdrop:SetBackdropColor(0,0,0,0)
 	backdrop:SetOutside(texture)
@@ -76,17 +76,25 @@ function module:CreateInspectTexture(slot, x, y)
 	return texture, backdrop
 end
 
-function module:GetInspectPoints(id)
-	if not id then return end
+function module:GetGemPoints(id, db)
+	if not id or not db then return end
+	local x, y = db.gems.xOffset, db.gems.yOffset
+	local mhX, mhY = db.gems.MainHandSlot.xOffset, db.gems.MainHandSlot.yOffset
+	local ohX, ohY = db.gems.SecondaryHandSlot.xOffset, db.gems.SecondaryHandSlot.yOffset
+	local rX, rY = db.gems.RangedSlot.xOffset, db.gems.RangedSlot.yOffset
+	local spacing = db.gems.spacing
+	-- Returns point, relativeFrame, relativePoint, x, y
 
-	if id <= 5 or (id == 9 or id == 15) then
-		return 7, 0, 18, 'BOTTOMLEFT' -- Left side
-	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then
-		return -7, 0, 18, 'BOTTOMRIGHT' -- Right side
-	-- elseif id == 18 then
-	-- 	return 0, 0, 0, 'BOTTOMRIGHT'
+	if id <= 5 or (id == 9 or id == 15) then --* Left Side
+		return 'BOTTOMLEFT', 'BOTTOMRIGHT', x, y, spacing
+	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then --* Right Side
+		return 'BOTTOMRIGHT', 'BOTTOMLEFT', -x, y, -spacing
+	elseif id == 16 then
+		return 'BOTTOMRIGHT', 'BOTTOMLEFT', mhX, mhY, -spacing
+	elseif id == 17 then
+		return 'BOTTOMRIGHT', 'TOPRIGHT', ohX, ohY, -spacing
 	else
-		return 0, 45, 60, 'BOTTOM'
+		return 'BOTTOMLEFT', 'BOTTOMRIGHT', rX, rY, spacing
 	end
 end
 
@@ -170,8 +178,6 @@ end
 
 function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	iLevelDB[i] = slotInfo.iLvl
-	local x, y, z, justify = module:GetInspectPoints(i) --* Remember to remove the z on this line
-
 	local db = E.db.wratharmory[string.lower(which)]
 
 	if i == 16 then
@@ -209,14 +215,18 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 		end
 	end
 
-	local gemStep = 1
-	for index = 1, 10 do
-		local offset = 8+(index*16)
-		local newX = ((justify == 'BOTTOMLEFT' or i == 17) and x+offset) or x-offset
+	local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
 
+	local gemStep = 1
+	for index = 1, 5 do
 		local texture = inspectItem['textureSlot'..index]
 		texture:ClearAllPoints()
-		texture:Point('BOTTOM', newX, y)
+		-- texture:Point('BOTTOM', newX, y)
+		if index == 1 then
+			texture:Point(point, inspectItem, relativePoint, x, y)
+		else
+			texture:Point(point, inspectItem['textureSlot'..(index-1)], relativePoint, spacing, 0)
+		end
 
 		local backdrop = inspectItem['textureSlotBackdrop'..index]
 		local gem = slotInfo.gems and slotInfo.gems[gemStep]
@@ -568,7 +578,6 @@ function module:CreateSlotStrings(frame, which)
 			--16 mh
 			--17 oh
 			--18 relic
-			local x, y, z, justify = module:GetInspectPoints(i)
 			if i == 16 then
 				slot.enchantText:Point('TOPRIGHT', slot, 'BOTTOMRIGHT', -35, 3)
 			elseif i == 18 then
@@ -576,13 +585,13 @@ function module:CreateSlotStrings(frame, which)
 			elseif i == 17 then
 				slot.enchantText:Point('TOP', slot, 'BOTTOM', 0, -5)
 			else
-				slot.enchantText:Point(justify, slot, x + (justify == 'BOTTOMLEFT' and 30 or -30), z)
+				slot.enchantText:Point('CENTER', slot, 0, 0)
 			end
 
-			for u = 1, 10 do
-				local offset = 8+(u*16)
-				local newX = ((justify == 'BOTTOMLEFT' or i == 17) and x+offset) or x-offset
-				slot['textureSlot'..u], slot['textureSlotBackdrop'..u] = M:CreateInspectTexture(slot, newX, --[[newY or]] y)
+			local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
+
+			for u = 1, 5 do
+				slot['textureSlot'..u], slot['textureSlotBackdrop'..u] = module:CreateInspectTexture(slot, point, relativePoint, x, y, u, spacing)
 			end
 		end
 	end
@@ -652,7 +661,7 @@ function module:ScanTooltipTextures()
 		wipe(tt.gems)
 	end
 
-	for i = 1, 10 do
+	for i = 1, 5 do
 		local tex = _G['ElvUI_ScanTooltipTexture'..i]
 		local texture = tex and tex:IsShown() and tex:GetTexture()
 		if texture then

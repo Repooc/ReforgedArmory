@@ -14,8 +14,21 @@ local SharedFontOptions = {
 local SharedGemOptions = {
 	enable = true,
 	size = 14,
-	xOffset = 0,
+	xOffset = 3,
 	yOffset = 0,
+	spacing = 2,
+	MainHandSlot = {
+		xOffset = -2,
+		yOffset = 0,
+	},
+	SecondaryHandSlot = {
+		xOffset = 0,
+		yOffset = 2,
+	},
+	RangedSlot = {
+		xOffset = 2,
+		yOffset = 0,
+	},
 }
 
 P.wratharmory = {
