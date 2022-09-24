@@ -89,12 +89,34 @@ function module:GetGemPoints(id, db)
 		return 'BOTTOMLEFT', 'BOTTOMRIGHT', x, y, spacing
 	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then --* Right Side
 		return 'BOTTOMRIGHT', 'BOTTOMLEFT', -x, y, -spacing
-	elseif id == 16 then
+	elseif id == 16 then --* MainHandSlot
 		return 'BOTTOMRIGHT', 'BOTTOMLEFT', mhX, mhY, -spacing
-	elseif id == 17 then
+	elseif id == 17 then --* SecondaryHandSlot
 		return 'BOTTOMRIGHT', 'TOPRIGHT', ohX, ohY, -spacing
-	else
+	else --* RangedSlot
 		return 'BOTTOMLEFT', 'BOTTOMRIGHT', rX, rY, spacing
+	end
+end
+
+function module:GetEnchantPoints(id, db)
+	if not id or not db then return end
+	local x, y = db.enchant.xOffset, db.enchant.yOffset
+	local mhX, mhY = db.enchant.MainHandSlot.xOffset, db.enchant.MainHandSlot.yOffset
+	local ohX, ohY = db.enchant.SecondaryHandSlot.xOffset, db.enchant.SecondaryHandSlot.yOffset
+	local rX, rY = db.enchant.RangedSlot.xOffset, db.enchant.RangedSlot.yOffset
+	local spacing = db.enchant.spacing or 0
+	-- Returns point, relativeFrame, relativePoint, x, y
+
+	if id <= 5 or (id == 9 or id == 15) then --* Left Side
+		return 'TOPLEFT', 'TOPRIGHT', x, y, spacing
+	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then --* Right Side
+		return 'TOPRIGHT', 'TOPLEFT', -x, y, -spacing
+	elseif id == 16 then --* MainHandSlot
+		return 'TOPRIGHT', 'TOPLEFT', mhX, mhY, -spacing
+	elseif id == 17 then --* SecondaryHandSlot
+		return 'TOP', 'BOTTOM', ohX, ohY, -spacing
+	else --* RangedSlot
+		return 'TOPLEFT', 'TOPRIGHT', rX, rY, spacing
 	end
 end
 
@@ -180,9 +202,17 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	iLevelDB[i] = slotInfo.iLvl
 	local db = E.db.wratharmory[string.lower(which)]
 
-	if i == 16 then
-		inspectItem.enchantText:ClearAllPoints()
-		inspectItem.enchantText:Point('TOPRIGHT', slot, 'BOTTOMRIGHT', 0, 3)
+	do
+		local point, relativePoint, x, y, spacing = module:GetEnchantPoints(i, db)
+		-- if i == 16 then
+		-- 	inspectItem.enchantText:ClearAllPoints()
+		-- 	inspectItem.enchantText:Point('TOPRIGHT', slot, 'BOTTOMRIGHT', 0, 3)
+		-- end
+		-- if i == 16 then
+			-- print(point, relativePoint, x, y, spacing)
+			inspectItem.enchantText:ClearAllPoints()
+			inspectItem.enchantText:Point(point, slot, relativePoint, x, y)
+		-- end
 	end
 
 	inspectItem.enchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
@@ -215,34 +245,35 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 		end
 	end
 
-	local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
+	do
+		local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
+		local gemStep = 1
+		for index = 1, 5 do
+			local texture = inspectItem['textureSlot'..index]
+			texture:Size(db.gems.size)
+			texture:ClearAllPoints()
+			-- texture:Point('BOTTOM', newX, y)
+			if index == 1 then
+				texture:Point(point, inspectItem, relativePoint, x, y)
+			else
+				texture:Point(point, inspectItem['textureSlot'..(index-1)], relativePoint, spacing, 0)
+			end
 
-	local gemStep = 1
-	for index = 1, 5 do
-		local texture = inspectItem['textureSlot'..index]
-		texture:Size(db.gems.size)
-		texture:ClearAllPoints()
-		-- texture:Point('BOTTOM', newX, y)
-		if index == 1 then
-			texture:Point(point, inspectItem, relativePoint, x, y)
-		else
-			texture:Point(point, inspectItem['textureSlot'..(index-1)], relativePoint, spacing, 0)
-		end
+			local backdrop = inspectItem['textureSlotBackdrop'..index]
+			local gem = slotInfo.gems and slotInfo.gems[gemStep]
+			if gem then
+				texture:SetTexture(gem)
+				backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
+				backdrop:Show()
 
-		local backdrop = inspectItem['textureSlotBackdrop'..index]
-		local gem = slotInfo.gems and slotInfo.gems[gemStep]
-		if gem then
-			texture:SetTexture(gem)
-			backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
-			backdrop:Show()
+				texture:SetShown(db.gems.enable)
+				backdrop:SetShown(db.gems.enable)
 
-			texture:SetShown(db.gems.enable)
-			backdrop:SetShown(db.gems.enable)
-
-			gemStep = gemStep + 1
-		else
-			texture:SetTexture()
-			backdrop:Hide()
+				gemStep = gemStep + 1
+			else
+				texture:SetTexture()
+				backdrop:Hide()
+			end
 		end
 	end
 end
@@ -575,24 +606,26 @@ function module:CreateSlotStrings(frame, which)
 
 			slot.enchantText = slot:CreateFontString(nil, 'OVERLAY')
 			slot.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
-
-			--16 mh
-			--17 oh
-			--18 relic
-			if i == 16 then
-				slot.enchantText:Point('TOPRIGHT', slot, 'BOTTOMRIGHT', -35, 3)
-			elseif i == 18 then
-				slot.enchantText:Point(i==16 and 'BOTTOMRIGHT' or 'BOTTOMLEFT', slot, i==16 and -35 or 40, 3)
-			elseif i == 17 then
-				slot.enchantText:Point('TOP', slot, 'BOTTOM', 0, -5)
-			else
-				slot.enchantText:Point('CENTER', slot, 0, 0)
+			do
+				local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db, 'enchant')
+				--16 mh
+				--17 oh
+				--18 relic
+				if i == 16 then
+					slot.enchantText:Point('TOPRIGHT', slot, 'BOTTOMRIGHT', -35, 3)
+				elseif i == 18 then
+					slot.enchantText:Point(i==16 and 'BOTTOMRIGHT' or 'BOTTOMLEFT', slot, i==16 and -35 or 40, 3)
+				elseif i == 17 then
+					slot.enchantText:Point('TOP', slot, 'BOTTOM', 0, -5)
+				else
+					slot.enchantText:Point('CENTER', slot, 0, 0)
+				end
 			end
-
-			local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
-
-			for u = 1, 5 do
-				slot['textureSlot'..u], slot['textureSlotBackdrop'..u] = module:CreateInspectTexture(slot, point, relativePoint, x, y, u, spacing)
+			do
+				local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
+				for u = 1, 5 do
+					slot['textureSlot'..u], slot['textureSlotBackdrop'..u] = module:CreateInspectTexture(slot, point, relativePoint, x, y, u, spacing)
+				end
 			end
 		end
 	end
@@ -708,14 +741,8 @@ function module:GetGearSlotInfo(unit, slot)
 		local itemLevel = GetDetailedItemLevelInfo(itemLink)
 		slotInfo.iLvl = tonumber(itemLevel)
 
-		-- local itemString = select(3, string.find(itemLink, "|H(.+)|h"))
-		-- local _, itemId, enchantId, jewelId1, jewelId2, jewelId3, jewelId4, suffixId, uniqueId, linkLevel, specializationID, reforgeId, unknown1, unknown2 = string.split(":", itemString)
-		-- print(slot, jewelId1, jewelId2, jewelId3, jewelId4)
-		local enchantSpellID = E.Libs.ItemEnchants:GetEnchantSpellID(itemLink)
-		if enchantSpellID then
-			local enchantName = GetSpellInfo(enchantSpellID)
-			slotInfo.enchantTextShort = enchantName or ''
-		end
+		local enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
+		slotInfo.enchantTextShort = E.Libs.GetEnchant.GetEnchant(enchantID) or ''
 	end
 
 	tt:Hide()
@@ -754,7 +781,7 @@ end
 
 function module:Initialize()
 	EP:RegisterPlugin(AddOnName, GetOptions)
-	E:AddLib('ItemEnchants', 'LibItemEnchants-1.0')
+	E:AddLib('GetEnchant', 'LibGetEnchant-1.0')
 
 	module:ToggleItemLevelInfo(true)
 

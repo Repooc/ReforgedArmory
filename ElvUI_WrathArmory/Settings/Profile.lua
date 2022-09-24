@@ -66,6 +66,18 @@ P.wratharmory.character.enchant.color = {r = 0, g = 0.99, b = 0}
 P.wratharmory.character.enchant.mouseover = false --! NYI
 P.wratharmory.character.enchant.qualityColor = false
 P.wratharmory.character.enchant.xOffset = 2
+P.wratharmory.character.enchant.MainHandSlot = {
+	xOffset = -1,
+	yOffset = -11,
+}
+P.wratharmory.character.enchant.SecondaryHandSlot = {
+	xOffset = -2,
+	yOffset = 0,
+}
+P.wratharmory.character.enchant.RangedSlot = {
+	xOffset = 2,
+	yOffset = 0,
+}
 
 -- Item Level
 P.wratharmory.character.itemLevel.qualityColor = true
@@ -77,7 +89,20 @@ P.wratharmory.inspect.avgItemLevel.yOffset = -50
 
 -- Enchant
 P.wratharmory.inspect.enchant.mouseover = false --! NYI
+P.wratharmory.inspect.enchant.color = {r = 0, g = 0.99, b = 0}
 P.wratharmory.inspect.enchant.qualityColor = false
+P.wratharmory.inspect.enchant.MainHandSlot = {
+	xOffset = -1,
+	yOffset = -11,
+}
+P.wratharmory.inspect.enchant.SecondaryHandSlot = {
+	xOffset = 0,
+	yOffset = -2,
+}
+P.wratharmory.inspect.enchant.RangedSlot = {
+	xOffset = 2,
+	yOffset = 0,
+}
 
 -- Item Level
 P.wratharmory.inspect.itemLevel.qualityColor = true

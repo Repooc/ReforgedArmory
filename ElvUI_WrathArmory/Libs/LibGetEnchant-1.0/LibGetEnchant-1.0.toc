@@ -1,0 +1,13 @@
+## Interface: 20501
+## Title: Lib: GetEnchant
+## Notes: Get Enchant String from Enchant ID
+## Author: Xelectra
+## X-Category: Library
+## X-License: BSD
+## Version: 1.0.0
+## DefaultState: Enabled
+## LoadOnDemand: 0
+
+LibStub\LibStub.lua
+
+LibGetEnchant-1.0.xml
