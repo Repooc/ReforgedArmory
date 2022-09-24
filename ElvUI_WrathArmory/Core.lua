@@ -791,6 +791,14 @@ function module:Initialize()
 		module:RegisterEvent('ADDON_LOADED')
 	end
 
+	GearManagerDialog:HookScript('OnShow', function(a, b, c)
+		GearManagerDialog:ClearAllPoints()
+		GearManagerDialog:Point('TOPLEFT', WrathArmory_StatsPane, 'TOPRIGHT', 0, 0)
+		-- topleft PaperDollFrame topright -30 -12  -- default
+	end)
+	-- GearManagerDialog:HookScript('OnHide', function(a, b, c)
+	-- 	print("Hiding Equipment Manager", a, b, c)
+	-- end)
 	--[[
 	module:UpdateOptions()
 
