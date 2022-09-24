@@ -220,6 +220,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local gemStep = 1
 	for index = 1, 5 do
 		local texture = inspectItem['textureSlot'..index]
+		texture:Size(db.gems.size)
 		texture:ClearAllPoints()
 		-- texture:Point('BOTTOM', newX, y)
 		if index == 1 then
