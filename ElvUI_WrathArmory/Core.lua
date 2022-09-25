@@ -594,19 +594,9 @@ function module:CreateSlotStrings(frame, which)
 			slot.enchantText = slot:CreateFontString(nil, 'OVERLAY')
 			slot.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
 			do
-				local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db, 'enchant')
-				--16 mh
-				--17 oh
-				--18 relic
-				if i == 16 then
-					slot.enchantText:Point('TOPRIGHT', slot, 'BOTTOMRIGHT', -35, 3)
-				elseif i == 18 then
-					slot.enchantText:Point(i==16 and 'BOTTOMRIGHT' or 'BOTTOMLEFT', slot, i==16 and -35 or 40, 3)
-				elseif i == 17 then
-					slot.enchantText:Point('TOP', slot, 'BOTTOM', 0, -5)
-				else
-					slot.enchantText:Point('CENTER', slot, 0, 0)
-				end
+				local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
+				slot.enchantText:ClearAllPoints()
+				slot.enchantText:Point(point, slot, relativePoint, x, y)
 			end
 			do
 				local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
