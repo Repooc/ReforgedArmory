@@ -203,35 +203,27 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local db = E.db.wratharmory[string.lower(which)]
 
 	do
-		local point, relativePoint, x, y, spacing = module:GetEnchantPoints(i, db)
-		-- if i == 16 then
-		-- 	inspectItem.enchantText:ClearAllPoints()
-		-- 	inspectItem.enchantText:Point('TOPRIGHT', slot, 'BOTTOMRIGHT', 0, 3)
-		-- end
-		-- if i == 16 then
-			-- print(point, relativePoint, x, y, spacing)
-			inspectItem.enchantText:ClearAllPoints()
-			inspectItem.enchantText:Point(point, slot, relativePoint, x, y)
-		-- end
-	end
-
-	inspectItem.enchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
-	inspectItem.enchantText:SetText(slotInfo.enchantTextShort)
-	inspectItem.enchantText:SetShown(db.enchant.enable)
-	local enchantTextColor = (db.enchant.qualityColor and slotInfo.itemQualityColors) or db.enchant.color
-	if enchantTextColor and next(enchantTextColor) then
-		inspectItem.enchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
+		local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
+		inspectItem.enchantText:ClearAllPoints()
+		inspectItem.enchantText:Point(point, slot, relativePoint, x, y)
+		inspectItem.enchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
+		inspectItem.enchantText:SetText(slotInfo.enchantTextShort)
+		inspectItem.enchantText:SetShown(db.enchant.enable)
+		local enchantTextColor = (db.enchant.qualityColor and slotInfo.itemQualityColors) or db.enchant.color
+		if enchantTextColor and next(enchantTextColor) then
+			inspectItem.enchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
+		end
 	end
 
 	inspectItem.iLvlText:ClearAllPoints()
 	inspectItem.iLvlText:Point('BOTTOM', inspectItem, db.itemLevel.xOffset, db.itemLevel.yOffset)
 	inspectItem.iLvlText:FontTemplate(LSM:Fetch('font', db.itemLevel.font), db.itemLevel.fontSize, db.itemLevel.fontOutline)
 	inspectItem.iLvlText:SetText(slotInfo.iLvl)
+	inspectItem.iLvlText:SetShown(db.itemLevel.enable)
 	local iLvlTextColor = (db.itemLevel.qualityColor and slotInfo.itemQualityColors) or db.itemLevel.color
 	if iLvlTextColor and next(iLvlTextColor) then
 		inspectItem.iLvlText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
 	end
-	inspectItem.iLvlText:SetShown(db.itemLevel.enable)
 
 	if which == 'Inspect' then
 		local unit = _G.InspectFrame.unit or 'target'
@@ -252,12 +244,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 			local texture = inspectItem['textureSlot'..index]
 			texture:Size(db.gems.size)
 			texture:ClearAllPoints()
-			-- texture:Point('BOTTOM', newX, y)
-			if index == 1 then
-				texture:Point(point, inspectItem, relativePoint, x, y)
-			else
-				texture:Point(point, inspectItem['textureSlot'..(index-1)], relativePoint, spacing, 0)
-			end
+			texture:Point(point, (index == 1 and inspectItem) or inspectItem['textureSlot'..(index-1)], relativePoint, index == 1 and x or spacing, index == 1 and y or 0)
 
 			local backdrop = inspectItem['textureSlotBackdrop'..index]
 			local gem = slotInfo.gems and slotInfo.gems[gemStep]
@@ -424,7 +411,7 @@ local function CreateItemLevel(frame, which)
 	local db = E.db.wratharmory[string.lower(which)].avgItemLevel
 	local isCharPage = which == 'Character'
 
-	local textFrame = CreateFrame('Frame', 'WrathArmory_'..which ..'AvgItemLevel', (isCharPage and module.Stats) or frame)
+	local textFrame = CreateFrame('Frame', 'WrathArmory_'..which ..'AvgItemLevel', (isCharPage and module.Stats) or InspectPaperDollFrame)
 	textFrame:Size(170, 30)
 	textFrame:Point('TOP', db.xOffset, db.yOffset)
 
@@ -671,6 +658,12 @@ function module:UpdateInspectPageFonts(which, gems)
 				end
 				slot.iLvlText:SetShown(itemLevel.enable)
 
+				do
+					local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
+					slot.enchantText:ClearAllPoints()
+					slot.enchantText:Point(point, slot, relativePoint, x, y)
+				end
+
 				slot.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
 				enchantTextColor = (enchant.qualityColor and qualityColor) or enchant.color
 				if enchantTextColor and next(enchantTextColor) then
@@ -794,7 +787,7 @@ function module:Initialize()
 	GearManagerDialog:HookScript('OnShow', function(a, b, c)
 		GearManagerDialog:ClearAllPoints()
 		GearManagerDialog:Point('TOPLEFT', WrathArmory_StatsPane, 'TOPRIGHT', 0, 0)
-		-- topleft PaperDollFrame topright -30 -12  -- default
+		-- 'TOPLEFT', PaperDollFrame, 'TOPRIGHT', -30, -12  -- default
 	end)
 	-- GearManagerDialog:HookScript('OnHide', function(a, b, c)
 	-- 	print("Hiding Equipment Manager", a, b, c)

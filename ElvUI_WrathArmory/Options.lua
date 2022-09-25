@@ -5,7 +5,7 @@ local C
 
 local function actionSubGroup(info, ...)
 	local which = (info[#info-2] == 'character' or info[#info-2] == 'inspect') and info[#info-2] or info[#info-3]
-	local updateGems = (info[#info-1] == 'gems' or info[#info-1] == 'enchant') or (info[#info-2] == 'gems' or info[#info-2] == 'enchant')
+	local updateGems = (info[#info-1] == 'gems') or (info[#info-2] == 'gems')
 
 	if info.type == 'color' then
 		local color = E.db.wratharmory[info[#info-2]][info[#info-1]][info[#info]]

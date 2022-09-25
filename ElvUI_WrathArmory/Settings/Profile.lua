@@ -62,13 +62,14 @@ P.wratharmory.character.avgItemLevel.fontSize = 25
 P.wratharmory.character.avgItemLevel.yOffset = -35
 
 -- Enchant
-P.wratharmory.character.enchant.color = {r = 0, g = 0.99, b = 0}
 P.wratharmory.character.enchant.mouseover = false --! NYI
+P.wratharmory.character.enchant.color = {r = 0, g = 0.99, b = 0}
 P.wratharmory.character.enchant.qualityColor = false
-P.wratharmory.character.enchant.xOffset = 2
+P.wratharmory.character.enchant.xOffset = 1
+P.wratharmory.character.enchant.yOffset = -2
 P.wratharmory.character.enchant.MainHandSlot = {
 	xOffset = -1,
-	yOffset = -11,
+	yOffset = -9,
 }
 P.wratharmory.character.enchant.SecondaryHandSlot = {
 	xOffset = -2,
@@ -91,9 +92,11 @@ P.wratharmory.inspect.avgItemLevel.yOffset = -50
 P.wratharmory.inspect.enchant.mouseover = false --! NYI
 P.wratharmory.inspect.enchant.color = {r = 0, g = 0.99, b = 0}
 P.wratharmory.inspect.enchant.qualityColor = false
+P.wratharmory.inspect.enchant.xOffset = 1
+P.wratharmory.inspect.enchant.yOffset = -2
 P.wratharmory.inspect.enchant.MainHandSlot = {
 	xOffset = -1,
-	yOffset = -11,
+	yOffset = -9,
 }
 P.wratharmory.inspect.enchant.SecondaryHandSlot = {
 	xOffset = 0,
