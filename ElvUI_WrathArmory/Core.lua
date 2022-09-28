@@ -765,7 +765,11 @@ function module:Initialize()
 		module:RegisterEvent('ADDON_LOADED')
 	end
 
-	GearManagerDialog:HookScript('OnShow', function(a, b, c)
+	_G.CharacterFrameCloseButton:ClearAllPoints()
+	_G.CharacterFrameCloseButton:Point('TOPRIGHT', CharacterFrame.backdrop, 0, 2)
+	_G.GearManagerToggleButton:Point('TOPRIGHT', _G.PaperDollItemsFrame, 'TOPRIGHT', -8, -35)
+
+	_G.GearManagerDialog:HookScript('OnShow', function(a, b, c)
 		GearManagerDialog:ClearAllPoints()
 		GearManagerDialog:Point('TOPLEFT', WrathArmory_StatsPane, 'TOPRIGHT', 0, 0)
 		-- 'TOPLEFT', PaperDollFrame, 'TOPRIGHT', -30, -12  -- default
