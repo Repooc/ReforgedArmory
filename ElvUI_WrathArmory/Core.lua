@@ -553,19 +553,9 @@ function module:CreateStatsPane()
 		_G['PlayerStatFrameRight'..i]:Width(isSkinned and 150 or 170)
 	end
 
-	-- f.ScrollFrame = CreateFrame('ScrollFrame', nil, f, 'UIPanelScrollFrameTemplate')
-	-- f.ScrollFrame:SetPoint('TOPLEFT', f, 'TOPLEFT', -35, -50)
-	-- f.ScrollFrame:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', -35, 10)
-
-	-- f.ScrollChild = CreateFrame('Frame', nil, f.ScrollFrame)
-	-- f.ScrollChild:SetSize(180, 422)
-	-- f.ScrollFrame:SetScrollChild(f.ScrollChild)
-	-- _Stats.frame = f
 
 
-	-- local toggleButton = CreateFrame('Button', 'ECS_ToggleButton', CharacterModelFrame, 'GameMenuButtonTemplate')
-	-- toggleButton:SetText('< ECS')
-	-- toggleButton:SetSize(44, 18)
+
 end
 
 function module:CreateSlotStrings(frame, which)
@@ -598,6 +588,7 @@ function module:CreateSlotStrings(frame, which)
 				slot.enchantText:ClearAllPoints()
 				slot.enchantText:Point(point, slot, relativePoint, x, y)
 			end
+
 			do
 				local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
 				for u = 1, 5 do
