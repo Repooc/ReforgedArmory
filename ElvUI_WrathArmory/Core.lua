@@ -16,7 +16,7 @@ module.Configs = {}
 -- local texturePath = 'Interface\\Addons\\ElvUI_WrathArmory\\Textures\\'
 
 function module:Print(...)
-	(E.db and _G[E.db.general.messageRedirect] or _G.DEFAULT_CHAT_FRAME):AddMessage(strjoin('', E.media.hexvaluecolor or '|cff00b3ff', 'ElvUI-Warth Armory:|r ', ...)) -- I put DEFAULT_CHAT_FRAME as a fail safe.
+	(E.db and _G[E.db.general.messageRedirect] or _G.DEFAULT_CHAT_FRAME):AddMessage(strjoin('', '|cff16c3f2Warth|rArmory', E.media.hexvaluecolor or '|cff16c3f2', ':|r ', ...)) -- I put DEFAULT_CHAT_FRAME as a fail safe.
 end
 
 local function GetOptions()
