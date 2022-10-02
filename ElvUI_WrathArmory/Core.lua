@@ -12,6 +12,7 @@ module.Title = GetAddOnMetadata('ElvUI_WrathArmory', 'Title')
 module.CleanTitle = GetAddOnMetadata('ElvUI_WrathArmory', 'X-CleanTitle')
 module.Version = GetAddOnMetadata('ElvUI_WrathArmory', 'Version')
 module.Configs = {}
+local githubURL = 'https://github.com/Repooc/ElvUI_WrathArmory/issues'
 
 -- local texturePath = 'Interface\\Addons\\ElvUI_WrathArmory\\Textures\\'
 
@@ -716,7 +717,14 @@ function module:GetGearSlotInfo(unit, slot)
 		slotInfo.iLvl = tonumber(itemLevel)
 
 		local enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
-		slotInfo.enchantTextShort = E.Libs.GetEnchant.GetEnchant(enchantID) or ''
+		local enchantTextShort = E.Libs.GetEnchant.GetEnchant(enchantID)
+
+		if enchantID and not enchantTextShort then
+			local msg = format('The enchant id, *%s|r, seems to be missing from our database and the enchant won\'t be displayed properly.  Please open a ticket at |cff16c3f2[|r*|Hurl:'..githubURL..'|h'..githubURL..'|h|r|cff16c3f2]|r with the missing id and name of the enchant that found on %s.', enchantID, itemLink):gsub('*', E.InfoColor)
+			module:Print(msg)
+		end
+
+		slotInfo.enchantTextShort = enchantTextShort or ''
 	end
 
 	tt:Hide()
