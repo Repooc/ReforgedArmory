@@ -60,19 +60,6 @@ local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
 }
 
-local getSockets = {
-	["EMPTY_SOCKET"] = 136260,
-	["EMPTY_SOCKET_BLUE"] = 136256,
-	["EMPTY_SOCKET_COGWHEEL"] = 407324,
-	["EMPTY_SOCKET_CYPHER"] = 136260,
-	["EMPTY_SOCKET_HYDRAULIC"] = 407325,
-	["EMPTY_SOCKET_META"] = 136257,
-	["EMPTY_SOCKET_NO_COLOR"] = 136260,
-	["EMPTY_SOCKET_PRISMATIC"] = 458977,
-	["EMPTY_SOCKET_RED"] = 136258,
-	["EMPTY_SOCKET_YELLOW"] = 136259,
- }
-
 function module:CreateInspectTexture(slot, point, relativePoint, x, y, gemStep, spacing)
 	local prevGem = gemStep - 1
 	local texture = slot:CreateTexture()
@@ -81,7 +68,13 @@ function module:CreateInspectTexture(slot, point, relativePoint, x, y, gemStep, 
 	texture:SetTexCoord(unpack(E.TexCoords))
 	texture:Size(14)
 
-	return texture
+	local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['textureSlotBackdrop'..prevGem])
+	backdrop:SetTemplate(nil, nil, true)
+	backdrop:SetBackdropColor(0,0,0,0)
+	backdrop:SetOutside(texture)
+	backdrop:Hide()
+
+	return texture, backdrop
 end
 
 function module:GetGemPoints(id, db)
@@ -254,14 +247,20 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 			texture:ClearAllPoints()
 			texture:Point(point, (index == 1 and inspectItem) or inspectItem['textureSlot'..(index-1)], relativePoint, index == 1 and x or spacing, index == 1 and y or 0)
 
+			local backdrop = inspectItem['textureSlotBackdrop'..index]
 			local gem = slotInfo.gems and slotInfo.gems[gemStep]
 			if gem then
 				texture:SetTexture(gem)
+				backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
+				backdrop:Show()
+
 				texture:SetShown(db.gems.enable)
+				backdrop:SetShown(db.gems.enable)
 
 				gemStep = gemStep + 1
 			else
 				texture:SetTexture()
+				backdrop:Hide()
 			end
 		end
 	end
@@ -594,7 +593,7 @@ function module:CreateSlotStrings(frame, which)
 			do
 				local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
 				for u = 1, 5 do
-					slot['textureSlot'..u] = module:CreateInspectTexture(slot, point, relativePoint, x, y, u, spacing)
+					slot['textureSlot'..u], slot['textureSlotBackdrop'..u] = module:CreateInspectTexture(slot, point, relativePoint, x, y, u, spacing)
 				end
 			end
 		end
@@ -662,6 +661,26 @@ function module:UpdateInspectPageFonts(which, gems)
 	end
 end
 
+function module:ScanTooltipTextures()
+	local tt = E.ScanTooltip
+
+	if not tt.gems then
+		tt.gems = {}
+	else
+		wipe(tt.gems)
+	end
+
+	for i = 1, 5 do
+		local tex = _G['ElvUI_ScanTooltipTexture'..i]
+		local texture = tex and tex:IsShown() and tex:GetTexture()
+		if texture then
+			tt.gems[i] = texture
+		end
+	end
+
+	return tt.gems
+end
+
 function module:GetGearSlotInfo(unit, slot)
 	local tt = E.ScanTooltip
 	tt:SetOwner(_G.UIParent, 'ANCHOR_NONE')
@@ -671,7 +690,7 @@ function module:GetGearSlotInfo(unit, slot)
 	if not tt.SlotInfo then tt.SlotInfo = {} else wipe(tt.SlotInfo) end
 	local slotInfo = tt.SlotInfo
 
-	slotInfo.gems = {}
+	slotInfo.gems = module:ScanTooltipTextures()
 	-- print('1', tt.itemQualityColors)
 	-- if not tt.itemQualityColors then tt.itemQualityColors = {} else wipe(tt.itemQualityColors) end
 	-- print('2', tt.itemQualityColors)
@@ -706,28 +725,6 @@ function module:GetGearSlotInfo(unit, slot)
 		end
 
 		slotInfo.enchantTextShort = enchantTextShort or ''
-
-		local stats = GetItemStats(itemLink)
-		local gemTextureID, newValue
-		local sockets = {}
-		if stats then
-			for stat, qty in pairs(stats) do
-				if getSockets[stat] then
-					for i = 1, qty do
-						tinsert(sockets, stat)
-					end
-				end
-			end
-			for gemNum = #sockets, 1, -1 do
-				local gem, gemLink = GetItemGem(itemLink, gemNum)
-				if gem then
-					gemTextureID = select(10, GetItemInfo(gemLink))
-					slotInfo.gems[gemNum] = gemTextureID
-				else
-					slotInfo.gems[gemNum] = getSockets[sockets[gemNum]]
-				end
-			end
-		end
 	end
 
 	tt:Hide()
