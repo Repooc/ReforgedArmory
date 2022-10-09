@@ -17,7 +17,7 @@ local githubURL = 'https://github.com/Repooc/ElvUI_WrathArmory/issues'
 -- local texturePath = 'Interface\\Addons\\ElvUI_WrathArmory\\Textures\\'
 
 function module:Print(...)
-	(E.db and _G[E.db.general.messageRedirect] or _G.DEFAULT_CHAT_FRAME):AddMessage(strjoin('', '|cff16c3f2Wrath|rArmory', E.media.hexvaluecolor or '|cff16c3f2', ':|r ', ...)) -- I put DEFAULT_CHAT_FRAME as a fail safe.
+	(E.db and _G[E.db.general.messageRedirect] or _G.DEFAULT_CHAT_FRAME):AddMessage(strjoin('', '|cff16c3f2Wrath|rArmory ', E.media.hexvaluecolor or '|cff16c3f2', module.Version, ':|r ', ...)) -- I put DEFAULT_CHAT_FRAME as a fail safe.
 end
 
 local function GetOptions()
