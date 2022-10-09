@@ -763,7 +763,7 @@ end
 
 function module:Initialize()
 	EP:RegisterPlugin(AddOnName, GetOptions)
-	E:AddLib('GetEnchant', 'LibGetEnchant-1.0')
+	E:AddLib('GetEnchant', 'LibGetEnchant-1.0-WrathArmory')
 
 	module:ToggleItemLevelInfo(true)
 
