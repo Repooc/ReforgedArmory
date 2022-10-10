@@ -1,6 +1,4 @@
-v1.01 10/9/2022
+v1.02 10/10/2022
 
-• moved equip manager icon and close button for character frame
-• add missing enchants
-• shorten some enchant strings
-• add a message in chat if an item finds an enchant id but not in the database
+• renamed the lib to ensure wratharmory is using this one (will revert name back prob later... tired of getting same ticket bc no one reads other tickets)
+• updated printed msg with version number and warning tickets will be closed if missing info or duplicate ticket.
