@@ -2384,7 +2384,6 @@ LibGetEnchantDB = {
 	[3603] = "Hand-Mounted Pyro Rocket",
 	[3604] = "Hyperspeed Accelerators",
 	[3605] = "Flexweave Underlay",
-	-- [3606] = "+24 Critical Strike Rating",
 	[3606] = "Nitro Boosts",
 	[3607] = "+40 Ranged Haste",
 	[3608] = "+40 Ranged Critical Strike",
