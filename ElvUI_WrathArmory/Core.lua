@@ -720,7 +720,7 @@ function module:GetGearSlotInfo(unit, slot)
 		local enchantTextShort = E.Libs.GetEnchant.GetEnchant(enchantID)
 
 		if enchantID and not enchantTextShort then
-			local msg = format('The enchant id, *%s|r, seems to be missing from our database and the enchant won\'t be displayed properly.  Please open a ticket at |cff16c3f2[|r*|Hurl:'..githubURL..'|h'..githubURL..'|h|r|cff16c3f2]|r with the missing id and name of the enchant that found on %s.', enchantID, itemLink):gsub('*', E.InfoColor)
+			local msg = format('The enchant id, *%s|r, seems to be missing from our database. Please open a ticket at |cff16c3f2[|r*|Hurl:'..githubURL..'|h'..githubURL..'|h|r|cff16c3f2]|r with the missing id and name of the enchant that found on %s. |cffFF0000If you do not provide the info or post a duplicate ticket, it will be closed without a response.|r', enchantID, itemLink):gsub('*', E.InfoColor)
 			module:Print(msg)
 		end
 
