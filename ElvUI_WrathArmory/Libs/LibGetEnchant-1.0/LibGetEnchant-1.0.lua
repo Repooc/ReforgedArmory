@@ -3,8 +3,6 @@ assert(LibStub, MAJOR.." requires LibStub")
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 
-lib.callbacks = lib.callbacks or LibStub("CallbackHandler-1.0"):New(lib)
-
 function lib.GetEnchant(enchantID)
 	local enchant = tonumber(enchantID)
 	if lib.LibGetEnchantDB[enchant] ~= nil then
