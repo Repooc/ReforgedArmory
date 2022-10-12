@@ -8,7 +8,7 @@ lib.callbacks = lib.callbacks or LibStub("CallbackHandler-1.0"):New(lib)
 
 function lib.GetEnchant(enchantID)
 	local enchant = tonumber(enchantID)
-	if LibGetEnchantDB[enchant] ~= nil then
-		return LibGetEnchantDB[enchant]
+	if ns.LibGetEnchantDB[enchant] ~= nil then
+		return ns.LibGetEnchantDB[enchant]
 	end
 end

@@ -1,4 +1,6 @@
-LibGetEnchantDB = {
+local _, ns = ...
+
+ns.LibGetEnchantDB = {
 	[1] = "Rockbiter 3",
 	[2] = "Frostbr& 1",
 	[3] = "Flametongue 3",
