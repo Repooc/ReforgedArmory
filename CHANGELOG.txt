@@ -1,4 +1,3 @@
-v1.02 10/10/2022
+v1.03 10/12/2022
 
-• renamed the lib to ensure wratharmory is using this one (will revert name back prob later... tired of getting same ticket bc no one reads other tickets)
-• updated printed msg with version number and warning tickets will be closed if missing info or duplicate ticket.
+• ok this should fix the stupid missing engineering problem
