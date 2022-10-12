@@ -2,6 +2,6 @@
 ..\FrameXML\UI.xsd">
 	<Script file = "LibStub\LibStub.lua"/>
   	<Include file ="CallbackHandler-1.0\CallbackHandler-1.0.xml"/>
-	<Script file="LibGetEnchantDB.lua"/>
 	<Script file="LibGetEnchant-1.0.lua"/>
+	<Script file="LibGetEnchantDB.lua"/>
 </Ui>

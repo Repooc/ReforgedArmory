@@ -1,4 +1,3 @@
-local _, ns = ...
 local MAJOR, MINOR = "LibGetEnchant-1.0-WrathArmory", 3
 assert(LibStub, MAJOR.." requires LibStub")
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
@@ -8,7 +7,7 @@ lib.callbacks = lib.callbacks or LibStub("CallbackHandler-1.0"):New(lib)
 
 function lib.GetEnchant(enchantID)
 	local enchant = tonumber(enchantID)
-	if ns.LibGetEnchantDB[enchant] ~= nil then
-		return ns.LibGetEnchantDB[enchant]
+	if lib.LibGetEnchantDB[enchant] ~= nil then
+		return lib.LibGetEnchantDB[enchant]
 	end
 end
