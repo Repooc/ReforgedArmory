@@ -36,8 +36,8 @@ P.wratharmory = {
 		enable = true,
 		avgItemLevel = CopyTable(SharedFontOptions),
 		enchant = CopyTable(SharedFontOptions),
-		itemLevel = CopyTable(SharedFontOptions),
 		gems = CopyTable(SharedGemOptions),
+		itemLevel = CopyTable(SharedFontOptions),
 	},
 	inspect = {
 		enable = true,
@@ -65,6 +65,7 @@ P.wratharmory.character.avgItemLevel.yOffset = -35
 P.wratharmory.character.enchant.mouseover = false --! NYI
 P.wratharmory.character.enchant.color = {r = 0, g = 0.99, b = 0}
 P.wratharmory.character.enchant.qualityColor = false
+P.wratharmory.character.enchant.fontSize = 13
 P.wratharmory.character.enchant.xOffset = 1
 P.wratharmory.character.enchant.yOffset = -2
 P.wratharmory.character.enchant.MainHandSlot = {
@@ -92,6 +93,7 @@ P.wratharmory.inspect.avgItemLevel.yOffset = -50
 P.wratharmory.inspect.enchant.mouseover = false --! NYI
 P.wratharmory.inspect.enchant.color = {r = 0, g = 0.99, b = 0}
 P.wratharmory.inspect.enchant.qualityColor = false
+P.wratharmory.inspect.enchant.fontSize = 13
 P.wratharmory.inspect.enchant.xOffset = 1
 P.wratharmory.inspect.enchant.yOffset = -2
 P.wratharmory.inspect.enchant.MainHandSlot = {

@@ -8,13 +8,24 @@ local function actionSubGroup(info, ...)
 	local updateGems = (info[#info-1] == 'gems') or (info[#info-2] == 'gems')
 
 	if info.type == 'color' then
-		local color = E.db.wratharmory[info[#info-2]][info[#info-1]][info[#info]]
-		local r, g, b, a = ...
-		if r then
-			color.r, color.g, color.b, color.a = r, g, b, a
-		else
-			local d = P.wratharmory[info[#info-2]][info[#info-1]][info[#info]]
-			return color.r, color.g, color.b, color.a, d.r, d.g, d.b, d.a
+		if info[#info-2] == 'character' or info[#info-2] == 'inspect' then
+			local color = E.db.wratharmory[info[#info-2]][info[#info-1]][info[#info]]
+			local r, g, b, a = ...
+			if r then
+				color.r, color.g, color.b, color.a = r, g, b, a
+			else
+				local d = P.wratharmory[info[#info-2]][info[#info-1]][info[#info]]
+				return color.r, color.g, color.b, color.a, d.r, d.g, d.b, d.a
+			end
+		elseif info[#info-3] == 'character' or info[#info-3] == 'inspect' then
+			local color = E.db.wratharmory[info[#info-3]][info[#info-2]][info[#info-1]][info[#info]]
+			local r, g, b, a = ...
+			if r then
+				color.r, color.g, color.b, color.a = r, g, b, a
+			else
+				local d = P.wratharmory[info[#info-3]][info[#info-2]][info[#info-1]][info[#info]]
+				return color.r, color.g, color.b, color.a, d.r, d.g, d.b, d.a
+			end
 		end
 	else
 		local value = ...

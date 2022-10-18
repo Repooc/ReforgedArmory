@@ -553,10 +553,6 @@ function module:CreateStatsPane()
 		_G['PlayerStatFrameLeft'..i]:Width(isSkinned and 150 or 170)
 		_G['PlayerStatFrameRight'..i]:Width(isSkinned and 150 or 170)
 	end
-
-
-
-
 end
 
 function module:CreateSlotStrings(frame, which)
@@ -584,6 +580,7 @@ function module:CreateSlotStrings(frame, which)
 
 			slot.enchantText = slot:CreateFontString(nil, 'OVERLAY')
 			slot.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
+
 			do
 				local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
 				slot.enchantText:ClearAllPoints()
