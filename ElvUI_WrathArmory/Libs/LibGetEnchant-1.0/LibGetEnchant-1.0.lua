@@ -5,7 +5,7 @@ if not lib then return end
 
 function lib.GetEnchant(enchantID)
 	local enchant = tonumber(enchantID)
-	if lib.LibGetEnchantDB[enchant] ~= nil then
+	if lib.LibGetEnchantDB[enchant] then
 		return lib.LibGetEnchantDB[enchant]
 	end
 end
