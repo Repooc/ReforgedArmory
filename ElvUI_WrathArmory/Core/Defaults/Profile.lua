@@ -48,8 +48,8 @@ P.wratharmory = {
 	},
 }
 
---* Character
--- Unit Avg Item Level
+--! Character
+--* Unit Avg Item Level
 P.wratharmory.character.avgItemLevel.background = {
 	spacing = 0,
 	color = {r = 0.99, g = 0.81, b = 0},
@@ -61,7 +61,7 @@ P.wratharmory.inspect.avgItemLevel.background = {
 P.wratharmory.character.avgItemLevel.fontSize = 25
 P.wratharmory.character.avgItemLevel.yOffset = -35
 
--- Enchant
+--* Enchant
 P.wratharmory.character.enchant.mouseover = false --! NYI
 P.wratharmory.character.enchant.color = {r = 0, g = 0.99, b = 0}
 P.wratharmory.character.enchant.qualityColor = false
@@ -87,15 +87,15 @@ P.wratharmory.character.enchant.RangedSlot = {
 	growthDirection = 'UP_RIGHT',
 }
 
--- Item Level
+--* Item Level
 P.wratharmory.character.itemLevel.qualityColor = true
 
---* Inspect
--- Unit Avg Item Level
+--! Inspect
+--* Unit Avg Item Level
 P.wratharmory.inspect.avgItemLevel.fontSize = 15
 P.wratharmory.inspect.avgItemLevel.yOffset = -50
 
--- Enchant
+--* Enchant
 P.wratharmory.inspect.enchant.mouseover = false --! NYI
 P.wratharmory.inspect.enchant.color = {r = 0, g = 0.99, b = 0}
 P.wratharmory.inspect.enchant.qualityColor = false
@@ -121,5 +121,5 @@ P.wratharmory.inspect.enchant.RangedSlot = {
 	growthDirection = 'UP_RIGHT',
 }
 
--- Item Level
+--* Item Level
 P.wratharmory.inspect.itemLevel.qualityColor = true
