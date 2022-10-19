@@ -1,4 +1,4 @@
-local E = unpack(ElvUI)
+local E, L = unpack(ElvUI)
 local S = E:GetModule('Skins')
 local EP = LibStub('LibElvUIPlugin-1.0')
 local LSM = E.Libs.LSM
@@ -12,10 +12,56 @@ module.Title = GetAddOnMetadata('ElvUI_WrathArmory', 'Title')
 module.CleanTitle = GetAddOnMetadata('ElvUI_WrathArmory', 'X-CleanTitle')
 module.Version = GetAddOnMetadata('ElvUI_WrathArmory', 'Version')
 module.Configs = {}
-local githubURL = 'https://github.com/Repooc/ElvUI_WrathArmory/issues'
+module.Values = {
+	SIDE_SLOTS_ANCHORPOINTS = {
+		BOTTOM = 'BOTTOM',
+		BOTTOMOUTSIDE = 'BOTTOMLEFT',
+		BOTTOMINSIDE = 'BOTTOMRIGHT',
+		CENTER = 'CENTER',
+		OUTSIDE = 'LEFT',
+		INSIDE = 'RIGHT',
+		TOP = 'TOP',
+		TOPOUTSIDE = 'TOPLEFT',
+		TOPINSIDE = 'TOPRIGHT',
+	},
+	MIRROR_ANCHORPOINT = {
+		BOTTOM = 'BOTTOM',
+		BOTTOMLEFT = 'BOTTOMRIGHT',
+		BOTTOMRIGHT = 'BOTTOMLEFT',
+		CENTER = 'CENTER',
+		LEFT = 'RIGHT',
+		RIGHT = 'LEFT',
+		TOP = 'TOP',
+		TOPLEFT = 'TOPRIGHT',
+		TOPRIGHT = 'TOPLEFT',
+	},
+	AllPoints = {
+		BOTTOM = 'BOTTOM',
+		BOTTOMOUTSIDE = 'BOTTOMOUTSIDE',
+		BOTTOMINSIDE = 'BOTTOMINSIDE',
+		CENTER = 'CENTER',
+		OUTSIDE = 'LEFT',
+		INSIDE = 'RIGHT',
+		TOP = 'TOP',
+		TOPOUTSIDE = 'TOPOUTSIDE',
+		TOPINSIDE = 'TOPINSIDE',
+	},
+	GrowthDirection = {
+		DOWN_INSIDE = format(L["%s and then %s"], L["Down"], L["Inside"]),
+		DOWN_OUTSIDE = format(L["%s and then %s"], L["Down"], L["Outside"]),
+		UP_INSIDE = format(L["%s and then %s"], L["Up"], L["Inside"]),
+		UP_OUTSIDE = format(L["%s and then %s"], L["Up"], L["Outside"]),
+		INSIDE_DOWN = format(L["%s and then %s"], L["Inside"], L["Down"]),
+		INSIDE_UP = format(L["%s and then %s"], L["Inside"], L["Up"]),
+		OUTSIDE_DOWN = format(L["%s and then %s"], L["Outside"], L["Down"]),
+		OUTSIDE_UP = format(L["%s and then %s"], L["Outside"], L["Up"]),
+	},
+}
+
 
 -- local texturePath = 'Interface\\Addons\\ElvUI_WrathArmory\\Textures\\'
 
+local githubURL = 'https://github.com/Repooc/ElvUI_WrathArmory/issues'
 function module:Print(...)
 	(E.db and _G[E.db.general.messageRedirect] or _G.DEFAULT_CHAT_FRAME):AddMessage(strjoin('', '|cff16c3f2Wrath|rArmory ', E.media.hexvaluecolor or '|cff16c3f2', module.Version, ':|r ', ...)) -- I put DEFAULT_CHAT_FRAME as a fail safe.
 end
@@ -110,6 +156,29 @@ function module:GetGemPoints(id, db)
 	end
 end
 
+local SIDE_SLOTS_DIRECTION_TO_POINT = {
+	LEFT = {
+		DOWN_INSIDE = 'TOPLEFT',
+		DOWN_OUTSIDE = 'TOPRIGHT',
+		UP_INSIDE = 'BOTTOMLEFT',
+		UP_OUTSIDE = 'BOTTOMRIGHT',
+		INSIDE_DOWN = 'TOPLEFT',
+		INSIDE_UP = 'BOTTOMLEFT',
+		OUTSIDE_DOWN = 'TOPRIGHT',
+		OUTSIDE_UP = 'BOTTOMRIGHT',
+	},
+	RIGHT = {
+		DOWN_INSIDE = 'TOPRIGHT',
+		DOWN_OUTSIDE = 'TOPLEFT',
+		UP_INSIDE = 'BOTTOMRIGHT',
+		UP_OUTSIDE = 'BOTTOMLEFT',
+		INSIDE_DOWN = 'TOPRIGHT',
+		INSIDE_UP = 'BOTTOMRIGHT',
+		OUTSIDE_DOWN = 'TOPLEFT',
+		OUTSIDE_UP = 'BOTTOMLEFT',
+	},
+}
+
 function module:GetEnchantPoints(id, db)
 	if not id or not db then return end
 	local x, y = db.enchant.xOffset, db.enchant.yOffset
@@ -120,9 +189,9 @@ function module:GetEnchantPoints(id, db)
 	local RangedSlot = db.enchant.RangedSlot
 
 	if id <= 5 or (id == 9 or id == 15) then --* Left Side
-		return 'TOPLEFT', 'TOPRIGHT', x, y, spacing
+		return SIDE_SLOTS_DIRECTION_TO_POINT['LEFT'][db.enchant.growthDirection], module.Values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint], x, y, spacing
 	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then --* Right Side
-		return 'TOPRIGHT', 'TOPLEFT', -x, y, -spacing
+		return SIDE_SLOTS_DIRECTION_TO_POINT['RIGHT'][db.enchant.growthDirection], module.Values.MIRROR_ANCHORPOINT[module.Values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint]], -x, y, -spacing
 	elseif id == 16 then --* MainHandSlot
 		return DIRECTION_TO_POINT[MainHandSlot.growthDirection], MainHandSlot.anchorPoint, MainHandSlot.xOffset, MainHandSlot.yOffset, -spacing
 	elseif id == 17 then --* SecondaryHandSlot
@@ -285,7 +354,6 @@ function module:CalculateAverageItemLevel(iLevelDB, unit)
 	local isOK, total, link = true, 0
 
 	if not spec or spec == 0 then
-		-- print('1')
 		isOK = false
 	end
 
@@ -298,7 +366,6 @@ function module:CalculateAverageItemLevel(iLevelDB, unit)
 				total = total + cur
 			end
 		elseif GetInventoryItemTexture(unit, id) then
-			-- print('2')
 			isOK = false
 		end
 	end
@@ -311,7 +378,6 @@ function module:CalculateAverageItemLevel(iLevelDB, unit)
 		_, _, mainQuality, _, _, _, _, _, _, _, _, _, mainItemSubClass = GetItemInfo(link)
 	elseif GetInventoryItemTexture(unit, 16) then
 		isOK = false
-		-- print('3')
 	end
 
 	-- Off hand
@@ -322,7 +388,6 @@ function module:CalculateAverageItemLevel(iLevelDB, unit)
 		_, _, _, _, _, _, _, _, offEquipLoc = GetItemInfo(link)
 	elseif GetInventoryItemTexture(unit, 17) then
 		isOK = false
-		-- print('4')
 	end
 
 	if mainItemLevel and offItemLevel then
