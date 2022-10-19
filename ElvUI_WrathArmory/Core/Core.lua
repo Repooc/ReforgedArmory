@@ -126,7 +126,7 @@ function module:GetEnchantPoints(id, db)
 	elseif id == 16 then --* MainHandSlot
 		return DIRECTION_TO_POINT[MainHandSlot.growthDirection], MainHandSlot.anchorPoint, MainHandSlot.xOffset, MainHandSlot.yOffset, -spacing
 	elseif id == 17 then --* SecondaryHandSlot
-		return 'TOP', 'BOTTOM', SecondaryHandSlot.xOffset, SecondaryHandSlot.yOffset, -spacing
+		return DIRECTION_TO_POINT[SecondaryHandSlot.growthDirection], SecondaryHandSlot.anchorPoint, SecondaryHandSlot.xOffset, SecondaryHandSlot.yOffset, -spacing
 	else --* RangedSlot
 		return DIRECTION_TO_POINT[RangedSlot.growthDirection], RangedSlot.anchorPoint, RangedSlot.xOffset, RangedSlot.yOffset, spacing
 	end

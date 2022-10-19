@@ -70,13 +70,13 @@ P.wratharmory.character.enchant.xOffset = 1
 P.wratharmory.character.enchant.yOffset = -2
 P.wratharmory.character.enchant.MainHandSlot = {
 	xOffset = -1,
-	yOffset = -9,
+	yOffset = -2,
 	anchorPoint = 'BOTTOMRIGHT',
 	growthDirection = 'DOWN_LEFT',
 }
 P.wratharmory.character.enchant.SecondaryHandSlot = {
-	xOffset = -2,
-	yOffset = 0,
+	xOffset = 0,
+	yOffset = -2,
 	anchorPoint = 'BOTTOMLEFT',
 	growthDirection = 'DOWN_RIGHT',
 }
@@ -104,15 +104,21 @@ P.wratharmory.inspect.enchant.xOffset = 1
 P.wratharmory.inspect.enchant.yOffset = -2
 P.wratharmory.inspect.enchant.MainHandSlot = {
 	xOffset = -1,
-	yOffset = -9,
+	yOffset = -2,
+	anchorPoint = 'BOTTOMRIGHT',
+	growthDirection = 'DOWN_LEFT',
 }
 P.wratharmory.inspect.enchant.SecondaryHandSlot = {
 	xOffset = 0,
 	yOffset = -2,
+	anchorPoint = 'BOTTOMLEFT',
+	growthDirection = 'DOWN_RIGHT',
 }
 P.wratharmory.inspect.enchant.RangedSlot = {
 	xOffset = 2,
 	yOffset = 0,
+	anchorPoint = 'BOTTOMRIGHT',
+	growthDirection = 'UP_RIGHT',
 }
 
 -- Item Level
