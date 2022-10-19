@@ -60,6 +60,17 @@ local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
 }
 
+local DIRECTION_TO_POINT = {
+	DOWN_RIGHT = 'TOPLEFT',
+	DOWN_LEFT = 'TOPRIGHT',
+	UP_RIGHT = 'BOTTOMLEFT',
+	UP_LEFT = 'BOTTOMRIGHT',
+	RIGHT_DOWN = 'TOPLEFT',
+	RIGHT_UP = 'BOTTOMLEFT',
+	LEFT_DOWN = 'TOPRIGHT',
+	LEFT_UP = 'BOTTOMRIGHT',
+}
+
 function module:CreateInspectTexture(slot, point, relativePoint, x, y, gemStep, spacing)
 	local prevGem = gemStep - 1
 	local texture = slot:CreateTexture()
@@ -102,22 +113,22 @@ end
 function module:GetEnchantPoints(id, db)
 	if not id or not db then return end
 	local x, y = db.enchant.xOffset, db.enchant.yOffset
-	local mhX, mhY = db.enchant.MainHandSlot.xOffset, db.enchant.MainHandSlot.yOffset
-	local ohX, ohY = db.enchant.SecondaryHandSlot.xOffset, db.enchant.SecondaryHandSlot.yOffset
-	local rX, rY = db.enchant.RangedSlot.xOffset, db.enchant.RangedSlot.yOffset
+
+	local MainHandSlot = db.enchant.MainHandSlot
+	local SecondaryHandSlot = db.enchant.SecondaryHandSlot
+	local RangedSlot = db.enchant.RangedSlot
 	local spacing = db.enchant.spacing or 0
-	-- Returns point, relativeFrame, relativePoint, x, y
 
 	if id <= 5 or (id == 9 or id == 15) then --* Left Side
 		return 'TOPLEFT', 'TOPRIGHT', x, y, spacing
 	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then --* Right Side
 		return 'TOPRIGHT', 'TOPLEFT', -x, y, -spacing
 	elseif id == 16 then --* MainHandSlot
-		return 'TOPRIGHT', 'TOPLEFT', mhX, mhY, -spacing
+		return DIRECTION_TO_POINT[MainHandSlot.growthDirection], MainHandSlot.anchorPoint, MainHandSlot.xOffset, MainHandSlot.yOffset, -spacing
 	elseif id == 17 then --* SecondaryHandSlot
-		return 'TOP', 'BOTTOM', ohX, ohY, -spacing
+		return 'TOP', 'BOTTOM', SecondaryHandSlot.xOffset, SecondaryHandSlot.yOffset, -spacing
 	else --* RangedSlot
-		return 'TOPLEFT', 'TOPRIGHT', rX, rY, spacing
+		return DIRECTION_TO_POINT[RangedSlot.growthDirection], RangedSlot.anchorPoint, RangedSlot.xOffset, RangedSlot.yOffset, spacing
 	end
 end
 

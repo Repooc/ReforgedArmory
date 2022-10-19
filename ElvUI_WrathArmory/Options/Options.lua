@@ -73,16 +73,22 @@ local function GetOptionsTable_FontGroup(name, groupName)
 		config.args.MainHandSlot = MainHandSlot
 		MainHandSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 		MainHandSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
+		MainHandSlot.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 8, C.Values.Anchors) --! Change terminology to reference slot instead of frame?
+		MainHandSlot.args.growthDirection = ACH:Select(L["Growth Direction"], nil, 9, C.Values.GrowthDirection)
 
 		local SecondaryHandSlot = ACH:Group(L["Secondary Hand Slot"], nil, 11, nil, actionSubGroup, actionSubGroup)
 		config.args.SecondaryHandSlot = SecondaryHandSlot
 		SecondaryHandSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 		SecondaryHandSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
+		SecondaryHandSlot.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 8, C.Values.Anchors) --! Change terminology to reference slot instead of frame?
+		SecondaryHandSlot.args.growthDirection = ACH:Select(L["Growth Direction"], nil, 9, C.Values.GrowthDirection)
 
 		local RangedSlot = ACH:Group(L["Ranged Slot"], nil, 12, nil, actionSubGroup, actionSubGroup)
 		config.args.RangedSlot = RangedSlot
 		RangedSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 		RangedSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
+		RangedSlot.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 8, C.Values.Anchors) --! Change terminology to reference slot instead of frame?
+		RangedSlot.args.growthDirection = ACH:Select(L["Growth Direction"], nil, 9, C.Values.GrowthDirection)
 	end
 
 	return config

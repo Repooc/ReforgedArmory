@@ -71,14 +71,20 @@ P.wratharmory.character.enchant.yOffset = -2
 P.wratharmory.character.enchant.MainHandSlot = {
 	xOffset = -1,
 	yOffset = -9,
+	anchorPoint = 'BOTTOMRIGHT',
+	growthDirection = 'DOWN_LEFT',
 }
 P.wratharmory.character.enchant.SecondaryHandSlot = {
 	xOffset = -2,
 	yOffset = 0,
+	anchorPoint = 'BOTTOMLEFT',
+	growthDirection = 'DOWN_RIGHT',
 }
 P.wratharmory.character.enchant.RangedSlot = {
 	xOffset = 2,
 	yOffset = 0,
+	anchorPoint = 'BOTTOMRIGHT',
+	growthDirection = 'UP_RIGHT',
 }
 
 -- Item Level
