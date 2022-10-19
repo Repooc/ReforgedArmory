@@ -1,3 +1,7 @@
-v1.03 10/12/2022
+v1.04 10/19/2022
 
-• ok this should fix the stupid missing engineering problem
+• Reorganized the project files!!! Delete the old ElvUI_WrathArmory folder and replace... do not override!!!
+• Enchant Strings
+    • Growth Direction option to help determine which way the text should expand
+    • Anchor Point option helps determine the starting location of the enchant text you want base on the slots points
+• LibGetEnchant clean up
