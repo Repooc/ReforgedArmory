@@ -113,11 +113,11 @@ end
 function module:GetEnchantPoints(id, db)
 	if not id or not db then return end
 	local x, y = db.enchant.xOffset, db.enchant.yOffset
+	local spacing = db.enchant.spacing or 0
 
 	local MainHandSlot = db.enchant.MainHandSlot
 	local SecondaryHandSlot = db.enchant.SecondaryHandSlot
 	local RangedSlot = db.enchant.RangedSlot
-	local spacing = db.enchant.spacing or 0
 
 	if id <= 5 or (id == 9 or id == 15) then --* Left Side
 		return 'TOPLEFT', 'TOPRIGHT', x, y, spacing
