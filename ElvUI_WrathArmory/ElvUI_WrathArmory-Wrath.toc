@@ -9,5 +9,6 @@
 ## X-Wago-ID: e56nlmG9
 
 Libs\Load_Libs.xml
+init.lua
 Core\Load_Core.xml
 Options\Load_Options.xml

@@ -1,18 +1,10 @@
 local E, L = unpack(ElvUI)
+local module = E:GetModule('ElvUI_WrathArmory')
 local S = E:GetModule('Skins')
-local EP = LibStub('LibElvUIPlugin-1.0')
 local LSM = E.Libs.LSM
 local LCS = E.Libs.LCS
-local AddOnName, Engine = ...
 
-local module = E:NewModule(AddOnName, 'AceHook-3.0', 'AceEvent-3.0')
-_G[AddOnName] = Engine
-
-module.Title = GetAddOnMetadata('ElvUI_WrathArmory', 'Title')
-module.CleanTitle = GetAddOnMetadata('ElvUI_WrathArmory', 'X-CleanTitle')
-module.Version = GetAddOnMetadata('ElvUI_WrathArmory', 'Version')
-module.Configs = {}
-module.Values = {
+local values = {
 	SIDE_SLOTS_ANCHORPOINTS = {
 		BOTTOM = 'BOTTOM',
 		BOTTOMOUTSIDE = 'BOTTOMLEFT',
@@ -35,72 +27,12 @@ module.Values = {
 		TOPLEFT = 'TOPRIGHT',
 		TOPRIGHT = 'TOPLEFT',
 	},
-	AllPoints = {
-		BOTTOM = 'BOTTOM',
-		BOTTOMOUTSIDE = 'BOTTOMOUTSIDE',
-		BOTTOMINSIDE = 'BOTTOMINSIDE',
-		CENTER = 'CENTER',
-		OUTSIDE = 'LEFT',
-		INSIDE = 'RIGHT',
-		TOP = 'TOP',
-		TOPOUTSIDE = 'TOPOUTSIDE',
-		TOPINSIDE = 'TOPINSIDE',
-	},
-	GrowthDirection = {
-		DOWN_INSIDE = format(L["%s and then %s"], L["Down"], L["Inside"]),
-		DOWN_OUTSIDE = format(L["%s and then %s"], L["Down"], L["Outside"]),
-		UP_INSIDE = format(L["%s and then %s"], L["Up"], L["Inside"]),
-		UP_OUTSIDE = format(L["%s and then %s"], L["Up"], L["Outside"]),
-		INSIDE_DOWN = format(L["%s and then %s"], L["Inside"], L["Down"]),
-		INSIDE_UP = format(L["%s and then %s"], L["Inside"], L["Up"]),
-		OUTSIDE_DOWN = format(L["%s and then %s"], L["Outside"], L["Down"]),
-		OUTSIDE_UP = format(L["%s and then %s"], L["Outside"], L["Up"]),
-	},
 }
-
-
--- local texturePath = 'Interface\\Addons\\ElvUI_WrathArmory\\Textures\\'
 
 local githubURL = 'https://github.com/Repooc/ElvUI_WrathArmory/issues'
-function module:Print(...)
-	(E.db and _G[E.db.general.messageRedirect] or _G.DEFAULT_CHAT_FRAME):AddMessage(strjoin('', '|cff16c3f2Wrath|rArmory ', E.media.hexvaluecolor or '|cff16c3f2', module.Version, ':|r ', ...)) -- I put DEFAULT_CHAT_FRAME as a fail safe.
-end
 
-local function GetOptions()
-	for _, func in pairs(module.Configs) do
-		func()
-	end
-end
 
-function module:UpdateOptions(unit, updateGems)
-	if unit then
-		module:UpdateInspectPageFonts(unit, updateGems)
-	else
-		module:UpdateInspectPageFonts('Character')
-		module:UpdateInspectPageFonts('Inspect')
-	end
 end
-
-local InspectItems = {
-	'HeadSlot',			--1L
-	'NeckSlot',			--2L
-	'ShoulderSlot',		--3L
-	'',					--4
-	'ChestSlot',		--5L
-	'WaistSlot',		--6R
-	'LegsSlot',			--7R
-	'FeetSlot',			--8R
-	'WristSlot',		--9L
-	'HandsSlot',		--10R
-	'Finger0Slot',		--11R
-	'Finger1Slot',		--12R
-	'Trinket0Slot',		--13R
-	'Trinket1Slot',		--14R
-	'BackSlot',			--15L
-	'MainHandSlot',		--16
-	'SecondaryHandSlot',--17
-	'RangedSlot',		--18
-}
 
 local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
@@ -120,7 +52,6 @@ local DIRECTION_TO_POINT = {
 function module:CreateInspectTexture(slot, point, relativePoint, x, y, gemStep, spacing)
 	local prevGem = gemStep - 1
 	local texture = slot:CreateTexture()
-	-- texture:Point(point, (gemStep == 1 and slot) or slot['textureSlot'..(prevGem)], relativePoint, gemStep == 1 and x or 25, y)
 	texture:Point(point, (gemStep == 1 and slot) or slot['textureSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
 	texture:SetTexCoord(unpack(E.TexCoords))
 	texture:Size(14)
@@ -136,22 +67,20 @@ end
 
 function module:GetGemPoints(id, db)
 	if not id or not db then return end
-	local x, y = db.gems.xOffset, db.gems.yOffset
+	local x, y, spacing = db.gems.xOffset, db.gems.yOffset, db.gems.spacing
 	local mhX, mhY = db.gems.MainHandSlot.xOffset, db.gems.MainHandSlot.yOffset
 	local ohX, ohY = db.gems.SecondaryHandSlot.xOffset, db.gems.SecondaryHandSlot.yOffset
 	local rX, rY = db.gems.RangedSlot.xOffset, db.gems.RangedSlot.yOffset
-	local spacing = db.gems.spacing
-	-- Returns point, relativeFrame, relativePoint, x, y
 
-	if id <= 5 or (id == 9 or id == 15) then --* Left Side
+	if id <= 5 or (id == 9 or id == 15) then						--* Left Side
 		return 'BOTTOMLEFT', 'BOTTOMRIGHT', x, y, spacing
-	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then --* Right Side
+	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
 		return 'BOTTOMRIGHT', 'BOTTOMLEFT', -x, y, -spacing
-	elseif id == 16 then --* MainHandSlot
+	elseif id == 16 then											--* MainHandSlot
 		return 'BOTTOMRIGHT', 'BOTTOMLEFT', mhX, mhY, -spacing
-	elseif id == 17 then --* SecondaryHandSlot
+	elseif id == 17 then											--* SecondaryHandSlot
 		return 'BOTTOMRIGHT', 'TOPRIGHT', ohX, ohY, -spacing
-	else --* RangedSlot
+	else															--* RangedSlot
 		return 'BOTTOMLEFT', 'BOTTOMRIGHT', rX, rY, spacing
 	end
 end
@@ -188,15 +117,15 @@ function module:GetEnchantPoints(id, db)
 	local SecondaryHandSlot = db.enchant.SecondaryHandSlot
 	local RangedSlot = db.enchant.RangedSlot
 
-	if id <= 5 or (id == 9 or id == 15) then --* Left Side
-		return SIDE_SLOTS_DIRECTION_TO_POINT['LEFT'][db.enchant.growthDirection], module.Values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint], x, y, spacing
-	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then --* Right Side
-		return SIDE_SLOTS_DIRECTION_TO_POINT['RIGHT'][db.enchant.growthDirection], module.Values.MIRROR_ANCHORPOINT[module.Values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint]], -x, y, -spacing
-	elseif id == 16 then --* MainHandSlot
+	if id <= 5 or (id == 9 or id == 15) then						--* Left Side
+		return SIDE_SLOTS_DIRECTION_TO_POINT['LEFT'][db.enchant.growthDirection], values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint], x, y, spacing
+	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
+		return SIDE_SLOTS_DIRECTION_TO_POINT['RIGHT'][db.enchant.growthDirection], values.MIRROR_ANCHORPOINT[values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint]], -x, y, -spacing
+	elseif id == 16 then											--* MainHandSlot
 		return DIRECTION_TO_POINT[MainHandSlot.growthDirection], MainHandSlot.anchorPoint, MainHandSlot.xOffset, MainHandSlot.yOffset, -spacing
-	elseif id == 17 then --* SecondaryHandSlot
+	elseif id == 17 then											--* SecondaryHandSlot
 		return DIRECTION_TO_POINT[SecondaryHandSlot.growthDirection], SecondaryHandSlot.anchorPoint, SecondaryHandSlot.xOffset, SecondaryHandSlot.yOffset, -spacing
-	else --* RangedSlot
+	else															--* RangedSlot
 		return DIRECTION_TO_POINT[RangedSlot.growthDirection], RangedSlot.anchorPoint, RangedSlot.xOffset, RangedSlot.yOffset, spacing
 	end
 end
@@ -228,16 +157,15 @@ function module:ClearPageInfo(frame, which)
 	if not frame or not which then return end
 	frame.ItemLevelText:SetText('')
 
-	for i = 1, 18 do
-		if i ~= 4 then
-			local inspectItem = _G[which..InspectItems[i]]
-			inspectItem.enchantText:SetText('')
-			inspectItem.iLvlText:SetText('')
+	for slot in pairs(module.GearList) do
+		local inspectItem = _G[which..slot]
 
-			for y = 1, 10 do
-				inspectItem['textureSlot'..y]:SetTexture()
-				inspectItem['textureSlotBackdrop'..y]:Hide()
-			end
+		inspectItem.enchantText:SetText('')
+		inspectItem.iLvlText:SetText('')
+
+		for y = 1, 10 do
+		inspectItem['textureSlot'..y]:SetTexture()
+		inspectItem['textureSlotBackdrop'..y]:Hide()
 		end
 	end
 end
@@ -457,20 +385,18 @@ do
 		wipe(iLevelDB)
 
 		local waitForItems
-		for i = 1, 18 do
-			if i ~= 4 then
-				local inspectItem = _G[which..InspectItems[i]]
-				inspectItem.enchantText:SetText('')
-				inspectItem.iLvlText:SetText('')
+		for slot, info in pairs(module.GearList) do
+			local inspectItem = _G[which..slot]
+			inspectItem.enchantText:SetText('')
+			inspectItem.iLvlText:SetText('')
 
-				local unit = (which == 'Character' and 'player') or frame.unit
-				local slotInfo = module:GetGearSlotInfo(unit, i)
-				if slotInfo == 'tooSoon' then
-					if not waitForItems then waitForItems = true end
-					module:TryGearAgain(frame, which, i, iLevelDB, inspectItem)
-				else
-					module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
-				end
+			local unit = (which == 'Character' and 'player') or frame.unit
+			local slotInfo = module:GetGearSlotInfo(unit, info.slotID)
+			if slotInfo == 'tooSoon' then
+				if not waitForItems then waitForItems = true end
+				module:TryGearAgain(frame, which, info.slotID, iLevelDB, inspectItem)
+			else
+				module:UpdatePageStrings(info.slotID, iLevelDB, inspectItem, slotInfo, which)
 			end
 		end
 
@@ -645,29 +571,25 @@ function module:CreateSlotStrings(frame, which)
 	else
 		module:CreateStatsPane()
 	end
+	for slotName, info in pairs(module.GearList) do
+		local slot = _G[which..slotName]
+		slot.iLvlText = slot:CreateFontString(nil, 'OVERLAY')
+		slot.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
+		slot.iLvlText:Point('BOTTOM', slot, itemLevel.xOffset, itemLevel.yOffset)
 
-	for i, s in pairs(InspectItems) do
-		if i ~= 4 then
-			local slot = _G[which..s]
+		slot.enchantText = slot:CreateFontString(nil, 'OVERLAY')
+		slot.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
 
-			slot.iLvlText = slot:CreateFontString(nil, 'OVERLAY')
-			slot.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
-			slot.iLvlText:Point('BOTTOM', slot, itemLevel.xOffset, itemLevel.yOffset)
+		do
+			local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
+			slot.enchantText:ClearAllPoints()
+			slot.enchantText:Point(point, slot, relativePoint, x, y)
+		end
 
-			slot.enchantText = slot:CreateFontString(nil, 'OVERLAY')
-			slot.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
-
-			do
-				local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
-				slot.enchantText:ClearAllPoints()
-				slot.enchantText:Point(point, slot, relativePoint, x, y)
-			end
-
-			do
-				local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
-				for u = 1, 5 do
-					slot['textureSlot'..u], slot['textureSlotBackdrop'..u] = module:CreateInspectTexture(slot, point, relativePoint, x, y, u, spacing)
-				end
+		do
+			local point, relativePoint, x, y, spacing = module:GetGemPoints(info.slotID, db)
+			for u = 1, 5 do
+				slot['textureSlot'..u], slot['textureSlotBackdrop'..u] = module:CreateInspectTexture(slot, point, relativePoint, x, y, u, spacing)
 			end
 		end
 	end
@@ -695,37 +617,35 @@ function module:UpdateInspectPageFonts(which, gems)
 
 	local slot, quality, iLvlTextColor, enchantTextColor
 	local qualityColor = {}
-	for i, s in pairs(InspectItems) do
-		if i ~= 4 then
-			slot = _G[which..s]
-			if slot then
-				quality = GetInventoryItemQuality(unit, i)
-				if quality then
-					qualityColor.r, qualityColor.g, qualityColor.b = GetItemQualityColor(quality)
-				end
-
-				slot.iLvlText:ClearAllPoints()
-				slot.iLvlText:Point('BOTTOM', slot, itemLevel.xOffset, itemLevel.yOffset)
-				slot.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
-				iLvlTextColor = (itemLevel.qualityColor and qualityColor) or itemLevel.color
-				if iLvlTextColor and next(iLvlTextColor) then
-					slot.iLvlText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
-				end
-				slot.iLvlText:SetShown(itemLevel.enable)
-
-				do
-					local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
-					slot.enchantText:ClearAllPoints()
-					slot.enchantText:Point(point, slot, relativePoint, x, y)
-				end
-
-				slot.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
-				enchantTextColor = (enchant.qualityColor and qualityColor) or enchant.color
-				if enchantTextColor and next(enchantTextColor) then
-					slot.enchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
-				end
-				slot.enchantText:SetShown(enchant.enable)
+	for slotName, info in pairs(module.GearList) do
+		slot = _G[which..slotName]
+		if slot then
+			quality = GetInventoryItemQuality(unit, info.slotID)
+			if quality then
+				qualityColor.r, qualityColor.g, qualityColor.b = GetItemQualityColor(quality)
 			end
+
+			slot.iLvlText:ClearAllPoints()
+			slot.iLvlText:Point('BOTTOM', slot, itemLevel.xOffset, itemLevel.yOffset)
+			slot.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
+			iLvlTextColor = (itemLevel.qualityColor and qualityColor) or itemLevel.color
+			if iLvlTextColor and next(iLvlTextColor) then
+				slot.iLvlText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
+			end
+			slot.iLvlText:SetShown(itemLevel.enable)
+
+			do
+				local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
+				slot.enchantText:ClearAllPoints()
+				slot.enchantText:Point(point, slot, relativePoint, x, y)
+			end
+
+			slot.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
+			enchantTextColor = (enchant.qualityColor and qualityColor) or enchant.color
+			if enchantTextColor and next(enchantTextColor) then
+				slot.enchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
+			end
+			slot.enchantText:SetShown(enchant.enable)
 		end
 	end
 
@@ -762,13 +682,9 @@ function module:GetGearSlotInfo(unit, slot)
 
 	if not tt.SlotInfo then tt.SlotInfo = {} else wipe(tt.SlotInfo) end
 	local slotInfo = tt.SlotInfo
+	local itemLink = GetInventoryItemLink(unit, slot)
 
 	slotInfo.gems = module:ScanTooltipTextures()
-	-- print('1', tt.itemQualityColors)
-	-- if not tt.itemQualityColors then tt.itemQualityColors = {} else wipe(tt.itemQualityColors) end
-	-- print('2', tt.itemQualityColors)
-
-	-- slotInfo.itemQualityColors = tt.itemQualityColors
 	slotInfo.itemQualityColors = slotInfo.itemQualityColors or {}
 
 	for x = 1, tt:NumLines() do
@@ -780,8 +696,6 @@ function module:GetGearSlotInfo(unit, slot)
 			end
 		end
 	end
-
-	local itemLink = GetInventoryItemLink(unit, slot)
 	if itemLink then
 		local quality = GetInventoryItemQuality(unit, slot)
 		slotInfo.itemQualityColors.r, slotInfo.itemQualityColors.g, slotInfo.itemQualityColors.b = GetItemQualityColor(quality)
@@ -833,38 +747,3 @@ function module:ADDON_LOADED(_, addon)
 		module:SetupInspectPageInfo()
 	end
 end
-
-function module:Initialize()
-	EP:RegisterPlugin(AddOnName, GetOptions)
-	E:AddLib('GetEnchant', 'LibGetEnchant-1.0-WrathArmory')
-
-	module:ToggleItemLevelInfo(true)
-
-	if IsAddOnLoaded('Blizzard_InspectUI') then
-		module:SetupInspectPageInfo()
-	else
-		module:RegisterEvent('ADDON_LOADED')
-	end
-
-	_G.CharacterFrameCloseButton:ClearAllPoints()
-	_G.CharacterFrameCloseButton:Point('TOPRIGHT', CharacterFrame.backdrop, 0, 2)
-	_G.GearManagerToggleButton:Point('TOPRIGHT', _G.PaperDollItemsFrame, 'TOPRIGHT', -8, -35)
-
-	_G.GearManagerDialog:HookScript('OnShow', function(a, b, c)
-		GearManagerDialog:ClearAllPoints()
-		GearManagerDialog:Point('TOPLEFT', WrathArmory_StatsPane, 'TOPRIGHT', 0, 0)
-		-- 'TOPLEFT', PaperDollFrame, 'TOPRIGHT', -30, -12  -- default
-	end)
-	-- GearManagerDialog:HookScript('OnHide', function(a, b, c)
-	-- 	print("Hiding Equipment Manager", a, b, c)
-	-- end)
-	--[[
-	module:UpdateOptions()
-
-	if not ELVUIILVL then
-		_G.ELVUIILVL = {}
-	end
-	]]
-end
-
-E.Libs.EP:HookInitialize(module, module.Initialize)

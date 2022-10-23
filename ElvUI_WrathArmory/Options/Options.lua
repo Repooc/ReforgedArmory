@@ -3,6 +3,28 @@ local module = E:GetModule('ElvUI_WrathArmory')
 local ACH = E.Libs.ACH
 local C
 
+local AllPoints = {
+	BOTTOM = 'BOTTOM',
+	BOTTOMOUTSIDE = 'BOTTOMOUTSIDE',
+	BOTTOMINSIDE = 'BOTTOMINSIDE',
+	CENTER = 'CENTER',
+	OUTSIDE = 'LEFT',
+	INSIDE = 'RIGHT',
+	TOP = 'TOP',
+	TOPOUTSIDE = 'TOPOUTSIDE',
+	TOPINSIDE = 'TOPINSIDE',
+}
+local SideSlotGrowthDirection = {
+	DOWN_INSIDE = format(L["%s and then %s"], L["Down"], L["Inside"]),
+	DOWN_OUTSIDE = format(L["%s and then %s"], L["Down"], L["Outside"]),
+	UP_INSIDE = format(L["%s and then %s"], L["Up"], L["Inside"]),
+	UP_OUTSIDE = format(L["%s and then %s"], L["Up"], L["Outside"]),
+	INSIDE_DOWN = format(L["%s and then %s"], L["Inside"], L["Down"]),
+	INSIDE_UP = format(L["%s and then %s"], L["Inside"], L["Up"]),
+	OUTSIDE_DOWN = format(L["%s and then %s"], L["Outside"], L["Down"]),
+	OUTSIDE_UP = format(L["%s and then %s"], L["Outside"], L["Up"]),
+}
+
 local function actionSubGroup(info, ...)
 	local which = (info[#info-2] == 'character' or info[#info-2] == 'inspect') and info[#info-2] or info[#info-3]
 	local updateGems = (info[#info-1] == 'gems') or (info[#info-2] == 'gems')
@@ -68,8 +90,8 @@ local function GetOptionsTable_FontGroup(name, groupName)
 	config.args.color = ACH:Color(L["Color"], nil, 11)
 
 	if groupName == 'enchant' then
-		config.args.growthDirection = ACH:Select(L["Growth Direction"], nil, 8, module.Values.GrowthDirection)
-		config.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 9, module.Values.AllPoints) --! Change terminology to reference slot instead of frame?
+		config.args.growthDirection = ACH:Select(L["Growth Direction"], nil, 8, SideSlotGrowthDirection)
+		config.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 9, AllPoints) --! Change terminology to reference slot instead of frame?
 
 		local MainHandSlot = ACH:Group(L["Main Hand Slot"], nil, 10, nil)
 		config.args.MainHandSlot = MainHandSlot
