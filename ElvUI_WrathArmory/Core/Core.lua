@@ -27,29 +27,47 @@ local values = {
 		TOPLEFT = 'TOPRIGHT',
 		TOPRIGHT = 'TOPLEFT',
 	},
+	SIDE_SLOTS_DIRECTION_TO_POINT = {
+		LEFT = {
+			DOWN_INSIDE = 'TOPLEFT',
+			DOWN_OUTSIDE = 'TOPRIGHT',
+			UP_INSIDE = 'BOTTOMLEFT',
+			UP_OUTSIDE = 'BOTTOMRIGHT',
+			INSIDE_DOWN = 'TOPLEFT',
+			INSIDE_UP = 'BOTTOMLEFT',
+			OUTSIDE_DOWN = 'TOPRIGHT',
+			OUTSIDE_UP = 'BOTTOMRIGHT',
+		},
+		RIGHT = {
+			DOWN_INSIDE = 'TOPRIGHT',
+			DOWN_OUTSIDE = 'TOPLEFT',
+			UP_INSIDE = 'BOTTOMRIGHT',
+			UP_OUTSIDE = 'BOTTOMLEFT',
+			INSIDE_DOWN = 'TOPRIGHT',
+			INSIDE_UP = 'BOTTOMRIGHT',
+			OUTSIDE_DOWN = 'TOPLEFT',
+			OUTSIDE_UP = 'BOTTOMLEFT',
+		}
+	},
+	DIRECTION_TO_POINT = {
+		DOWN_RIGHT = 'TOPLEFT',
+		DOWN_LEFT = 'TOPRIGHT',
+		UP_RIGHT = 'BOTTOMLEFT',
+		UP_LEFT = 'BOTTOMRIGHT',
+		RIGHT_DOWN = 'TOPLEFT',
+		RIGHT_UP = 'BOTTOMLEFT',
+		LEFT_DOWN = 'TOPRIGHT',
+		LEFT_UP = 'BOTTOMRIGHT',
+	}
 }
 
-local githubURL = 'https://github.com/Repooc/ElvUI_WrathArmory/issues'
 
-
-end
 
 local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
 }
 
-local DIRECTION_TO_POINT = {
-	DOWN_RIGHT = 'TOPLEFT',
-	DOWN_LEFT = 'TOPRIGHT',
-	UP_RIGHT = 'BOTTOMLEFT',
-	UP_LEFT = 'BOTTOMRIGHT',
-	RIGHT_DOWN = 'TOPLEFT',
-	RIGHT_UP = 'BOTTOMLEFT',
-	LEFT_DOWN = 'TOPRIGHT',
-	LEFT_UP = 'BOTTOMRIGHT',
-}
-
-function module:CreateInspectTexture(slot, point, relativePoint, x, y, gemStep, spacing)
+function module:CreateGemTexture(slot, point, relativePoint, x, y, gemStep, spacing)
 	local prevGem = gemStep - 1
 	local texture = slot:CreateTexture()
 	texture:Point(point, (gemStep == 1 and slot) or slot['textureSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
@@ -85,28 +103,20 @@ function module:GetGemPoints(id, db)
 	end
 end
 
-local SIDE_SLOTS_DIRECTION_TO_POINT = {
-	LEFT = {
-		DOWN_INSIDE = 'TOPLEFT',
-		DOWN_OUTSIDE = 'TOPRIGHT',
-		UP_INSIDE = 'BOTTOMLEFT',
-		UP_OUTSIDE = 'BOTTOMRIGHT',
-		INSIDE_DOWN = 'TOPLEFT',
-		INSIDE_UP = 'BOTTOMLEFT',
-		OUTSIDE_DOWN = 'TOPRIGHT',
-		OUTSIDE_UP = 'BOTTOMRIGHT',
-	},
-	RIGHT = {
-		DOWN_INSIDE = 'TOPRIGHT',
-		DOWN_OUTSIDE = 'TOPLEFT',
-		UP_INSIDE = 'BOTTOMRIGHT',
-		UP_OUTSIDE = 'BOTTOMLEFT',
-		INSIDE_DOWN = 'TOPRIGHT',
-		INSIDE_UP = 'BOTTOMRIGHT',
-		OUTSIDE_DOWN = 'TOPLEFT',
-		OUTSIDE_UP = 'BOTTOMLEFT',
-	},
-}
+function module:GetWarningPoints(id, db)
+	if not id or not db then return end
+	if id <= 5 or (id == 9 or id == 15) then						--* Left Side
+		return 'TOPRIGHT', 'TOPLEFT', 'BOTTOMRIGHT', 'BOTTOMLEFT', 8, 0, E.Border, 0, -E.Border, 0
+	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
+		return 'TOPLEFT', 'TOPRIGHT', 'BOTTOMLEFT', 'BOTTOMRIGHT', 8, 0, E.Border, 0, -E.Border, 0
+	elseif id == 16 then											--* MainHandSlot
+		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
+	elseif id == 17 then											--* SecondaryHandSlot
+		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
+	else															--* RangedSlot
+		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
+	end
+end
 
 function module:GetEnchantPoints(id, db)
 	if not id or not db then return end
@@ -118,15 +128,15 @@ function module:GetEnchantPoints(id, db)
 	local RangedSlot = db.enchant.RangedSlot
 
 	if id <= 5 or (id == 9 or id == 15) then						--* Left Side
-		return SIDE_SLOTS_DIRECTION_TO_POINT['LEFT'][db.enchant.growthDirection], values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint], x, y, spacing
+		return values.SIDE_SLOTS_DIRECTION_TO_POINT['LEFT'][db.enchant.growthDirection], values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint], x, y, spacing
 	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
-		return SIDE_SLOTS_DIRECTION_TO_POINT['RIGHT'][db.enchant.growthDirection], values.MIRROR_ANCHORPOINT[values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint]], -x, y, -spacing
+		return values.SIDE_SLOTS_DIRECTION_TO_POINT['RIGHT'][db.enchant.growthDirection], values.MIRROR_ANCHORPOINT[values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint]], -x, y, -spacing
 	elseif id == 16 then											--* MainHandSlot
-		return DIRECTION_TO_POINT[MainHandSlot.growthDirection], MainHandSlot.anchorPoint, MainHandSlot.xOffset, MainHandSlot.yOffset, -spacing
+		return values.DIRECTION_TO_POINT[MainHandSlot.growthDirection], MainHandSlot.anchorPoint, MainHandSlot.xOffset, MainHandSlot.yOffset, -spacing
 	elseif id == 17 then											--* SecondaryHandSlot
-		return DIRECTION_TO_POINT[SecondaryHandSlot.growthDirection], SecondaryHandSlot.anchorPoint, SecondaryHandSlot.xOffset, SecondaryHandSlot.yOffset, -spacing
+		return values.DIRECTION_TO_POINT[SecondaryHandSlot.growthDirection], SecondaryHandSlot.anchorPoint, SecondaryHandSlot.xOffset, SecondaryHandSlot.yOffset, -spacing
 	else															--* RangedSlot
-		return DIRECTION_TO_POINT[RangedSlot.growthDirection], RangedSlot.anchorPoint, RangedSlot.xOffset, RangedSlot.yOffset, spacing
+		return values.DIRECTION_TO_POINT[RangedSlot.growthDirection], RangedSlot.anchorPoint, RangedSlot.xOffset, RangedSlot.yOffset, spacing
 	end
 end
 
@@ -209,14 +219,39 @@ end
 
 function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	iLevelDB[i] = slotInfo.iLvl
-	local db = E.db.wratharmory[string.lower(which)]
+	local frame = _G[which..'Frame']
+	local unit = (which == 'Character' and 'player') or frame.unit
 
+	local itemLink = GetInventoryItemLink(unit, i)
+	local db = E.db.wratharmory[string.lower(which)]
+	local missingBuckle, missingGem, missingEnchant, warningMsg = false, false, false, ''
+	local slotName = inspectItem:GetName():gsub('Character', ''):gsub('Inspect', '')
+	local canEnchant = module.GearList[slotName].canEnchant
 	do
 		local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
 		inspectItem.enchantText:ClearAllPoints()
-		inspectItem.enchantText:Point(point, slot, relativePoint, x, y)
+		inspectItem.enchantText:Point(point, inspectItem, relativePoint, x, y)
 		inspectItem.enchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
-		inspectItem.enchantText:SetText(slotInfo.enchantTextShort)
+
+		local text = slotInfo.enchantTextShort
+		if itemLink then
+			if text == '' and canEnchant then
+				missingEnchant = true
+				warningMsg = strjoin('', warningMsg, '|cffff0000', L["Not Enchanted"], '|r\n')
+			end
+
+			if #slotInfo.emptySockets > 0 then
+				missingGem = true
+				warningMsg = strjoin('', warningMsg, '|cffff0000', L["Not Fully Gemmed"], '|r\n')
+			end
+			if slotInfo.missingBeltBuckle then
+				missingBuckle = true
+				warningMsg = strjoin('', warningMsg, '|cffff0000', L["Missing Belt Buckle"], '|r\n')
+			end
+			inspectItem.WrathArmory_Warning.Reason = warningMsg
+		end
+		inspectItem.WrathArmory_Warning:SetShown(missingEnchant or missingGem or missingBuckle)
+		inspectItem.enchantText:SetText(text)
 		inspectItem.enchantText:SetShown(db.enchant.enable)
 		local enchantTextColor = (db.enchant.qualityColor and slotInfo.itemQualityColors) or db.enchant.color
 		if enchantTextColor and next(enchantTextColor) then
@@ -234,15 +269,12 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 		inspectItem.iLvlText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
 	end
 
-	if which == 'Inspect' then
-		local unit = _G.InspectFrame.unit or 'target'
-		if unit then
-			local quality = GetInventoryItemQuality(unit, i)
-			if quality and quality > 1 then
-				inspectItem.backdrop:SetBackdropBorderColor(GetItemQualityColor(quality))
-			else
-				inspectItem.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
-			end
+	if which == 'Inspect' and unit then
+		local quality = GetInventoryItemQuality(unit, i)
+		if quality and quality > 1 then
+			inspectItem.backdrop:SetBackdropBorderColor(GetItemQualityColor(quality))
+		else
+			inspectItem.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
 		end
 	end
 
@@ -557,6 +589,19 @@ function module:CreateStatsPane()
 	end
 end
 
+local function Warning_OnEnter(frame)
+	if frame.Reason then
+		_G.GameTooltip:SetOwner(frame, 'ANCHOR_RIGHT')
+		_G.GameTooltip:AddLine(frame.Reason, 1, 1, 1)
+		_G.GameTooltip:Show()
+	end
+end
+
+local function Warning_OnLeave()
+	_G.GameTooltip:Hide()
+end
+
+local WarningTexture = [[Interface\AddOns\ElvUI\Core\Media\Textures\Minimalist]]
 function module:CreateSlotStrings(frame, which)
 	if not frame or not which then return end
 
@@ -577,6 +622,25 @@ function module:CreateSlotStrings(frame, which)
 		slot.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
 		slot.iLvlText:Point('BOTTOM', slot, itemLevel.xOffset, itemLevel.yOffset)
 
+		--* Warning
+		slot.WrathArmory_Warning = CreateFrame('Frame', nil, slot)
+		do
+			-- local point, relativePoint, x, y = module:GetWarningPoints(info.slotID, db)
+			local point1, relativePoint1, point2, relativePoint2, size, x1, y1, x2, y2, spacing = module:GetWarningPoints(info.slotID, db)
+			slot.WrathArmory_Warning:Point(point1, slot, relativePoint1, x1, y1)
+			slot.WrathArmory_Warning:Point(point2, slot, relativePoint2, x2, y2)
+			slot.WrathArmory_Warning:Size(size)
+			slot.WrathArmory_Warning.texture = slot.WrathArmory_Warning:CreateTexture(nil, 'BACKGROUND')
+			slot.WrathArmory_Warning.texture:SetInside()
+			slot.WrathArmory_Warning.texture:SetTexture(WarningTexture)
+			slot.WrathArmory_Warning.texture:SetVertexColor(1, 0, 0, 1)
+			slot.WrathArmory_Warning:SetFrameLevel(3)
+			slot.WrathArmory_Warning:SetScript('OnEnter', Warning_OnEnter)
+			slot.WrathArmory_Warning:SetScript('OnLeave', Warning_OnLeave)
+			slot.WrathArmory_Warning:Hide()
+		end
+
+		--* Enchant Text
 		slot.enchantText = slot:CreateFontString(nil, 'OVERLAY')
 		slot.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
 
@@ -589,7 +653,7 @@ function module:CreateSlotStrings(frame, which)
 		do
 			local point, relativePoint, x, y, spacing = module:GetGemPoints(info.slotID, db)
 			for u = 1, 5 do
-				slot['textureSlot'..u], slot['textureSlotBackdrop'..u] = module:CreateInspectTexture(slot, point, relativePoint, x, y, u, spacing)
+				slot['textureSlot'..u], slot['textureSlotBackdrop'..u] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
 			end
 		end
 	end
@@ -654,65 +718,79 @@ function module:UpdateInspectPageFonts(which, gems)
 	end
 end
 
-function module:ScanTooltipTextures()
+--* Makes a table with Blizzards locale of the empty gem sockets which is used to help determine if missing a socket from a belt buckle
+local socketNames, socketTypes = {}, { EMPTY_SOCKET_META, EMPTY_SOCKET_BLUE, EMPTY_SOCKET_RED, EMPTY_SOCKET_YELLOW, EMPTY_SOCKET_NO_COLOR, EMPTY_SOCKET_PRISMATIC, EMPTY_SOCKET_COGWHEEL, EMPTY_SOCKET_HYDRAULIC }
+for _, socketName in pairs(socketTypes) do
+	socketNames[socketName] = true
+end
+
+local temp = {}
+temp.gems, temp.emptySockets, temp.filledSockets, temp.baseSocketCount = {}, {}, {}, 0
+function module:AcquireGemInfo(itemLink)
+	wipe(temp.gems)
+	wipe(temp.emptySockets)
+	wipe(temp.filledSockets)
+	temp.baseSocketCount = 0
+
 	local tt = E.ScanTooltip
-
-	if not tt.gems then
-		tt.gems = {}
-	else
-		wipe(tt.gems)
-	end
-
-	for i = 1, 5 do
-		local tex = _G['ElvUI_ScanTooltipTexture'..i]
-		local texture = tex and tex:IsShown() and tex:GetTexture()
-		if texture then
-			tt.gems[i] = texture
+	for x = 1, tt:NumLines() do
+		local line = _G['ElvUI_ScanTooltipTextLeft'..x]
+		if line then
+			local lineText = line:GetText()
+			if x == 1 and lineText == RETRIEVING_ITEM_INFO then break end
+			if socketNames[lineText] then
+				temp.baseSocketCount = temp.baseSocketCount + 1
+				tinsert(temp.emptySockets, lineText)
+			end
 		end
 	end
 
-	return tt.gems
+	for i = 1, 4 do
+		local tex = _G['ElvUI_ScanTooltipTexture'..i]
+		local texture = tex and tex:IsShown() and tex:GetTexture()
+		if texture then temp.gems[i] = texture end
+		if itemLink then
+			local gemName, gemLink = GetItemGem(itemLink, i)
+			if gemName then tinsert(temp.filledSockets, gemLink) end
+		end
+	end
+
+	return temp.gems, temp.emptySockets, temp.filledSockets, temp.baseSocketCount
 end
 
+local githubURL = 'https://github.com/Repooc/ElvUI_WrathArmory/issues'
 function module:GetGearSlotInfo(unit, slot)
 	local tt = E.ScanTooltip
 	tt:SetOwner(_G.UIParent, 'ANCHOR_NONE')
 	tt:SetInventoryItem(unit, slot)
 	tt:Show()
 
-	if not tt.SlotInfo then tt.SlotInfo = {} else wipe(tt.SlotInfo) end
-	local slotInfo = tt.SlotInfo
+	local slotInfo = {}
 	local itemLink = GetInventoryItemLink(unit, slot)
+	slotInfo.gems, slotInfo.emptySockets, slotInfo.filledSockets, slotInfo.baseSocketCount = module:AcquireGemInfo(itemLink)
+	slotInfo.itemQualityColors = {}
+	slotInfo.missingBeltBuckle = false
+	local enchantID
 
-	slotInfo.gems = module:ScanTooltipTextures()
-	slotInfo.itemQualityColors = slotInfo.itemQualityColors or {}
-
-	for x = 1, tt:NumLines() do
-		local line = _G['ElvUI_ScanTooltipTextLeft'..x]
-		if line then
-			local lineText = line:GetText()
-			if x == 1 and lineText == RETRIEVING_ITEM_INFO then
-				return 'tooSoon'
-			end
-		end
-	end
 	if itemLink then
+		if UnitLevel(unit) >= 70 and slot == 6 and (#slotInfo.filledSockets + #slotInfo.emptySockets <= slotInfo.baseSocketCount) then
+			slotInfo.missingBeltBuckle = true
+		end
+
 		local quality = GetInventoryItemQuality(unit, slot)
 		slotInfo.itemQualityColors.r, slotInfo.itemQualityColors.g, slotInfo.itemQualityColors.b = GetItemQualityColor(quality)
 
 		local itemLevel = GetDetailedItemLevelInfo(itemLink)
 		slotInfo.iLvl = tonumber(itemLevel)
-
-		local enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
-		local enchantTextShort = E.Libs.GetEnchant.GetEnchant(enchantID)
-
-		if enchantID and not enchantTextShort then
-			local msg = format('The enchant id, *%s|r, seems to be missing from our database. Please open a ticket at |cff16c3f2[|r*|Hurl:'..githubURL..'|h'..githubURL..'|h|r|cff16c3f2]|r with the missing id and name of the enchant that found on %s. |cffFF0000If you do not provide the info or post a duplicate ticket, it will be closed without a response.|r', enchantID, itemLink):gsub('*', E.InfoColor)
-			module:Print(msg)
-		end
-
-		slotInfo.enchantTextShort = enchantTextShort or ''
+		enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
 	end
+
+	local enchantTextShort = E.Libs.GetEnchant.GetEnchant(enchantID)
+	if enchantID and not enchantTextShort then
+		local msg = format('The enchant id, *%s|r, seems to be missing from our database. Please open a ticket at |cff16c3f2[|r*|Hurl:'..githubURL..'|h'..githubURL..'|h|r|cff16c3f2]|r with the missing id and name of the enchant that found on %s. |cffFF0000If you do not provide the info or post a duplicate ticket, it will be closed without a response.|r', enchantID, itemLink):gsub('*', E.InfoColor)
+		module:Print(msg)
+	end
+	slotInfo.enchantTextShort = enchantTextShort or ''
 
 	tt:Hide()
 
