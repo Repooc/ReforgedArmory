@@ -26,7 +26,7 @@ local SideSlotGrowthDirection = {
 }
 
 local function actionGroup(info, which, groupName, ...)
-	local updateGems = groupName == 'gems'
+	local force = groupName == 'gems' or groupName == 'warningIndicator'
 	if info.type == 'color' then
 		local color = E.db.wratharmory[which][groupName][info[#info]]
 		local r, g, b, a = ...
@@ -46,11 +46,11 @@ local function actionGroup(info, which, groupName, ...)
 	end
 
 	local unit = which:gsub("^%l", string.upper)
-	module:UpdateOptions(unit, updateGems)
+	module:UpdateOptions(unit, force)
 end
 
 local function actionSubGroup(info, which, groupName, subGroup, ...)
-	local updateGems = groupName == 'gems'
+	local force = groupName == 'gems' or groupName == 'warningIndicator'
 	if info.type == 'color' then
 		local color = E.db.wratharmory[which][groupName][subGroup][info[#info]]
 		local r, g, b, a = ...
@@ -70,7 +70,7 @@ local function actionSubGroup(info, which, groupName, subGroup, ...)
 	end
 
 	local unit = which:gsub("^%l", string.upper)
-	module:UpdateOptions(unit, updateGems)
+	module:UpdateOptions(unit, force)
 end
 local SharedOptions = {
 	enable = ACH:Toggle(L["Enable"], nil, 0),
@@ -170,6 +170,13 @@ local function GetOptionsTable_ItemLevelGroup(which, groupName)
 	return config
 end
 
+local function GetOptionsTable_WarningIndicator(which, groupName)
+	local config = ACH:Group(L["Warning Indicator"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
+
+	return config
+end
+
 local function configTable()
 	C = unpack(E.OptionsUI)
 	local Armory = ACH:Group('|cFF16C3F2Wrath|rArmory', nil, 6, 'tab')
@@ -182,6 +189,7 @@ local function configTable()
 	Character.args.enchant = GetOptionsTable_EnchantGroup('character', 'enchant')
 	Character.args.itemLevel = GetOptionsTable_ItemLevelGroup('character', 'itemLevel')
 	Character.args.gems = GetOptionsTable_Gems('character', 'gems')
+	Character.args.warningIndicator = GetOptionsTable_WarningIndicator('character', 'warningIndicator')
 
 	--* Inspect Frame
     local Inspect = ACH:Group(L["Inspect"], nil, 1)
@@ -190,6 +198,7 @@ local function configTable()
 	Inspect.args.enchant = GetOptionsTable_EnchantGroup('inspect', 'enchant')
 	Inspect.args.itemLevel = GetOptionsTable_ItemLevelGroup('inspect', 'itemLevel')
 	Inspect.args.gems = GetOptionsTable_Gems('inspect', 'gems')
+	Inspect.args.warningIndicator = GetOptionsTable_WarningIndicator('inspect', 'warningIndicator')
 end
 
 tinsert(module.Configs, configTable)

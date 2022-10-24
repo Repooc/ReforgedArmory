@@ -20,9 +20,9 @@ local function GetOptions()
 	end
 end
 
-function module:UpdateOptions(unit, updateGems)
+function module:UpdateOptions(unit, force)
 	if unit then
-		module:UpdateInspectPageFonts(unit, updateGems)
+		module:UpdateInspectPageFonts(unit, force)
 	else
 		module:UpdateInspectPageFonts('Character')
 		module:UpdateInspectPageFonts('Inspect')

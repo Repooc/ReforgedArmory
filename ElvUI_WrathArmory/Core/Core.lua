@@ -250,7 +250,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 			end
 			inspectItem.WrathArmory_Warning.Reason = warningMsg
 		end
-		inspectItem.WrathArmory_Warning:SetShown(missingEnchant or missingGem or missingBuckle)
+		inspectItem.WrathArmory_Warning:SetShown(db.warningIndicator.enable and (missingEnchant or missingGem or missingBuckle))
 		inspectItem.enchantText:SetText(text)
 		inspectItem.enchantText:SetShown(db.enchant.enable)
 		local enchantTextColor = (db.enchant.qualityColor and slotInfo.itemQualityColors) or db.enchant.color
@@ -663,7 +663,7 @@ function module:SetupInspectPageInfo()
 	module:CreateSlotStrings(_G.InspectFrame, 'Inspect')
 end
 
-function module:UpdateInspectPageFonts(which, gems)
+function module:UpdateInspectPageFonts(which, force)
 	local frame = _G[which..'Frame']
 	if not frame then return end
 
@@ -713,7 +713,7 @@ function module:UpdateInspectPageFonts(which, gems)
 		end
 	end
 
-	if gems then
+	if force then
 		module:UpdatePageInfo(frame, which, unit)
 	end
 end

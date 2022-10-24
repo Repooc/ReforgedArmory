@@ -38,6 +38,9 @@ P.wratharmory = {
 		enchant = CopyTable(SharedFontOptions),
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
+		warningIndicator = {
+			enable = true,
+		},
 	},
 	inspect = {
 		enable = true,
@@ -45,6 +48,9 @@ P.wratharmory = {
 		enchant = CopyTable(SharedFontOptions),
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
+		warningIndicator = {
+			enable = true,
+		},
 	},
 }
 
