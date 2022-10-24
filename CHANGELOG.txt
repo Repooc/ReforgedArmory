@@ -1,7 +1,6 @@
-v1.04 10/19/2022
+v1.05 ??/??/2022
 
-• Reorganized the project files!!! Delete the old ElvUI_WrathArmory folder and replace... do not override!!!
-• Enchant Strings
-    • Growth Direction option to help determine which way the text should expand
-    • Anchor Point option helps determine the starting location of the enchant text you want base on the slots points
-• LibGetEnchant clean up
+• Reorganized the project files a little more!!! Delete the old ElvUI_WrathArmory folder and replace... do not override!!!
+• Warning Bar Indicator (WIP Still, only enable/disable option for now)
+    (If missing enchants, missing belt buckle, and having empty sockets, the warning bar will display to indicate a possible issue, which you can mouse over and see the warning text of the possible issue)
+• LibGetEnchant update & clean up some enchants to be shorter
