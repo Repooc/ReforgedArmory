@@ -42,9 +42,9 @@ P.wratharmory = {
 	inspect = {
 		enable = true,
 		avgItemLevel = CopyTable(SharedFontOptions),
-		itemLevel = CopyTable(SharedFontOptions),
 		enchant = CopyTable(SharedFontOptions),
 		gems = CopyTable(SharedGemOptions),
+		itemLevel = CopyTable(SharedFontOptions),
 	},
 }
 
