@@ -178,7 +178,7 @@ local function GetOptionsTable_WarningIndicator(which, groupName)
 end
 
 local function configTable()
-	C = unpack(E.Options)
+	C = unpack(E.Config)
 	local Armory = ACH:Group('|cFF16C3F2Wrath|rArmory', nil, 6, 'tab')
 	E.Options.args.wratharmory = Armory
 
