@@ -1,6 +1,7 @@
-v1.05 ??/??/2022
+v1.05 11/12/2022
 
 • Reorganized the project files a little more!!! Delete the old ElvUI_WrathArmory folder and replace... do not override!!!
 • Warning Bar Indicator (WIP Still, only enable/disable option for now)
     (If missing enchants, missing belt buckle, and having empty sockets, the warning bar will display to indicate a possible issue, which you can mouse over and see the warning text of the possible issue)
 • LibGetEnchant update & clean up some enchants to be shorter
+• update codebase to reflect ElvUI changes
