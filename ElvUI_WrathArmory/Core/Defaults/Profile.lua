@@ -39,7 +39,7 @@ P.wratharmory = {
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
 		warningIndicator = {
-			enable = true,
+			enable = false,
 		},
 	},
 	inspect = {
@@ -49,7 +49,7 @@ P.wratharmory = {
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
 		warningIndicator = {
-			enable = true,
+			enable = false,
 		},
 	},
 }
