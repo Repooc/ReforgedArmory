@@ -272,7 +272,8 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	if which == 'Inspect' and unit then
 		local quality = GetInventoryItemQuality(unit, i)
 		if quality and quality > 1 then
-			inspectItem.backdrop:SetBackdropBorderColor(GetItemQualityColor(quality))
+			local r, g, b = GetItemQualityColor(quality)
+			inspectItem.backdrop:SetBackdropBorderColor(r, g, b, 1)
 		else
 			inspectItem.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
 		end
