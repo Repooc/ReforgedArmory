@@ -194,7 +194,7 @@ local function configTable()
 	--* Inspect Frame
     local Inspect = ACH:Group(L["Inspect"], nil, 1)
 	Armory.args.inspect = Inspect
-	Inspect.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('character', 'avgItemLevel')
+	Inspect.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('inspect', 'avgItemLevel')
 	Inspect.args.enchant = GetOptionsTable_EnchantGroup('inspect', 'enchant')
 	Inspect.args.itemLevel = GetOptionsTable_ItemLevelGroup('inspect', 'itemLevel')
 	Inspect.args.gems = GetOptionsTable_Gems('inspect', 'gems')
