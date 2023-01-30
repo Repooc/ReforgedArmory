@@ -1,4 +1,3 @@
-v1.06 1/18/2023
+v1.07 1/30/2023
 
-• bump toc
-• fix lua error when inspecting someone
+• fix not able to change inspect avg itemlevel font size
