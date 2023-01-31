@@ -779,7 +779,9 @@ function module:GetGearSlotInfo(unit, slot)
 		end
 
 		local quality = GetInventoryItemQuality(unit, slot)
-		slotInfo.itemQualityColors.r, slotInfo.itemQualityColors.g, slotInfo.itemQualityColors.b = GetItemQualityColor(quality)
+		if quality then
+			slotInfo.itemQualityColors.r, slotInfo.itemQualityColors.g, slotInfo.itemQualityColors.b = GetItemQualityColor(quality)
+		end
 
 		local itemLevel = GetDetailedItemLevelInfo(itemLink)
 		slotInfo.iLvl = tonumber(itemLevel)
