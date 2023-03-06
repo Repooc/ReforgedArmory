@@ -665,10 +665,12 @@ function module:SetupInspectPageInfo()
 end
 
 function module:UpdateInspectPageFonts(which, force)
-	local frame = _G[which..'Frame']
-	local unit = (which == 'Character' and 'player') or frame.unit
-	if not frame or not unit then return end
+	if not which then return end
 
+	local frame = _G[which..'Frame']
+	if not frame then return end
+
+	local unit = (which == 'Character' and 'player') or frame.unit
 	local db = E.db.wratharmory[string.lower(which)]
 	local itemLevel, enchant, avgItemLevel = db.itemLevel, db.enchant, db.avgItemLevel
 
