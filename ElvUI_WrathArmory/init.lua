@@ -100,6 +100,21 @@ module.GearList = {
 	},
 }
 
+local function HandleTabs()
+	local lastTab
+	for index, tab in next, { _G.CharacterFrameTab1, HasPetUI() and _G.CharacterFrameTab2 or nil, _G.CharacterFrameTab3, _G.CharacterFrameTab4, _G.CharacterFrameTab5 } do
+		tab:ClearAllPoints()
+
+		if index == 1 then
+			tab:Point('TOPLEFT', _G.CharacterFrame.backdrop, 'BOTTOMLEFT', 1, 0)
+		else
+			tab:Point('TOPLEFT', lastTab, 'TOPRIGHT', -19, 0)
+		end
+
+		lastTab = tab
+	end
+end
+
 function module:Initialize()
 	EP:RegisterPlugin(AddOnName, GetOptions)
 	E:AddLib('GetEnchant', 'LibGetEnchant-1.0-WrathArmory')
@@ -131,6 +146,10 @@ function module:Initialize()
 		_G.ELVUIILVL = {}
 	end
 	]]
+
+	-- Reposition Tabs
+	hooksecurefunc('PetPaperDollFrame_UpdateTabs', HandleTabs)
+	HandleTabs()
 end
 
 E.Libs.EP:HookInitialize(module, module.Initialize)

@@ -514,8 +514,6 @@ function module:CreateStatsPane()
 	if isSkinned then
 		--* Adjust CharacterFrame backdrop to be further down and adjust the tabs
 		S:HandleFrame(CharacterFrame, true, nil, 11, -12, 0, 65)
-		CharacterFrameTab1:ClearAllPoints()
-		CharacterFrameTab1:Point('CENTER', CharacterFrame, 'BOTTOMLEFT', 60, 51)
 
 		CharacterHandsSlot:ClearAllPoints()
 		CharacterHandsSlot:Point('TOPRIGHT', PaperDollItemsFrame, 'TOPRIGHT', -11, -74)
