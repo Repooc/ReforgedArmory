@@ -1,7 +1,7 @@
-﻿## Interface: 30401
+﻿## Interface: 30403
 ## Title: |cff1784d1ElvUI|r |cFF16C3F2Wrath|rArmory
 ## Author: Repooc
-## Version: 1.08
+## Version: 1.09
 ## RequiredDeps: ElvUI
 ## DefaultState: Enabled
 ## X-CleanTitle: ElvUI_WrathArmory

@@ -1,3 +1,4 @@
-v1.08 3/6/2023
+v1.09 10/11/2023
 
-• prevent some nil errors
+• fix tabs on character frame
+• update toc
