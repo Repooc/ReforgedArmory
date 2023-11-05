@@ -1,0 +1,14 @@
+tag 70fa74dc72aa809d79deac1f5b3994ef4bd713d1 1.0.r8
+Author:	Road-block <dridzt.addons@hotmail.com>
+Date:	Sun Oct 15 17:22:24 2023 +0300
+
+wrath P4 updates
+
+commit 0e4798c3e201e0beea8002dda3f5b9735b4bd8e9
+Author: Road-block <dridzt.addons@hotmail.com>
+Date:   Sun Oct 15 17:19:30 2023 +0300
+
+    add blizzard itemlevel calculation where available (player only)
+    add speculative dedicated insanity report (not 100% trusted it's not purely itemlevel check)
+    update embedded libs and interface versions for wrath P4
+

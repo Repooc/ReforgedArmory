@@ -1,3 +1,6 @@
 <Ui xmlns='http://www.blizzard.com/wow/ui/'>
 	<Include file='LibGetEnchant-1.0\LibGetEnchant-1.0.xml'/>
+	<Script file='LibGearScore-1.0\Libs\LibStub\LibStub.lua'/>
+	<Include file='LibGearScore-1.0\Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml'/>
+	<Script file='LibGearScore-1.0\LibGearScore.lua'/>
 </Ui>
