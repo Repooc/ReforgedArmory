@@ -26,7 +26,7 @@ local SideSlotGrowthDirection = {
 }
 
 local function actionGroup(info, which, groupName, ...)
-	local force = groupName == 'gems' or groupName == 'warningIndicator'
+	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel'
 	if info.type == 'color' then
 		local color = E.db.wratharmory[which][groupName][info[#info]]
 		local r, g, b, a = ...
@@ -82,6 +82,7 @@ local SharedOptions = {
 local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 	local config = ACH:Group(L["Average Item Level"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
 	config.args = CopyTable(SharedOptions)
+	config.args.gearScore = ACH:Toggle(L["Show GearScore"], nil, 0)
 	config.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
 	config.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
 	config.args.fontSize = ACH:Range(L["Font Size"], nil, 4, C.Values.FontSize)

@@ -3,6 +3,7 @@ local module = E:GetModule('ElvUI_WrathArmory')
 local S = E:GetModule('Skins')
 local LSM = E.Libs.LSM
 local LCS = E.Libs.LCS
+local LibGearScore = LibStub:GetLibrary("LibGearScore.1000", true)
 
 local values = {
 	SIDE_SLOTS_ANCHORPOINTS = {
@@ -374,14 +375,19 @@ function module:UpdateAverageString(frame, which, iLevelDB)
 
 	local db = E.db.wratharmory[string.lower(which)].avgItemLevel
 	local isCharPage = which == 'Character'
-	local AvgItemLevel = module:CalculateAverageItemLevel(iLevelDB, isCharPage and 'player' or frame.unit)
+	local _, GearScore = LibGearScore:GetScore(isCharPage and 'player' or frame.unit)
+	local AvgItemLevel = GearScore.AvgItemLevel
+	local AvgILvlAndGearScore = 'iLvl: '..AvgItemLevel
+	if db.gearScore then
+		AvgILvlAndGearScore = AvgILvlAndGearScore..'  GS: '..GearScore.GearScore
+	end
 
 	if AvgItemLevel then
 		if isCharPage then
-			frame.ItemLevelText:SetText(AvgItemLevel)
+			frame.ItemLevelText:SetText(AvgILvlAndGearScore)
 			frame.ItemLevelText:SetTextColor(db.color.r, db.color.g, db.color.b)
 		else
-			frame.ItemLevelText:SetText(AvgItemLevel)
+			frame.ItemLevelText:SetText(AvgILvlAndGearScore)
 			frame.ItemLevelText:SetTextColor(db.color.r, db.color.g, db.color.b)
 			frame.ItemLevelText:ClearAllPoints()
 			frame.ItemLevelText:Point('CENTER', _G['WrathArmory_'..which..'AvgItemLevel'], 0, -2)
