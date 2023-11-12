@@ -15,6 +15,11 @@ jobs:
       CF_URL: https://www.curseforge.com/wow/addons/wratharmory-elvui-plugin
       WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
       WAGO_URL: https://addons.wago.io/addons/wratharmory-elvui-plugin
+      DISCORD_NEWS_CHANNEL_ID: "1164433316976537620"
+      RR_AUTHOR_SUPPORT_INFO_NAME: "general-info"
+      RR_AUTHOR_SUPPORT_INFO_URL: "https://discord.com/channels/1162274244487561216/1171940634672767128"
+      RR_ADDON_CHANNEL_NAME: "wrath-armory"
+      RR_ADDON_CHANNEL_URL: "https://discord.com/channels/1162274244487561216/1162288082427576340"
     steps:
       - name: Clone Project
         uses: actions/checkout@v3
@@ -26,15 +31,34 @@ jobs:
         id: releaseaddon
         uses: BigWigsMods/packager@master
       - name: Notify Discord
-        if: steps.releaseaddon.outcome == 'success'
+        if: success()
         uses: repooc/djs-actions@my_changes
         with:
           id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          title: 'New *${{ github.event.repository.name }}* Version Released!'
+          title: 'New **__${{ github.event.repository.name }}__** *Version Released!*'
           description: '[${{ github.event.sender.login }}](${{ github.event.sender.html_url }}) has released a new version of ${{ github.event.repository.name }}!
 
             If you use a wow addon client that can download from either wago addons or curse, then it is recommended that you use that to install/update the addon.  You can update how you see fit, even if you want to download manually and install it, go for it.  The can grab the addon from the links down below.'
-          fields: '[{"name": "Released By:", "value": "[${{ github.event.sender.login }}](${{ github.event.sender.html_url }})", "inline": true}, {"name": "Issue Tracker:", "value": "[${{ github.event.repository.name }}](${{ github.event.repository.html_url }}/issues)", "inline": true}, {"name": "Version", "value": "${{ env.RELEASE_VERSION }}", "inline": true}, {"name": "Wago Addons", "value": "[Click Here](${{ env.WAGO_URL }})", "inline": true}, {"name": "Curseforge", "value": "[Click Here](${{ env.CF_URL }})", "inline": true}]'
-          footer: Addons by Repooc
+          fields: '[{"name": "Released By:", "value": "[${{ github.event.sender.login }}](${{ github.event.sender.html_url }})", "inline": true}, {"name": "Issue Tracker:", "value": "[${{ github.event.repository.name }}](${{ github.event.repository.html_url }}/issues)", "inline": true}, {"name": "Version", "value": "${{ env.RELEASE_VERSION }}", "inline": true}, {"name": "Wago Addons", "value": "[Click Here](${{ env.WAGO_URL }})", "inline": true}, {"name": "Curseforge", "value": "[Click Here](${{ env.CF_URL }})", "inline": true}, {"name": "Changelog", "value": "[Click Here](${{ github.event.repository.html_url }}/CHANGELOG.txt)", "inline": true}]'
+          footer: Repooc Reforged
           timestamp: true
+      - name: Publish
+        id: publish-to-discord
+        uses: Crec0/announce-n-crosspost@v1
+        if: success()
+        with:
+          bot-token: ${{ secrets.ANNOUNCER_BOT_TOKEN }}
+          channel: ${{ env.DISCORD_NEWS_CHANNEL_ID }}
+          content: |
+            **__${{ github.event.repository.name }}__** **v${{ env.RELEASE_VERSION }}** *has been released!*  
+              
+            You can view the changes made by viewing the [changelog](<${{ github.event.repository.html_url }}/CHANGELOG.txt>) here!
+              
+            Go grab the new version from [Wago AddOns](<${{ env.WAGO_URL }}>) or [Curse](<${{ env.CF_URL }}>)!
+              
+            If you would like to help support the work I do, consider supporting me via the [Discord Shop](https://discord.com/servers/repooc-reforged-1162274244487561216) or the other various ways listed in the [${{env.RR_AUTHOR_SUPPORT_INFO_NAME}}](<${{env.RR_AUTHOR_SUPPORT_INFO_URL}}>) channel.
+              
+            You can get help for the addon in the [${{env.RR_ADDON_CHANNEL_NAME}}](<${{env.RR_ADDON_CHANNEL_URL}}>) support channel!
+      - name: Print message id
+        run: echo "Message id = ${{ steps.publish-to-discord.outputs.message-id }}"
