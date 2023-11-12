@@ -1,12 +1,13 @@
 ﻿## Interface: 30403
 ## Title: |cff1784d1ElvUI|r |cFF16C3F2Wrath|rArmory
 ## Author: Repooc
-## Version: 1.09
+## Version: 1.10
 ## RequiredDeps: ElvUI
 ## DefaultState: Enabled
 ## X-CleanTitle: ElvUI_WrathArmory
 ## X-Curse-Project-ID: 678586
 ## X-Wago-ID: e56nlmG9
+## IconTexture: Interface\AddOns\ElvUI_SplitActionBars\Logo
 
 Libs\Load_Libs.xml
 init.lua
