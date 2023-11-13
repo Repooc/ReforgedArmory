@@ -53,7 +53,7 @@ jobs:
           content: |
             **__${{ github.event.repository.name }}__** **v${{ env.RELEASE_VERSION }}** *has been released!*  
               
-            You can view the changes made by viewing the [changelog](<${{ github.event.repository.html_url }}/CHANGELOG.txt>) here!
+            You can view the changes made by viewing the [changelog](<${{ github.event.repository.html_url }}/blob/main/CHANGELOG.txt>) here!
               
             Go grab the new version from [Wago AddOns](<${{ env.WAGO_URL }}>) or [Curse](<${{ env.CF_URL }}>)!
               
