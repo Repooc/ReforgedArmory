@@ -670,6 +670,9 @@ function module:ADDON_LOADED(_, addon)
 				InspectMainHandSlot:ClearAllPoints()
 				InspectMainHandSlot:Point('TOPRIGHT', (isSkinned and InspectSecondaryHandSlot) or InspectPaperDollItemsFrame, 'TOPLEFT', -5, 0)
 
+				_G.InspectFrameCloseButton:ClearAllPoints()
+				_G.InspectFrameCloseButton:Point('TOPRIGHT', (isSkinned and InspectFrame.backdrop.Center) or InspectFrame, 'TOPRIGHT', -4, -4)
+
 				_G.InspectFrame.InspectInfoHooked = true
 			end)
 		end
