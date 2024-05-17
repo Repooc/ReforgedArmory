@@ -1,5 +1,5 @@
 local E, L, _, P = unpack(ElvUI)
-local module = E:GetModule('ElvUI_WrathArmory')
+local module = E:GetModule('ElvUI_CataArmory')
 local ACH = E.Libs.ACH
 local C
 
@@ -28,20 +28,21 @@ local SideSlotGrowthDirection = {
 local function actionGroup(info, which, groupName, ...)
 	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel'
 	if info.type == 'color' then
-		local color = E.db.wratharmory[which][groupName][info[#info]]
+		print(info, info.type, which, groupName, force)
+		local color = E.db.cataarmory[which][groupName][info[#info]]
 		local r, g, b, a = ...
 		if r then
 			color.r, color.g, color.b, color.a = r, g, b, a
 		else
-			local d = P.wratharmory[which][groupName][info[#info]]
+			local d = P.cataarmory[which][groupName][info[#info]]
 			return color.r, color.g, color.b, color.a, d.r, d.g, d.b, d.a
 		end
 	else
 		local value = ...
 		if value ~= nil then
-			E.db.wratharmory[which][groupName][info[#info]] = value
+			E.db.cataarmory[which][groupName][info[#info]] = value
 		else
-			return E.db.wratharmory[which][groupName][info[#info]]
+			return E.db.cataarmory[which][groupName][info[#info]]
 		end
 	end
 
@@ -52,20 +53,20 @@ end
 local function actionSubGroup(info, which, groupName, subGroup, ...)
 	local force = groupName == 'gems' or groupName == 'warningIndicator'
 	if info.type == 'color' then
-		local color = E.db.wratharmory[which][groupName][subGroup][info[#info]]
+		local color = E.db.cataarmory[which][groupName][subGroup][info[#info]]
 		local r, g, b, a = ...
 		if r then
 			color.r, color.g, color.b, color.a = r, g, b, a
 		else
-			local d = P.wratharmory[which][groupName][subGroup][info[#info]]
+			local d = P.cataarmory[which][groupName][subGroup][info[#info]]
 			return color.r, color.g, color.b, color.a, d.r, d.g, d.b, d.a
 		end
 	else
 		local value = ...
 		if value ~= nil then
-			E.db.wratharmory[which][groupName][subGroup][info[#info]] = value
+			E.db.cataarmory[which][groupName][subGroup][info[#info]] = value
 		else
-			return E.db.wratharmory[which][groupName][subGroup][info[#info]]
+			return E.db.cataarmory[which][groupName][subGroup][info[#info]]
 		end
 	end
 
@@ -82,7 +83,7 @@ local SharedOptions = {
 local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 	local config = ACH:Group(L["Average Item Level"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
 	config.args = CopyTable(SharedOptions)
-	config.args.gearScore = ACH:Toggle(L["Show GearScore"], nil, 0)
+	-- config.args.gearScore = ACH:Toggle(L["Show GearScore"], nil, 0)
 	config.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
 	config.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
 	config.args.fontSize = ACH:Range(L["Font Size"], nil, 4, C.Values.FontSize)
@@ -102,7 +103,7 @@ local function GetOptionsTable_EnchantGroup(which, groupName)
 	config.args.growthDirection = ACH:Select(L["Growth Direction"], nil, 8, SideSlotGrowthDirection)
 	config.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 9, AllPoints) --! Change terminology to reference slot instead of frame?
 	config.args.qualityColor = ACH:Toggle(L["Quality Color"], L["Use the same color as the quality color of the equipped item."], 10)
-	config.args.color = ACH:Color(L["Color"], nil, 11, nil, nil, nil, nil, function() return E.db.wratharmory[which][groupName].qualityColor end)
+	config.args.color = ACH:Color(L["Color"], nil, 11, nil, nil, nil, nil, function() return E.db.cataarmory[which][groupName].qualityColor end)
 
 	--* Main Hand Slot
 	local MainHandSlot = ACH:Group(L["Main Hand Slot"], nil, 10, nil, function(info) return actionSubGroup(info, which, groupName, 'MainHandSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'MainHandSlot', ...) end)
@@ -166,7 +167,7 @@ local function GetOptionsTable_ItemLevelGroup(which, groupName)
 	config.args.fontSize = ACH:Range(L["Font Size"], nil, 4, C.Values.FontSize)
 	config.args.spacer2 = ACH:Spacer(5, 'full')
 	config.args.qualityColor = ACH:Toggle(L["Quality Color"], L["Use the same color as the quality color of the equipped item."], 10)
-	config.args.color = ACH:Color(L["Color"], nil, 11, nil, nil, nil, nil, function() return E.db.wratharmory[which][groupName].qualityColor end)
+	config.args.color = ACH:Color(L["Color"], nil, 11, nil, nil, nil, nil, function() return E.db.cataarmory[which][groupName].qualityColor end)
 
 	return config
 end
@@ -181,25 +182,25 @@ end
 local function configTable()
 	C = unpack(E.Config)
 	local Armory = ACH:Group('|cFF16C3F2Wrath|rArmory', nil, 6, 'tab')
-	E.Options.args.wratharmory = Armory
+	E.Options.args.cataarmory = Armory
 
 	--* Character Frame
 	local Character = ACH:Group(L["Character"], nil, 0)
 	Armory.args.character = Character
 	Character.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('character', 'avgItemLevel')
-	Character.args.enchant = GetOptionsTable_EnchantGroup('character', 'enchant')
-	Character.args.itemLevel = GetOptionsTable_ItemLevelGroup('character', 'itemLevel')
-	Character.args.gems = GetOptionsTable_Gems('character', 'gems')
-	Character.args.warningIndicator = GetOptionsTable_WarningIndicator('character', 'warningIndicator')
+	-- Character.args.enchant = GetOptionsTable_EnchantGroup('character', 'enchant')
+	-- Character.args.itemLevel = GetOptionsTable_ItemLevelGroup('character', 'itemLevel')
+	-- Character.args.gems = GetOptionsTable_Gems('character', 'gems')
+	-- Character.args.warningIndicator = GetOptionsTable_WarningIndicator('character', 'warningIndicator')
 
 	--* Inspect Frame
     local Inspect = ACH:Group(L["Inspect"], nil, 1)
 	Armory.args.inspect = Inspect
 	Inspect.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('inspect', 'avgItemLevel')
-	Inspect.args.enchant = GetOptionsTable_EnchantGroup('inspect', 'enchant')
-	Inspect.args.itemLevel = GetOptionsTable_ItemLevelGroup('inspect', 'itemLevel')
-	Inspect.args.gems = GetOptionsTable_Gems('inspect', 'gems')
-	Inspect.args.warningIndicator = GetOptionsTable_WarningIndicator('inspect', 'warningIndicator')
+	-- Inspect.args.enchant = GetOptionsTable_EnchantGroup('inspect', 'enchant')
+	-- Inspect.args.itemLevel = GetOptionsTable_ItemLevelGroup('inspect', 'itemLevel')
+	-- Inspect.args.gems = GetOptionsTable_Gems('inspect', 'gems')
+	-- Inspect.args.warningIndicator = GetOptionsTable_WarningIndicator('inspect', 'warningIndicator')
 end
 
 tinsert(module.Configs, configTable)

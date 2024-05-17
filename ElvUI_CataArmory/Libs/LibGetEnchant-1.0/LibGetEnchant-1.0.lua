@@ -1,11 +1,11 @@
-local MAJOR, MINOR = "LibGetEnchant-1.0-WrathArmory", 3
+local MAJOR, MINOR = "LibGetEnchant-1.0-CataArmory", 4
 assert(LibStub, MAJOR.." requires LibStub")
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 
 function lib.GetEnchant(enchantID)
 	local enchant = tonumber(enchantID)
-	if lib.LibGetEnchantDB[enchant] then
-		return lib.LibGetEnchantDB[enchant]
-	end
+	if not lib.LibGetEnchantDB[enchant] then return end
+
+	return lib.LibGetEnchantDB[enchant]
 end
