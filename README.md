@@ -1,4 +1,4 @@
-# WrathArmory (ElvUI Plugin)
+# CataArmory (ElvUI Plugin)
 
 **Do you wish you could display item level, enchants, gems on the character and inspect frame and have your options easily accessible in the ElvUI config?**  
 

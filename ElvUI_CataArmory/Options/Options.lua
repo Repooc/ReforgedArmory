@@ -1,5 +1,6 @@
 local E, L, _, P = unpack(ElvUI)
 local module = E:GetModule('ElvUI_CataArmory')
+local RRP = LibStub('RepoocReforged-1.0'):LoadMainCategory()
 local ACH = E.Libs.ACH
 local C
 
@@ -28,7 +29,6 @@ local SideSlotGrowthDirection = {
 local function actionGroup(info, which, groupName, ...)
 	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel'
 	if info.type == 'color' then
-		print(info, info.type, which, groupName, force)
 		local color = E.db.cataarmory[which][groupName][info[#info]]
 		local r, g, b, a = ...
 		if r then
@@ -181,26 +181,30 @@ end
 
 local function configTable()
 	C = unpack(E.Config)
-	local Armory = ACH:Group('|cFF16C3F2Wrath|rArmory', nil, 6, 'tab')
-	E.Options.args.cataarmory = Armory
+	--* Repooc Reforged Plugin section
+	local rrp = E.Options.args.rrp
+	if not rrp then print("Error Loading Repooc Reforged Plugin Library") return end
+
+	local Armory = ACH:Group('|cff00FF98Cata|r|cffA330C9Armory|r', nil, 6, 'tab')
+	rrp.args.cataarmory = Armory
 
 	--* Character Frame
 	local Character = ACH:Group(L["Character"], nil, 0)
 	Armory.args.character = Character
 	Character.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('character', 'avgItemLevel')
-	-- Character.args.enchant = GetOptionsTable_EnchantGroup('character', 'enchant')
-	-- Character.args.itemLevel = GetOptionsTable_ItemLevelGroup('character', 'itemLevel')
-	-- Character.args.gems = GetOptionsTable_Gems('character', 'gems')
-	-- Character.args.warningIndicator = GetOptionsTable_WarningIndicator('character', 'warningIndicator')
+	Character.args.enchant = GetOptionsTable_EnchantGroup('character', 'enchant')
+	Character.args.itemLevel = GetOptionsTable_ItemLevelGroup('character', 'itemLevel')
+	Character.args.gems = GetOptionsTable_Gems('character', 'gems')
+	Character.args.warningIndicator = GetOptionsTable_WarningIndicator('character', 'warningIndicator')
 
 	--* Inspect Frame
     local Inspect = ACH:Group(L["Inspect"], nil, 1)
 	Armory.args.inspect = Inspect
 	Inspect.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('inspect', 'avgItemLevel')
-	-- Inspect.args.enchant = GetOptionsTable_EnchantGroup('inspect', 'enchant')
-	-- Inspect.args.itemLevel = GetOptionsTable_ItemLevelGroup('inspect', 'itemLevel')
-	-- Inspect.args.gems = GetOptionsTable_Gems('inspect', 'gems')
-	-- Inspect.args.warningIndicator = GetOptionsTable_WarningIndicator('inspect', 'warningIndicator')
+	Inspect.args.enchant = GetOptionsTable_EnchantGroup('inspect', 'enchant')
+	Inspect.args.itemLevel = GetOptionsTable_ItemLevelGroup('inspect', 'itemLevel')
+	Inspect.args.gems = GetOptionsTable_Gems('inspect', 'gems')
+	Inspect.args.warningIndicator = GetOptionsTable_WarningIndicator('inspect', 'warningIndicator')
 end
 
 tinsert(module.Configs, configTable)

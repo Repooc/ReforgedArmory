@@ -1,0 +1,3 @@
+[submodule "ElvUI_CataArmory/Libs/RepoocReforged-1.0"]
+	path = ElvUI_CataArmory/Libs/RepoocReforged-1.0
+	url = https://github.com/Repooc/RepoocReforged-1.0.git

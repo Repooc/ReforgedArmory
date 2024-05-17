@@ -1,3 +1,0 @@
-v1.10 11/12/2023
-
-• Added Gearscore option (thanks @chedster)

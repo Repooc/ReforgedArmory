@@ -1,6 +1,11 @@
 package-as: ElvUI_CataArmory
+enable-nolib-creation: no
+externals:
+  ElvUI_CataArmory/Libs/RepoocReforged-1.0:
+    url: https://github.com/Repooc/RepoocReforged-1.0
 manual-changelog:
-    filename: CHANGELOG.txt
-    markup-type: bbcode
+    filename: CHANGELOG.md
+    markup-type: markdown
 move-folders:
     ElvUI_CataArmory/ElvUI_CataArmory: ElvUI_CataArmory
+enable-toc-creation: yes

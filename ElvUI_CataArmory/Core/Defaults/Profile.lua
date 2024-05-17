@@ -11,17 +11,6 @@ local SharedFontOptions = {
 	qualityColor = false,
 }
 
--- local SharedEnchantOptions = {
--- 	enable = true,
--- 	font = 'PT Sans Narrow',
--- 	fontSize = 15,
--- 	fontOutline = 'OUTLINE',
--- 	xOffset = 0,
--- 	yOffset = 0,
--- 	color = {r = 0.99, g = 0.81, b = 0},
--- 	qualityColor = false,
--- }
-
 local SharedGemOptions = {
 	enable = true,
 	size = 14,
@@ -45,11 +34,6 @@ local SharedGemOptions = {
 P.cataarmory = {
 	character = {
 		enable = true,
-		characterLevelText = {
-			enable = true,
-			xOffset = 0,
-			yOffset = 3,
-		},
 		avgItemLevel = CopyTable(SharedFontOptions),
 		enchant = CopyTable(SharedFontOptions),
 		gems = CopyTable(SharedGemOptions),

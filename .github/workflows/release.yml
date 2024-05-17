@@ -12,13 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CF_API_KEY: ${{ secrets.CF_API_KEY }}
-      CF_URL: https://www.curseforge.com/wow/addons/wratharmory-elvui-plugin
+      CF_URL: https://www.curseforge.com/wow/addons/cataarmory-elvui-plugin
       WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
-      WAGO_URL: https://addons.wago.io/addons/wratharmory-elvui-plugin
+      WAGO_URL: https://addons.wago.io/addons/cataarmory-elvui-plugin
       DISCORD_NEWS_CHANNEL_ID: "1164433316976537620"
       RR_AUTHOR_SUPPORT_INFO_NAME: "general-info"
       RR_AUTHOR_SUPPORT_INFO_URL: "https://discord.com/channels/1162274244487561216/1171940634672767128"
-      RR_ADDON_CHANNEL_NAME: "wrath-armory"
+      RR_ADDON_CHANNEL_NAME: "cata-armory"
       RR_ADDON_CHANNEL_URL: "https://discord.com/channels/1162274244487561216/1162288082427576340"
     steps:
       - name: Clone Project
