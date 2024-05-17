@@ -22,7 +22,7 @@ jobs:
       RR_ADDON_CHANNEL_URL: "https://discord.com/channels/1162274244487561216/1162288082427576340"
     steps:
       - name: Clone Project
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 100
       - name: Setup Environment
@@ -51,14 +51,14 @@ jobs:
           bot-token: ${{ secrets.ANNOUNCER_BOT_TOKEN }}
           channel: ${{ env.DISCORD_NEWS_CHANNEL_ID }}
           content: |
-            **__${{ github.event.repository.name }}__** **v${{ env.RELEASE_VERSION }}** *has been released!*  
-              
+            **__${{ github.event.repository.name }}__** **v${{ env.RELEASE_VERSION }}** *has been released!*
+
             You can view the changes made by viewing the [changelog](<${{ github.event.repository.html_url }}/blob/main/CHANGELOG.txt>) here!
-              
+
             Go grab the new version from [Wago AddOns](<${{ env.WAGO_URL }}>) or [Curse](<${{ env.CF_URL }}>)!
-              
+
             If you would like to help support the work I do, consider supporting me via the [Discord Shop](https://discord.com/servers/repooc-reforged-1162274244487561216) or the other various ways listed in the [${{env.RR_AUTHOR_SUPPORT_INFO_NAME}}](<${{env.RR_AUTHOR_SUPPORT_INFO_URL}}>) channel.
-              
+
             You can get help for the addon in the [${{env.RR_ADDON_CHANNEL_NAME}}](<${{env.RR_ADDON_CHANNEL_URL}}>) support channel!
       - name: Print message id
         run: echo "Message id = ${{ steps.publish-to-discord.outputs.message-id }}"
