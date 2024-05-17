@@ -1,6 +1,6 @@
-package-as: ElvUI_WrathArmory
+package-as: ElvUI_CataArmory
 manual-changelog:
     filename: CHANGELOG.txt
     markup-type: bbcode
 move-folders:
-    ElvUI_WrathArmory/ElvUI_WrathArmory: ElvUI_WrathArmory
+    ElvUI_CataArmory/ElvUI_CataArmory: ElvUI_CataArmory
