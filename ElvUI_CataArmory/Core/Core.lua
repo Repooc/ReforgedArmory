@@ -234,9 +234,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 
 		local text = slotInfo.enchantTextShort
 		if itemLink then
-			-- print('WarnCheck', text == '' and 'empty string', canEnchant)
 			if text == '' and canEnchant then
-				print(itemLink, text and (text == '' and 'no string' or text) or 'nil', canEnchant)
 				missingEnchant = true
 				warningMsg = strjoin('', warningMsg, '|cffff0000', L["Not Enchanted"], '|r\n')
 			end
