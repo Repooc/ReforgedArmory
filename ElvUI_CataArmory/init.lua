@@ -118,7 +118,7 @@ function module:Initialize()
 		module:RegisterEvent('ADDON_LOADED')
 	end
 
-	-- module:UpdateOptions()
+	hooksecurefunc(E, 'UpdateDB', module.UpdateOptions)
 end
 
 E.Libs.EP:HookInitialize(module, module.Initialize)
