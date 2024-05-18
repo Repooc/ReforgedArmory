@@ -191,6 +191,7 @@ local function configTable()
 	--* Character Frame
 	local Character = ACH:Group(L["Character"], nil, 0)
 	Armory.args.character = Character
+	Character.args.enable = ACH:Toggle(L["Enable"], nil, 0, nil, nil, nil, function(info) return E.db.cataarmory.character.enable end, function(info, value) E.db.cataarmory.character.enable = value module:ToggleItemLevelInfo() end)
 	Character.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('character', 'avgItemLevel')
 	Character.args.enchant = GetOptionsTable_EnchantGroup('character', 'enchant')
 	Character.args.itemLevel = GetOptionsTable_ItemLevelGroup('character', 'itemLevel')
@@ -200,6 +201,7 @@ local function configTable()
 	--* Inspect Frame
     local Inspect = ACH:Group(L["Inspect"], nil, 1)
 	Armory.args.inspect = Inspect
+	Inspect.args.enable = ACH:Toggle(L["Enable"], nil, 0, nil, nil, nil, function(info) return E.db.cataarmory.inspect.enable end, function(info, value) E.db.cataarmory.inspect.enable = value module:ToggleItemLevelInfo() end)
 	Inspect.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('inspect', 'avgItemLevel')
 	Inspect.args.enchant = GetOptionsTable_EnchantGroup('inspect', 'enchant')
 	Inspect.args.itemLevel = GetOptionsTable_ItemLevelGroup('inspect', 'itemLevel')
