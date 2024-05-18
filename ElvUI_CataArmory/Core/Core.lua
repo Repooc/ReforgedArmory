@@ -166,13 +166,16 @@ function module:ClearPageInfo(frame, which)
 	if not frame or not which then return end
 	frame.ItemLevelText:SetText('')
 
+	if _G['CataArmory_'..which..'_AvgItemLevel'] then _G['CataArmory_'..which..'_AvgItemLevel']:Hide() end
+
 	for slot in pairs(module.GearList) do
 		local inspectItem = _G[which..slot]
 
 		inspectItem.enchantText:SetText('')
 		inspectItem.iLvlText:SetText('')
+		inspectItem.CataArmory_Warning:Hide()
 
-		for y = 1, 10 do
+		for y = 1, 5 do
 			inspectItem['CA_textureSlot'..y]:SetTexture()
 			inspectItem['CA_textureSlotBackdrop'..y]:Hide()
 		end
@@ -210,6 +213,7 @@ function module:ToggleItemLevelInfo(setupCharacterPage)
 
 	if E.db.cataarmory.inspect.enable then
 		module:RegisterEvent('INSPECT_READY', 'UpdateInspectInfo')
+		module:UpdateInspectInfo()
 	else
 		module:UnregisterEvent('INSPECT_READY')
 		module:ClearPageInfo(_G.InspectFrame, 'Inspect')
@@ -334,7 +338,7 @@ function module:UpdateAverageString(frame, which, iLevelDB)
 		frame.ItemLevelText:SetText('')
 	end
 
-	local avgItemLevelFame = _G['CataArmory_'..which ..'_AvgItemLevel'] or CreateFrame('Frame', 'CataArmory_'..which ..'_AvgItemLevel', (isCharPage and PaperDollFrame) or InspectPaperDollFrame)
+	local avgItemLevelFame = _G['CataArmory_'..which..'_AvgItemLevel'] or CreateFrame('Frame', 'CataArmory_'..which..'_AvgItemLevel', (isCharPage and PaperDollFrame) or InspectPaperDollFrame)
 	avgItemLevelFame:SetHeight(db.fontSize + 6)
 	avgItemLevelFame:SetShown(db.enable)
 end
@@ -390,7 +394,7 @@ local function CreateItemLevel(frame, which)
 	local db = E.db.cataarmory[string.lower(which)].avgItemLevel
 	local isCharPage = which == 'Character'
 
-	local textFrame = CreateFrame('Frame', 'CataArmory_'..which ..'_AvgItemLevel', (isCharPage and PaperDollFrame) or InspectPaperDollFrame)
+	local textFrame = CreateFrame('Frame', 'CataArmory_'..which..'_AvgItemLevel', (isCharPage and PaperDollFrame) or InspectPaperDollFrame)
 	textFrame:Size(170, 30)
 	textFrame:Point('TOP', db.xOffset, db.yOffset)
 
@@ -434,6 +438,8 @@ local function CreateItemLevel(frame, which)
 
 	module[string.lower(which)] = {}
 	module[string.lower(which)].ItemLevelText = text
+
+	textFrame:Hide()
 end
 
 local function Warning_OnEnter(frame)
@@ -520,7 +526,7 @@ function module:UpdateInspectPageFonts(which, force)
 
 	frame.ItemLevelText:FontTemplate(LSM:Fetch('font', avgItemLevel.font), avgItemLevel.fontSize, avgItemLevel.fontOutline)
 
-	local avgItemLevelFame = _G['CataArmory_'..which ..'_AvgItemLevel']
+	local avgItemLevelFame = _G['CataArmory_'..which..'_AvgItemLevel']
 	avgItemLevelFame:SetHeight(avgItemLevel.fontSize + 6)
 	avgItemLevelFame:ClearAllPoints()
 	avgItemLevelFame:Point('TOP', avgItemLevel.xOffset, avgItemLevel.yOffset)
