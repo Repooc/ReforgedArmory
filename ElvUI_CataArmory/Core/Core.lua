@@ -69,11 +69,11 @@ local whileOpenEvents = {
 function module:CreateGemTexture(slot, point, relativePoint, x, y, gemStep, spacing)
 	local prevGem = gemStep - 1
 	local texture = slot:CreateTexture()
-	texture:Point(point, (gemStep == 1 and slot) or slot['textureSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
+	texture:Point(point, (gemStep == 1 and slot) or slot['CA_textureSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
 	texture:SetTexCoord(unpack(E.TexCoords))
 	texture:Size(14)
 
-	local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['textureSlotBackdrop'..prevGem])
+	local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['CA_textureSlotBackdrop'..prevGem])
 	backdrop:SetTemplate(nil, nil, true)
 	backdrop:SetBackdropColor(0,0,0,0)
 	backdrop:SetOutside(texture)
@@ -173,8 +173,8 @@ function module:ClearPageInfo(frame, which)
 		inspectItem.iLvlText:SetText('')
 
 		for y = 1, 10 do
-		inspectItem['textureSlot'..y]:SetTexture()
-		inspectItem['textureSlotBackdrop'..y]:Hide()
+			inspectItem['CA_textureSlot'..y]:SetTexture()
+			inspectItem['CA_textureSlotBackdrop'..y]:Hide()
 		end
 	end
 end
@@ -282,12 +282,12 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 		local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
 		local gemStep = 1
 		for index = 1, 5 do
-			local texture = inspectItem['textureSlot'..index]
+			local texture = inspectItem['CA_textureSlot'..index]
 			texture:Size(db.gems.size)
 			texture:ClearAllPoints()
-			texture:Point(point, (index == 1 and inspectItem) or inspectItem['textureSlot'..(index-1)], relativePoint, index == 1 and x or spacing, index == 1 and y or 0)
+			texture:Point(point, (index == 1 and inspectItem) or inspectItem['CA_textureSlot'..(index-1)], relativePoint, index == 1 and x or spacing, index == 1 and y or 0)
 
-			local backdrop = inspectItem['textureSlotBackdrop'..index]
+			local backdrop = inspectItem['CA_textureSlotBackdrop'..index]
 			local gem = slotInfo.gems and slotInfo.gems[gemStep]
 			if gem then
 				texture:SetTexture(gem)
@@ -498,7 +498,7 @@ function module:CreateSlotStrings(frame, which)
 		do
 			local point, relativePoint, x, y, spacing = module:GetGemPoints(info.slotID, db)
 			for u = 1, 5 do
-				slot['textureSlot'..u], slot['textureSlotBackdrop'..u] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
+				slot['CA_textureSlot'..u], slot['CA_textureSlotBackdrop'..u] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
 			end
 		end
 	end
