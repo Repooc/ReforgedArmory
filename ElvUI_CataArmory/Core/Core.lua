@@ -140,14 +140,16 @@ function module:GetEnchantPoints(id, db)
 end
 
 function module:UpdateInspectInfo(_, arg1)
+	if not _G.InspectFrame then return end
+
 	E:Delay(0.75, function()
 		if _G.InspectFrame and _G.InspectFrame:IsVisible() then
 			module:UpdatePageInfo(_G.InspectFrame, 'Inspect', arg1)
 		end
 	end)
 	module:UpdatePageInfo(_G.InspectFrame, 'Inspect', arg1)
-	if _G.InspectFrame and _G.InspectFrame.ItemLevelText then
-		_G.InspectFrame.ItemLevelText:FontTemplate(LSM:Fetch('font', E.db.cataarmory.inspect.avgItemLevel.font), E.db.cataarmory.inspect.avgItemLevel.fontSize, E.db.cataarmory.inspect.avgItemLevel.fontOutline)
+	if _G.InspectFrame and _G.InspectFrame.CataArmory_AvgItemLevel and _G.InspectFrame.CataArmory_AvgItemLevel.Text then
+		_G.InspectFrame.CataArmory_AvgItemLevel.Text:FontTemplate(LSM:Fetch('font', E.db.cataarmory.inspect.avgItemLevel.font), E.db.cataarmory.inspect.avgItemLevel.fontSize, E.db.cataarmory.inspect.avgItemLevel.fontOutline)
 	end
 end
 
@@ -164,14 +166,16 @@ end
 
 function module:ClearPageInfo(frame, which)
 	if not frame or not which then return end
-	frame.ItemLevelText:SetText('')
 
-	if _G['CataArmory_'..which..'_AvgItemLevel'] then _G['CataArmory_'..which..'_AvgItemLevel']:Hide() end
+	if frame.CataArmory_AvgItemLevel then
+		frame.CataArmory_AvgItemLevel:Hide()
+		frame.CataArmory_AvgItemLevel.Text:SetText('')
+	end
 
 	for slot in pairs(module.GearList) do
 		local inspectItem = _G[which..slot]
 
-		inspectItem.enchantText:SetText('')
+		inspectItem.CataArmory_EnchantText:SetText('')
 		inspectItem.iLvlText:SetText('')
 		inspectItem.CataArmory_Warning:Hide()
 
@@ -232,13 +236,12 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local canEnchant = module.GearList[slotName].canEnchant
 	do
 		local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
-		inspectItem.enchantText:ClearAllPoints()
-		inspectItem.enchantText:Point(point, inspectItem, relativePoint, x, y)
-		inspectItem.enchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
+		inspectItem.CataArmory_EnchantText:ClearAllPoints()
+		inspectItem.CataArmory_EnchantText:Point(point, inspectItem, relativePoint, x, y)
+		inspectItem.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
 
-		local text = slotInfo.enchantTextShort
 		if itemLink then
-			if text == '' and canEnchant then
+			if slotInfo.enchantText == '' and canEnchant then
 				missingEnchant = true
 				warningMsg = strjoin('', warningMsg, '|cffff0000', L["Not Enchanted"], '|r\n')
 			end
@@ -254,11 +257,11 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 			inspectItem.CataArmory_Warning.Reason = warningMsg
 		end
 		inspectItem.CataArmory_Warning:SetShown(db.warningIndicator.enable and (missingEnchant or missingGem or missingBuckle))
-		inspectItem.enchantText:SetText(text)
-		inspectItem.enchantText:SetShown(db.enchant.enable)
+		inspectItem.CataArmory_EnchantText:SetText(slotInfo.enchantText)
+		inspectItem.CataArmory_EnchantText:SetShown(db.enchant.enable)
 		local enchantTextColor = (db.enchant.qualityColor and slotInfo.itemQualityColors) or db.enchant.color
 		if enchantTextColor and next(enchantTextColor) then
-			inspectItem.enchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
+			inspectItem.CataArmory_EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
 		end
 	end
 
@@ -311,7 +314,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 end
 
 function module:UpdateAverageString(frame, which, iLevelDB)
-	if not iLevelDB then return end
+	if not iLevelDB or not frame then return end
 
 	local db = E.db.cataarmory[string.lower(which)].avgItemLevel
 	local isCharPage, avgItemLevel, avgTotal = which == 'Character'
@@ -325,17 +328,17 @@ function module:UpdateAverageString(frame, which, iLevelDB)
 
 	if avgItemLevel then
 		if isCharPage then
-			frame.ItemLevelText:SetText(avgItemLevel)
-			frame.ItemLevelText:SetTextColor(db.color.r, db.color.g, db.color.b)
+			frame.CataArmory_AvgItemLevel.Text:SetText(avgItemLevel)
+			frame.CataArmory_AvgItemLevel.Text:SetTextColor(db.color.r, db.color.g, db.color.b)
 		else
-			frame.ItemLevelText:SetText(avgItemLevel)
-			frame.ItemLevelText:SetTextColor(db.color.r, db.color.g, db.color.b)
-			frame.ItemLevelText:ClearAllPoints()
-			frame.ItemLevelText:Point('CENTER', _G['CataArmory_'..which..'_AvgItemLevel'], 0, -2)
+			frame.CataArmory_AvgItemLevel.Text:SetText(avgItemLevel)
+			frame.CataArmory_AvgItemLevel.Text:SetTextColor(db.color.r, db.color.g, db.color.b)
+			frame.CataArmory_AvgItemLevel.Text:ClearAllPoints()
+			frame.CataArmory_AvgItemLevel.Text:Point('CENTER', frame.CataArmory_AvgItemLevel, 0, -2)
 			-- CataArmory_ItemLevelText.ItemLevelText:SetFormattedText(L["Item level: %.2f"], AvgItemLevel) --* Remember to remove this and remove if not needed
 		end
 	else
-		frame.ItemLevelText:SetText('')
+		frame.CataArmory_AvgItemLevel.Text:SetText('')
 	end
 
 	local avgItemLevelFame = _G['CataArmory_'..which..'_AvgItemLevel'] or CreateFrame('Frame', 'CataArmory_'..which..'_AvgItemLevel', (isCharPage and PaperDollFrame) or InspectPaperDollFrame)
@@ -367,7 +370,7 @@ do
 		local waitForItems
 		for slot, info in pairs(module.GearList) do
 			local inspectItem = _G[which..slot]
-			inspectItem.enchantText:SetText('')
+			inspectItem.CataArmory_EnchantText:SetText('')
 			inspectItem.iLvlText:SetText('')
 
 			local unit = (which == 'Character' and 'player') or frame.unit
@@ -388,7 +391,7 @@ do
 	end
 end
 
-local function CreateItemLevel(frame, which)
+local function CreateAvgItemLevel(frame, which)
 	if not frame or not which then return end
 
 	local db = E.db.cataarmory[string.lower(which)].avgItemLevel
@@ -398,46 +401,45 @@ local function CreateItemLevel(frame, which)
 	textFrame:Size(170, 30)
 	textFrame:Point('TOP', db.xOffset, db.yOffset)
 
-	if not textFrame.bg then
-		textFrame.bg = textFrame:CreateTexture(nil, 'BACKGROUND')
+	if not textFrame.Background then
+		textFrame.Background = textFrame:CreateTexture(nil, 'BACKGROUND')
 	end
-	textFrame.bg:SetTexture([[Interface\LevelUp\LevelUpTex]])
-	textFrame.bg:ClearAllPoints()
-	textFrame.bg:SetPoint('CENTER')
-	textFrame.bg:Point('TOPLEFT', textFrame)
-	textFrame.bg:Point('BOTTOMRIGHT', textFrame)
-	textFrame.bg:SetTexCoord(0.00195313, 0.63867188, 0.03710938, 0.23828125)
-	textFrame.bg:SetVertexColor(1, 1, 1, 0.7)
+	textFrame.Background:SetTexture([[Interface\LevelUp\LevelUpTex]])
+	textFrame.Background:ClearAllPoints()
+	textFrame.Background:SetPoint('CENTER')
+	textFrame.Background:Point('TOPLEFT', textFrame)
+	textFrame.Background:Point('BOTTOMRIGHT', textFrame)
+	textFrame.Background:SetTexCoord(0.00195313, 0.63867188, 0.03710938, 0.23828125)
+	textFrame.Background:SetVertexColor(1, 1, 1, 0.7)
 
-	if not textFrame.lineTop then
-		textFrame.lineTop = textFrame:CreateTexture(nil, 'BACKGROUND')
+	if not textFrame.TopLine then
+		textFrame.TopLine = textFrame:CreateTexture(nil, 'BACKGROUND')
 	end
-	textFrame.lineTop:SetDrawLayer('BACKGROUND', 2)
-	textFrame.lineTop:SetTexture([[Interface\LevelUp\LevelUpTex]])
-	textFrame.lineTop:ClearAllPoints()
-	textFrame.lineTop:SetPoint('TOP', textFrame.bg, 0, 4)
-	textFrame.lineTop:SetTexCoord(0.00195313, 0.81835938, 0.01953125, 0.03320313)
-	textFrame.lineTop:Size(textFrame:GetWidth(), 7)
+	textFrame.TopLine:SetDrawLayer('BACKGROUND', 2)
+	textFrame.TopLine:SetTexture([[Interface\LevelUp\LevelUpTex]])
+	textFrame.TopLine:ClearAllPoints()
+	textFrame.TopLine:SetPoint('TOP', textFrame.Background, 0, 4)
+	textFrame.TopLine:SetTexCoord(0.00195313, 0.81835938, 0.01953125, 0.03320313)
+	textFrame.TopLine:Size(textFrame:GetWidth(), 7)
 
-	if not textFrame.lineBottom then
-		textFrame.lineBottom = textFrame:CreateTexture(nil, 'BACKGROUND')
+	if not textFrame.BottomLine then
+		textFrame.BottomLine = textFrame:CreateTexture(nil, 'BACKGROUND')
 	end
-	textFrame.lineBottom:SetDrawLayer('BACKGROUND', 2)
-	textFrame.lineBottom:SetTexture([[Interface\LevelUp\LevelUpTex]])
-	textFrame.lineBottom:ClearAllPoints()
-	textFrame.lineBottom:SetPoint('BOTTOM', textFrame.bg, 0, 0)
-	textFrame.lineBottom:SetTexCoord(0.00195313, 0.81835938, 0.01953125, 0.03320313)
-	textFrame.lineBottom:Size(textFrame:GetWidth(), 7)
+	textFrame.BottomLine:SetDrawLayer('BACKGROUND', 2)
+	textFrame.BottomLine:SetTexture([[Interface\LevelUp\LevelUpTex]])
+	textFrame.BottomLine:ClearAllPoints()
+	textFrame.BottomLine:SetPoint('BOTTOM', textFrame.Background, 0, 0)
+	textFrame.BottomLine:SetTexCoord(0.00195313, 0.81835938, 0.01953125, 0.03320313)
+	textFrame.BottomLine:Size(textFrame:GetWidth(), 7)
 
 	local text = textFrame:CreateFontString(nil, 'OVERLAY')
 	text:FontTemplate(LSM:Fetch('font', db.font), db.fontSize, db.fontOutline)
 	text:SetText('')
 	text:SetPoint('CENTER', 0, -2)
 	text:SetTextColor(db.color.r, db.color.g, db.color.b)
-	frame.ItemLevelText = text
 
-	module[string.lower(which)] = {}
-	module[string.lower(which)].ItemLevelText = text
+	frame.CataArmory_AvgItemLevel = textFrame
+	frame.CataArmory_AvgItemLevel.Text = text
 
 	textFrame:Hide()
 end
@@ -462,19 +464,25 @@ function module:CreateSlotStrings(frame, which)
 	local itemLevel = db.itemLevel
 	local enchant = db.enchant
 
+	CreateAvgItemLevel(frame, which)
+
 	if which == 'Inspect' then
-		CreateItemLevel(frame, which)
 		InspectFrameTab1:ClearAllPoints()
-		InspectFrameTab1:Point('CENTER', InspectFrame, 'BOTTOMLEFT', 60, 51)
+		InspectFrameTab1:Point('TOPLEFT', InspectFrame, 'BOTTOMLEFT', 1, 66)
 	end
+
 	for slotName, info in pairs(module.GearList) do
 		local slot = _G[which..slotName]
-		slot.iLvlText = slot:CreateFontString(nil, 'OVERLAY')
+		if not slot.iLvlText then
+			slot.iLvlText = slot:CreateFontString(nil, 'OVERLAY')
+		end
 		slot.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
 		slot.iLvlText:Point('BOTTOM', slot, itemLevel.xOffset, itemLevel.yOffset)
 
 		--* Warning
-		slot.CataArmory_Warning = CreateFrame('Frame', nil, slot)
+		if not slot.CataArmory_Warning then
+			slot.CataArmory_Warning = CreateFrame('Frame', nil, slot)
+		end
 		do
 			-- local point, relativePoint, x, y = module:GetWarningPoints(info.slotID, db)
 			local point1, relativePoint1, point2, relativePoint2, size, x1, y1, x2, y2, spacing = module:GetWarningPoints(info.slotID, db)
@@ -492,13 +500,15 @@ function module:CreateSlotStrings(frame, which)
 		end
 
 		--* Enchant Text
-		slot.enchantText = slot:CreateFontString(nil, 'OVERLAY')
-		slot.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
+		if not slot.CataArmory_EnchantText then
+			slot.CataArmory_EnchantText = slot:CreateFontString(nil, 'OVERLAY')
+		end
+		slot.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
 
 		do
 			local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
-			slot.enchantText:ClearAllPoints()
-			slot.enchantText:Point(point, slot, relativePoint, x, y)
+			slot.CataArmory_EnchantText:ClearAllPoints()
+			slot.CataArmory_EnchantText:Point(point, slot, relativePoint, x, y)
 		end
 
 		do
@@ -511,7 +521,36 @@ function module:CreateSlotStrings(frame, which)
 end
 
 function module:SetupInspectPageInfo()
-	module:CreateSlotStrings(_G.InspectFrame, 'Inspect')
+	local frame = _G.InspectFrame
+	if frame then
+		module:CreateSlotStrings(frame, 'Inspect')
+		frame:HookScript('OnShow', function()
+			if frame.InspectInfoHooked then return end
+
+			--* Move Rotate Buttons on InspectFrame
+			S:HandleFrame(InspectFrame, true, nil, 11, -12, -5, 65)
+			local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
+			InspectModelFrameRotateLeftButton:ClearAllPoints()
+			InspectModelFrameRotateLeftButton:Point('TOPLEFT', (isSkinned and frame.backdrop.Center) or frame, 'TOPLEFT', 3, -3)
+
+			-- frame:Width(410)
+			InspectHandsSlot:ClearAllPoints()
+			InspectHandsSlot:Point('TOPRIGHT', (isSkinned and frame.backdrop.Center) or InspectPaperDollItemsFrame, 'TOPRIGHT', -10, -56)
+
+			InspectModelFrame:ClearAllPoints()
+			InspectModelFrame:Point('TOP', 0, -78)
+
+			InspectSecondaryHandSlot:ClearAllPoints()
+			InspectSecondaryHandSlot:Point('BOTTOM', (isSkinned and frame.backdrop.Center) or InspectPaperDollItemsFrame, 'BOTTOM', 0, 20)
+			InspectMainHandSlot:ClearAllPoints()
+			InspectMainHandSlot:Point('TOPRIGHT', (isSkinned and InspectSecondaryHandSlot) or InspectPaperDollItemsFrame, 'TOPLEFT', -5, 0)
+
+			_G.InspectFrameCloseButton:ClearAllPoints()
+			_G.InspectFrameCloseButton:Point('TOPRIGHT', (isSkinned and frame.backdrop.Center) or frame, 'TOPRIGHT', -4, -4)
+
+			frame.InspectInfoHooked = true
+		end)
+	end
 end
 
 function module:UpdateInspectPageFonts(which, force)
@@ -524,13 +563,12 @@ function module:UpdateInspectPageFonts(which, force)
 	local db = E.db.cataarmory[string.lower(which)]
 	local itemLevel, enchant, avgItemLevel = db.itemLevel, db.enchant, db.avgItemLevel
 
-	frame.ItemLevelText:FontTemplate(LSM:Fetch('font', avgItemLevel.font), avgItemLevel.fontSize, avgItemLevel.fontOutline)
+	frame.CataArmory_AvgItemLevel.Text:FontTemplate(LSM:Fetch('font', avgItemLevel.font), avgItemLevel.fontSize, avgItemLevel.fontOutline)
 
-	local avgItemLevelFame = _G['CataArmory_'..which..'_AvgItemLevel']
-	avgItemLevelFame:SetHeight(avgItemLevel.fontSize + 6)
-	avgItemLevelFame:ClearAllPoints()
-	avgItemLevelFame:Point('TOP', avgItemLevel.xOffset, avgItemLevel.yOffset)
-	avgItemLevelFame:SetShown(avgItemLevel.enable)
+	frame.CataArmory_AvgItemLevel:SetHeight(avgItemLevel.fontSize + 6)
+	frame.CataArmory_AvgItemLevel:ClearAllPoints()
+	frame.CataArmory_AvgItemLevel:Point('TOP', avgItemLevel.xOffset, avgItemLevel.yOffset)
+	frame.CataArmory_AvgItemLevel:SetShown(avgItemLevel.enable)
 
 	local slot, quality, iLvlTextColor, enchantTextColor
 	local qualityColor = {}
@@ -553,16 +591,16 @@ function module:UpdateInspectPageFonts(which, force)
 
 			do
 				local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
-				slot.enchantText:ClearAllPoints()
-				slot.enchantText:Point(point, slot, relativePoint, x, y)
+				slot.CataArmory_EnchantText:ClearAllPoints()
+				slot.CataArmory_EnchantText:Point(point, slot, relativePoint, x, y)
 			end
 
-			slot.enchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
+			slot.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
 			enchantTextColor = (enchant.qualityColor and qualityColor) or enchant.color
 			if enchantTextColor and next(enchantTextColor) then
-				slot.enchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
+				slot.CataArmory_EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
 			end
-			slot.enchantText:SetShown(enchant.enable)
+			slot.CataArmory_EnchantText:SetShown(enchant.enable)
 		end
 	end
 
@@ -640,12 +678,12 @@ function module:GetGearSlotInfo(unit, slot)
 		enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
 	end
 
-	local enchantTextShort = E.Libs.GetEnchant.GetEnchant(enchantID)
-	if enchantID and not enchantTextShort then
+	local enchantText = E.Libs.GetEnchant.GetEnchant(enchantID)
+	if enchantID and not enchantText then
 		local msg = format('The enchant id, *%s|r, seems to be missing from our database. Please open a ticket at |cff16c3f2[|r*|Hurl:'..githubURL..'|h'..githubURL..'|h|r|cff16c3f2]|r with the missing id and name of the enchant that found on %s. |cffFF0000If you do not provide the info or post a duplicate ticket, it will be closed without a response.|r', enchantID, itemLink):gsub('*', E.InfoColor)
 		module:Print(msg)
 	end
-	slotInfo.enchantTextShort = enchantTextShort or ''
+	slotInfo.enchantText = enchantText or ''
 
 	tt:Hide()
 
@@ -654,32 +692,6 @@ end
 
 function module:ADDON_LOADED(_, addon)
 	if addon == 'Blizzard_InspectUI' then
-		if not _G.InspectFrame.InspectInfoHooked then
-			_G.InspectFrame:HookScript('OnShow', function()
-				--* Move Rotate Buttons on InspectFrame
-				S:HandleFrame(InspectFrame, true, nil, 11, -12, -5, 65)
-				local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
-				InspectModelFrameRotateLeftButton:ClearAllPoints()
-				InspectModelFrameRotateLeftButton:Point('TOPLEFT', (isSkinned and InspectFrame.backdrop.Center) or InspectFrame, 'TOPLEFT', 3, -3)
-
-				-- _G.InspectFrame:Width(410)
-				InspectHandsSlot:ClearAllPoints()
-				InspectHandsSlot:Point('TOPRIGHT', (isSkinned and InspectFrame.backdrop.Center) or InspectPaperDollItemsFrame, 'TOPRIGHT', -10, -56)
-
-				InspectModelFrame:ClearAllPoints()
-				InspectModelFrame:Point('TOP', 0, -78)
-
-				InspectSecondaryHandSlot:ClearAllPoints()
-				InspectSecondaryHandSlot:Point('BOTTOM', (isSkinned and InspectFrame.backdrop.Center) or InspectPaperDollItemsFrame, 'BOTTOM', 0, 20)
-				InspectMainHandSlot:ClearAllPoints()
-				InspectMainHandSlot:Point('TOPRIGHT', (isSkinned and InspectSecondaryHandSlot) or InspectPaperDollItemsFrame, 'TOPLEFT', -5, 0)
-
-				_G.InspectFrameCloseButton:ClearAllPoints()
-				_G.InspectFrameCloseButton:Point('TOPRIGHT', (isSkinned and InspectFrame.backdrop.Center) or InspectFrame, 'TOPRIGHT', -4, -4)
-
-				_G.InspectFrame.InspectInfoHooked = true
-			end)
-		end
 		module:SetupInspectPageInfo()
 	end
 end

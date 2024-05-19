@@ -1,5 +1,6 @@
 local E, L = unpack(ElvUI)
 local EP = E.Libs.EP
+local M = E.Misc
 local AddOnName, Engine = ...
 
 local module = E:NewModule(AddOnName, 'AceHook-3.0', 'AceEvent-3.0')
@@ -106,9 +107,19 @@ module.GearList = {
 	},
 }
 
+local function DisableElvUIInfo(which, db)
+	if E.db.cataarmory[which].enable then
+		E.db.general.itemLevel[db] = false
+	end
+end
+
 function module:Initialize()
 	EP:RegisterPlugin(AddOnName, GetOptions)
 	E:AddLib('GetEnchant', 'LibGetEnchant-1.0-CataArmory')
+
+	DisableElvUIInfo('character', 'displayCharacterInfo')
+	DisableElvUIInfo('inspect', 'displayInspectInfo')
+	M:ToggleItemLevelInfo()
 
 	module:ToggleItemLevelInfo(true)
 
