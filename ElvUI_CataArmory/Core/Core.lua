@@ -456,6 +456,12 @@ local function Warning_OnLeave()
 	_G.GameTooltip:Hide()
 end
 
+function module:PaperDollFrame_SetLevel()
+	local characterLevelText = E.db.cataarmory.character.characterLevelText
+	CharacterLevelText:ClearAllPoints()
+	CharacterLevelText:Point('TOP', CharacterFrameTitleText, 'BOTTOM', characterLevelText.xOffset, characterLevelText.yOffset)
+end
+
 local WarningTexture = [[Interface\AddOns\ElvUI\Core\Media\Textures\Minimalist]]
 function module:CreateSlotStrings(frame, which)
 	if not frame or not which then return end

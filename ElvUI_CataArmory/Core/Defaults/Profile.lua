@@ -34,6 +34,11 @@ local SharedGemOptions = {
 P.cataarmory = {
 	character = {
 		enable = true,
+		characterLevelText = {
+			enable = true,
+			xOffset = 0,
+			yOffset = 3,
+		},
 		avgItemLevel = CopyTable(SharedFontOptions),
 		enchant = CopyTable(SharedFontOptions),
 		gems = CopyTable(SharedGemOptions),

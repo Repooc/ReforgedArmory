@@ -129,7 +129,8 @@ function module:Initialize()
 		module:RegisterEvent('ADDON_LOADED')
 	end
 
-	hooksecurefunc(E, 'UpdateDB', module.UpdateOptions)
+	module:SecureHook('PaperDollFrame_SetLevel', module.PaperDollFrame_SetLevel)
+	module:SecureHook(E, 'UpdateDB', module.UpdateOptions)
 end
 
 E.Libs.EP:HookInitialize(module, module.Initialize)
