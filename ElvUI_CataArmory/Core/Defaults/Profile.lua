@@ -34,25 +34,36 @@ local SharedGemOptions = {
 P.cataarmory = {
 	character = {
 		enable = true,
-		characterLevelText = {
+		levelText = {
 			enable = true,
 			xOffset = 0,
-			yOffset = 3,
+			yOffset = 2,
 		},
 		avgItemLevel = CopyTable(SharedFontOptions),
 		enchant = CopyTable(SharedFontOptions),
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
+		slotBackground = {
+			color = { .41, .83, 1 },
+		},
 		warningIndicator = {
 			enable = false,
 		},
 	},
 	inspect = {
 		enable = true,
+		levelText = {
+			enable = true,
+			xOffset = 0,
+			yOffset = -3,
+		},
 		avgItemLevel = CopyTable(SharedFontOptions),
 		enchant = CopyTable(SharedFontOptions),
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
+		slotBackground = {
+			color = { .41, .83, 1 },
+		},
 		warningIndicator = {
 			enable = false,
 		},

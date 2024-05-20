@@ -172,6 +172,13 @@ local function GetOptionsTable_ItemLevelGroup(which, groupName)
 	return config
 end
 
+local function GetOptionsTable_LevelText(which, groupName)
+	local config = ACH:Group(L["Level Text"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	config.args = CopyTable(SharedOptions)
+
+	return config
+end
+
 local function GetOptionsTable_WarningIndicator(which, groupName)
 	local config = ACH:Group(L["Warning Indicator"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
@@ -185,7 +192,7 @@ local function configTable()
 	local rrp = E.Options.args.rrp
 	if not rrp then print("Error Loading Repooc Reforged Plugin Library") return end
 
-	local Armory = ACH:Group('|cff00FF98Cata|r|cffA330C9Armory|r', nil, 6, 'tab')
+	local Armory = ACH:Group('|cff00FF98Cata|r |cffA330C9Armory|r', nil, 6, 'tab')
 	rrp.args.cataarmory = Armory
 
 	--* Character Frame
@@ -194,8 +201,9 @@ local function configTable()
 	Character.args.enable = ACH:Toggle(L["Enable"], nil, 0, nil, nil, nil, function(info) return E.db.cataarmory.character.enable end, function(info, value) E.db.cataarmory.character.enable = value module:ToggleItemLevelInfo() end)
 	Character.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('character', 'avgItemLevel')
 	Character.args.enchant = GetOptionsTable_EnchantGroup('character', 'enchant')
-	Character.args.itemLevel = GetOptionsTable_ItemLevelGroup('character', 'itemLevel')
 	Character.args.gems = GetOptionsTable_Gems('character', 'gems')
+	Character.args.itemLevel = GetOptionsTable_ItemLevelGroup('character', 'itemLevel')
+	Character.args.levelText = GetOptionsTable_LevelText('character', 'levelText')
 	Character.args.warningIndicator = GetOptionsTable_WarningIndicator('character', 'warningIndicator')
 
 	--* Inspect Frame
@@ -204,8 +212,9 @@ local function configTable()
 	Inspect.args.enable = ACH:Toggle(L["Enable"], nil, 0, nil, nil, nil, function(info) return E.db.cataarmory.inspect.enable end, function(info, value) E.db.cataarmory.inspect.enable = value module:ToggleItemLevelInfo() end)
 	Inspect.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('inspect', 'avgItemLevel')
 	Inspect.args.enchant = GetOptionsTable_EnchantGroup('inspect', 'enchant')
-	Inspect.args.itemLevel = GetOptionsTable_ItemLevelGroup('inspect', 'itemLevel')
 	Inspect.args.gems = GetOptionsTable_Gems('inspect', 'gems')
+	Inspect.args.itemLevel = GetOptionsTable_ItemLevelGroup('inspect', 'itemLevel')
+	Inspect.args.levelText = GetOptionsTable_LevelText('inspect', 'levelText')
 	Inspect.args.warningIndicator = GetOptionsTable_WarningIndicator('inspect', 'warningIndicator')
 end
 

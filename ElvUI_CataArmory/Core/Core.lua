@@ -60,11 +60,34 @@ local values = {
 	}
 }
 
-
+local GradientTexture = [[Interface\AddOns\ElvUI_CataArmory\Media\Gradient]]
+local WarningTexture = [[Interface\AddOns\ElvUI\Core\Media\Textures\Minimalist]]
 
 local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
 }
+
+function module:UpdateSlotBackground(slot, db)
+	if not slot then return end
+	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
+	local info = module.GearList[slotName] or module.IgnoredGearList[slotName]
+	local direction = info.direction
+
+	if direction then
+		slot.CataArmory_Background:ClearAllPoints()
+		slot.CataArmory_Background:Point(direction, slot, direction, 0, 0)
+		slot.CataArmory_Background:Size(132, 41)
+		slot.CataArmory_Background:SetTexture(GradientTexture)
+		slot.CataArmory_Background:SetVertexColor(unpack(db.slotBackground.color))
+		if direction == 'LEFT' then
+			slot.CataArmory_Background:SetTexCoord(0, 1, 0, 1)
+		else
+			slot.CataArmory_Background:SetTexCoord(1, 0, 0, 1)
+		end
+		-- slot.CataArmory_Background:Hide()
+		slot.CataArmory_Background:Show()
+	end
+end
 
 function module:CreateGemTexture(slot, point, relativePoint, x, y, gemStep, spacing)
 	local prevGem = gemStep - 1
@@ -186,44 +209,6 @@ function module:ClearPageInfo(frame, which)
 	end
 end
 
-function module:ToggleItemLevelInfo(setupCharacterPage)
-	if setupCharacterPage then
-		module:CreateSlotStrings(_G.CharacterFrame, 'Character')
-	end
-
-	if E.db.cataarmory.character.enable then
-		module:RegisterEvent('PLAYER_EQUIPMENT_CHANGED', 'UpdateCharacterInfo')
-		module:RegisterEvent('UPDATE_INVENTORY_DURABILITY', 'UpdateCharacterInfo')
-		module:RegisterEvent('PLAYER_AVG_ITEM_LEVEL_UPDATE', 'UpdateCharacterItemLevel')
-
-		if not _G.CharacterFrame.CharacterInfoHooked then
-			_G.CharacterFrame:HookScript('OnShow', function()
-				module.UpdateCharacterInfo()
-			end)
-
-			_G.CharacterFrame.CharacterInfoHooked = true
-		end
-
-		if not setupCharacterPage then
-			module:UpdateCharacterInfo()
-		end
-	else
-		module:UnregisterEvent('PLAYER_EQUIPMENT_CHANGED')
-		module:UnregisterEvent('UPDATE_INVENTORY_DURABILITY')
-		module:UnregisterEvent('PLAYER_AVG_ITEM_LEVEL_UPDATE')
-
-		module:ClearPageInfo(_G.CharacterFrame, 'Character')
-	end
-
-	if E.db.cataarmory.inspect.enable then
-		module:RegisterEvent('INSPECT_READY', 'UpdateInspectInfo')
-		module:UpdateInspectInfo()
-	else
-		module:UnregisterEvent('INSPECT_READY')
-		module:ClearPageInfo(_G.InspectFrame, 'Inspect')
-	end
-end
-
 function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	iLevelDB[i] = slotInfo.iLvl
 	local frame = _G[which..'Frame']
@@ -233,7 +218,9 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local db = E.db.cataarmory[string.lower(which)]
 	local missingBuckle, missingGem, missingEnchant, warningMsg = false, false, false, ''
 	local slotName = inspectItem:GetName():gsub('Character', ''):gsub('Inspect', '')
-	local canEnchant = module.GearList[slotName].canEnchant
+	local info = module.GearList[slotName] or module.IgnoredGearList[slotName]
+	local canEnchant = info.canEnchant
+	local direction = info.direction
 	do
 		local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
 		inspectItem.CataArmory_EnchantText:ClearAllPoints()
@@ -263,6 +250,14 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 		if enchantTextColor and next(enchantTextColor) then
 			inspectItem.CataArmory_EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
 		end
+	end
+
+	--* Slot Background
+	if direction then
+		if not inspectItem.CataArmory_Background then
+			inspectItem.CataArmory_Background = inspectItem:CreateTexture(nil, 'BACKGROUND')
+		end
+		module:UpdateSlotBackground(inspectItem, db)
 	end
 
 	inspectItem.iLvlText:ClearAllPoints()
@@ -457,12 +452,21 @@ local function Warning_OnLeave()
 end
 
 function module:PaperDollFrame_SetLevel()
-	local characterLevelText = E.db.cataarmory.character.characterLevelText
+	local db = E.db.cataarmory.character.levelText
+	if not db.enable then return end
+
 	CharacterLevelText:ClearAllPoints()
-	CharacterLevelText:Point('TOP', CharacterFrameTitleText, 'BOTTOM', characterLevelText.xOffset, characterLevelText.yOffset)
+	CharacterLevelText:Point('TOP', CharacterFrameTitleText, 'BOTTOM', db.xOffset, db.yOffset)
 end
 
-local WarningTexture = [[Interface\AddOns\ElvUI\Core\Media\Textures\Minimalist]]
+function module:InspectPaperDollFrame_SetLevel()
+	local db = E.db.cataarmory.inspect.levelText
+	if not db.enable or not InspectLevelText then return end
+
+	InspectLevelText:ClearAllPoints()
+	InspectLevelText:Point('TOP', InspectNameText, 'BOTTOM', db.xOffset, db.yOffset)
+end
+
 function module:CreateSlotStrings(frame, which)
 	if not frame or not which then return end
 
@@ -472,9 +476,15 @@ function module:CreateSlotStrings(frame, which)
 
 	CreateAvgItemLevel(frame, which)
 
-	if which == 'Inspect' then
-		InspectFrameTab1:ClearAllPoints()
-		InspectFrameTab1:Point('TOPLEFT', InspectFrame, 'BOTTOMLEFT', 1, 66)
+	for slotName, info in pairs(module.IgnoredGearList) do
+		local slot = _G[which..slotName]
+		--* Slot Background
+		if info.direction then
+			if not slot.CataArmory_Background then
+				slot.CataArmory_Background = slot:CreateTexture(nil, 'BACKGROUND')
+			end
+			module:UpdateSlotBackground(slot, db)
+		end
 	end
 
 	for slotName, info in pairs(module.GearList) do
@@ -484,6 +494,14 @@ function module:CreateSlotStrings(frame, which)
 		end
 		slot.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
 		slot.iLvlText:Point('BOTTOM', slot, itemLevel.xOffset, itemLevel.yOffset)
+
+		--* Slot Background
+		if info.direction then
+			if not slot.CataArmory_Background then
+				slot.CataArmory_Background = slot:CreateTexture(nil, 'BACKGROUND')
+			end
+			module:UpdateSlotBackground(slot, db)
+		end
 
 		--* Warning
 		if not slot.CataArmory_Warning then
@@ -526,36 +544,47 @@ function module:CreateSlotStrings(frame, which)
 	end
 end
 
+function module:InspectFrame_OnShow()
+	local frame = _G.InspectFrame
+	if not frame or frame.InspectInfoHooked then return end
+	-- if frame.InspectInfoHooked then return end
+
+	--* Move Rotate Buttons on InspectFrame
+	-- S:HandleFrame(InspectFrame, true, nil, 11, -12, -5, 65)
+	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
+	InspectModelFrameRotateLeftButton:ClearAllPoints()
+	InspectModelFrameRotateLeftButton:Point('TOPLEFT', (isSkinned and frame.backdrop.Center) or frame, 'TOPLEFT', 3, -3)
+
+	InspectModelFrame:ClearAllPoints()
+	InspectModelFrame:Point('TOP', 0, -78)
+
+	InspectSecondaryHandSlot:ClearAllPoints()
+	InspectSecondaryHandSlot:Point('BOTTOM', (isSkinned and frame.backdrop.Center) or InspectPaperDollItemsFrame, 'BOTTOM', 0, 20)
+	InspectMainHandSlot:ClearAllPoints()
+	InspectMainHandSlot:Point('TOPRIGHT', (isSkinned and InspectSecondaryHandSlot) or InspectPaperDollItemsFrame, 'TOPLEFT', -5, 0)
+
+	_G.InspectFrameCloseButton:ClearAllPoints()
+	_G.InspectFrameCloseButton:Point('TOPRIGHT', (isSkinned and frame.backdrop.Center) or frame, 'TOPRIGHT', -4, -4)
+
+	if isSkinned and frame.backdrop then
+		InspectModelFrame:ClearAllPoints()
+		InspectModelFrame:Point('TOP', InspectPaperDollFrame, 'TOP', -5, -88)
+
+		frame.backdrop:ClearAllPoints()
+		frame.backdrop:Point('TOPLEFT', frame, 'TOPLEFT', 11, -12)
+		frame.backdrop:Point('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', -32, 50)
+
+		InspectFrameTab1:ClearAllPoints(); InspectFrameTab1:Point('TOPLEFT', frame, 'BOTTOMLEFT', 1, 26)
+		InspectFrameTab1:Point('TOPLEFT', InspectFrame, 'BOTTOMLEFT', 1, 52)
+	end
+
+	frame.InspectInfoHooked = true
+end
+
 function module:SetupInspectPageInfo()
 	local frame = _G.InspectFrame
 	if frame then
 		module:CreateSlotStrings(frame, 'Inspect')
-		frame:HookScript('OnShow', function()
-			if frame.InspectInfoHooked then return end
-
-			--* Move Rotate Buttons on InspectFrame
-			S:HandleFrame(InspectFrame, true, nil, 11, -12, -5, 65)
-			local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
-			InspectModelFrameRotateLeftButton:ClearAllPoints()
-			InspectModelFrameRotateLeftButton:Point('TOPLEFT', (isSkinned and frame.backdrop.Center) or frame, 'TOPLEFT', 3, -3)
-
-			-- frame:Width(410)
-			InspectHandsSlot:ClearAllPoints()
-			InspectHandsSlot:Point('TOPRIGHT', (isSkinned and frame.backdrop.Center) or InspectPaperDollItemsFrame, 'TOPRIGHT', -10, -56)
-
-			InspectModelFrame:ClearAllPoints()
-			InspectModelFrame:Point('TOP', 0, -78)
-
-			InspectSecondaryHandSlot:ClearAllPoints()
-			InspectSecondaryHandSlot:Point('BOTTOM', (isSkinned and frame.backdrop.Center) or InspectPaperDollItemsFrame, 'BOTTOM', 0, 20)
-			InspectMainHandSlot:ClearAllPoints()
-			InspectMainHandSlot:Point('TOPRIGHT', (isSkinned and InspectSecondaryHandSlot) or InspectPaperDollItemsFrame, 'TOPLEFT', -5, 0)
-
-			_G.InspectFrameCloseButton:ClearAllPoints()
-			_G.InspectFrameCloseButton:Point('TOPRIGHT', (isSkinned and frame.backdrop.Center) or frame, 'TOPRIGHT', -4, -4)
-
-			frame.InspectInfoHooked = true
-		end)
 	end
 end
 
@@ -571,9 +600,10 @@ function module:UpdateInspectPageFonts(which, force)
 
 	frame.CataArmory_AvgItemLevel.Text:FontTemplate(LSM:Fetch('font', avgItemLevel.font), avgItemLevel.fontSize, avgItemLevel.fontOutline)
 
-	frame.CataArmory_AvgItemLevel:SetHeight(avgItemLevel.fontSize + 6)
 	frame.CataArmory_AvgItemLevel:ClearAllPoints()
 	frame.CataArmory_AvgItemLevel:Point('TOP', avgItemLevel.xOffset, avgItemLevel.yOffset)
+
+	frame.CataArmory_AvgItemLevel:SetHeight(avgItemLevel.fontSize + 6)
 	frame.CataArmory_AvgItemLevel:SetShown(avgItemLevel.enable)
 
 	local slot, quality, iLvlTextColor, enchantTextColor
@@ -696,8 +726,67 @@ function module:GetGearSlotInfo(unit, slot)
 	return slotInfo
 end
 
-function module:ADDON_LOADED(_, addon)
-	if addon == 'Blizzard_InspectUI' then
-		module:SetupInspectPageInfo()
+local function CharacterFrame_OnShow()
+	module.UpdateCharacterInfo()
+	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
+
+	local frame = _G.CharacterFrame
+	if isSkinned then
+		CharacterMainHandSlot:ClearAllPoints()
+		CharacterMainHandSlot:Point('BOTTOMLEFT', _G.PaperDollItemsFrame, 'BOTTOMLEFT', 106, -5)
+
+		if frame.BottomRightCorner then
+			frame.BottomRightCorner:ClearAllPoints()
+			frame.BottomRightCorner:Point('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, -20)
+		end
+		if frame.BottomLeftCorner then
+			frame.BottomLeftCorner:ClearAllPoints()
+			frame.BottomLeftCorner:Point('BOTTOMLEFT', frame, 'BOTTOMLEFT', 0, -20)
+		end
+		CharacterFrameTab1:ClearAllPoints()
+		CharacterFrameTab1:Point('TOPLEFT', frame, 'BOTTOMLEFT', -10, -18)
+	end
+end
+
+function module:ToggleItemLevelInfo(setupCharacterPage)
+	if setupCharacterPage then
+		module:CreateSlotStrings(_G.CharacterFrame, 'Character')
+	end
+
+	if E.db.cataarmory.character.enable then
+		module:RegisterEvent('PLAYER_EQUIPMENT_CHANGED', 'UpdateCharacterInfo')
+		module:RegisterEvent('UPDATE_INVENTORY_DURABILITY', 'UpdateCharacterInfo')
+		module:RegisterEvent('PLAYER_AVG_ITEM_LEVEL_UPDATE', 'UpdateCharacterItemLevel')
+
+		if not module:IsHooked(_G.CharacterFrame, 'OnShow') then
+			module:SecureHookScript(_G.CharacterFrame, 'OnShow', CharacterFrame_OnShow)
+		end
+
+		if not setupCharacterPage then
+			module:UpdateCharacterInfo()
+		end
+	else
+		module:UnregisterEvent('PLAYER_EQUIPMENT_CHANGED')
+		module:UnregisterEvent('UPDATE_INVENTORY_DURABILITY')
+		module:UnregisterEvent('PLAYER_AVG_ITEM_LEVEL_UPDATE')
+		if module:IsHooked(_G.CharacterFrame, 'OnShow') then
+			module:Unhook(_G.CharacterFrame, 'OnShow')
+		end
+
+		module:ClearPageInfo(_G.CharacterFrame, 'Character')
+	end
+
+	if E.db.cataarmory.inspect.enable then
+		module:RegisterEvent('INSPECT_READY', 'UpdateInspectInfo')
+		if IsAddOnLoaded('Blizzard_InspectUI') and not module:IsHooked(_G.InspectFrame, 'OnShow') then
+			module:SecureHookScript(_G.InspectFrame, 'OnShow', module.InspectFrame_OnShow)
+		end
+		module:UpdateInspectInfo()
+	else
+		module:UnregisterEvent('INSPECT_READY')
+		if IsAddOnLoaded('Blizzard_InspectUI') and module:IsHooked(_G.InspectFrame, 'OnShow') then
+			module:Unhook(_G.InspectFrame, 'OnShow')
+		end
+		module:ClearPageInfo(_G.InspectFrame, 'Inspect')
 	end
 end

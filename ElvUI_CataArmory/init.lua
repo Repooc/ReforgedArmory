@@ -30,9 +30,17 @@ end
 function module:UpdateOptions(unit, force)
 	if unit then
 		module:UpdateInspectPageFonts(unit, force)
+		if unit == 'Character' then
+			module.PaperDollFrame_SetLevel()
+		elseif unit == 'Inspect' then
+			module.InspectPaperDollFrame_SetLevel()
+		end
 	else
 		module:UpdateInspectPageFonts('Character')
+		module.PaperDollFrame_SetLevel()
+
 		module:UpdateInspectPageFonts('Inspect')
+		module.InspectPaperDollFrame_SetLevel()
 	end
 end
 
@@ -40,62 +48,77 @@ module.GearList = {
 	HeadSlot = {
 		slotID = 1,
 		canEnchant = true,
+		direction = 'LEFT',
 	},
 	NeckSlot = {
 		slotID = 2,
 		canEnchant = false,
+		direction = 'LEFT',
 	},
 	ShoulderSlot = {
 		slotID = 3,
 		canEnchant = true,
+		direction = 'LEFT',
 	},
 	ChestSlot = {
 		slotID = 5,
 		canEnchant = true,
+		direction = 'LEFT',
 	},
 	WaistSlot = {
 		slotID = 6,
 		canEnchant = false,
+		direction = 'RIGHT',
 	},
 	LegsSlot = {
 		slotID = 7,
 		canEnchant = true,
+		direction = 'RIGHT',
 	},
 	FeetSlot = {
 		slotID = 8,
 		canEnchant = true,
+		direction = 'RIGHT',
 	},
 	WristSlot = {
 		slotID = 9,
 		canEnchant = true,
+		direction = 'LEFT',
 	},
 	HandsSlot = {
 		slotID = 10,
 		canEnchant = false,
+		direction = 'RIGHT',
 	},
 	Finger0Slot = {
 		slotID = 11,
 		canEnchant = true,
+		direction = 'RIGHT',
 	},
 	Finger1Slot = {
 		slotID = 12,
 		canEnchant = true,
+		direction = 'RIGHT',
 	},
 	Trinket0Slot = {
 		slotID = 13,
 		canEnchant = false,
+		direction = 'RIGHT',
 	},
 	Trinket1Slot = {
 		slotID = 14,
 		canEnchant = false,
+		direction = 'RIGHT',
 	},
 	BackSlot = {
 		slotID = 15,
 		canEnchant = false,
+		direction = 'LEFT',
 	},
 	MainHandSlot = {
 		slotID = 16,
 		canEnchant = true,
+		direction = 'RIGHT',
 	},
 	SecondaryHandSlot = {
 		slotID = 17,
@@ -104,12 +127,32 @@ module.GearList = {
 	RangedSlot = {
 		slotID = 18,
 		canEnchant = false,
+		direction = 'LEFT',
+	},
+}
+module.IgnoredGearList = {
+	ShirtSlot = {
+		direction = 'LEFT',
+	},
+	TabardSlot = {
+		direction = 'LEFT',
 	},
 }
 
 local function DisableElvUIInfo(which, db)
 	if E.db.cataarmory[which].enable then
 		E.db.general.itemLevel[db] = false
+	end
+end
+
+function module:ADDON_LOADED(_, addon)
+	if addon == 'Blizzard_InspectUI' then
+		module:SetupInspectPageInfo()
+		module:SecureHook('InspectPaperDollFrame_SetLevel', module.InspectPaperDollFrame_SetLevel)
+
+		if not module:IsHooked(_G.InspectFrame, 'OnShow') then
+			module:SecureHookScript(_G.InspectFrame, 'OnShow', module.InspectFrame_OnShow)
+		end
 	end
 end
 
@@ -121,13 +164,17 @@ function module:Initialize()
 	DisableElvUIInfo('inspect', 'displayInspectInfo')
 	M:ToggleItemLevelInfo()
 
-	module:ToggleItemLevelInfo(true)
-
 	if IsAddOnLoaded('Blizzard_InspectUI') then
 		module:SetupInspectPageInfo()
+		module:SecureHook('InspectPaperDollFrame_SetLevel', module.InspectPaperDollFrame_SetLevel)
+		if not module:IsHooked(_G.InspectFrame, 'OnShow') then
+			module:SecureHookScript(_G.InspectFrame, 'OnShow', module.InspectFrame_OnShow)
+		end
 	else
 		module:RegisterEvent('ADDON_LOADED')
 	end
+
+	module:ToggleItemLevelInfo(true)
 
 	module:SecureHook('PaperDollFrame_SetLevel', module.PaperDollFrame_SetLevel)
 	module:SecureHook(E, 'UpdateDB', module.UpdateOptions)
