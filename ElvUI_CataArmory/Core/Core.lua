@@ -67,8 +67,10 @@ local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
 }
 
-function module:UpdateSlotBackground(slot, db)
-	if not slot then return end
+function module:UpdateSlotBackground(which, slot)
+	if not which then return end
+
+	local db = E.db.cataarmory[string.lower(which)]
 	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
 	local info = module.GearList[slotName] or module.IgnoredGearList[slotName]
 	local direction = info.direction
@@ -84,8 +86,8 @@ function module:UpdateSlotBackground(slot, db)
 		else
 			slot.CataArmory_Background:SetTexCoord(1, 0, 0, 1)
 		end
-		-- slot.CataArmory_Background:Hide()
-		slot.CataArmory_Background:Show()
+
+		slot.CataArmory_Background:SetShown(db.slotBackground.enable)
 	end
 end
 
@@ -257,7 +259,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 		if not inspectItem.CataArmory_Background then
 			inspectItem.CataArmory_Background = inspectItem:CreateTexture(nil, 'BACKGROUND')
 		end
-		module:UpdateSlotBackground(inspectItem, db)
+		module:UpdateSlotBackground(which, inspectItem)
 	end
 
 	inspectItem.iLvlText:ClearAllPoints()
@@ -483,7 +485,7 @@ function module:CreateSlotStrings(frame, which)
 			if not slot.CataArmory_Background then
 				slot.CataArmory_Background = slot:CreateTexture(nil, 'BACKGROUND')
 			end
-			module:UpdateSlotBackground(slot, db)
+			module:UpdateSlotBackground(which, slot)
 		end
 	end
 
@@ -500,7 +502,7 @@ function module:CreateSlotStrings(frame, which)
 			if not slot.CataArmory_Background then
 				slot.CataArmory_Background = slot:CreateTexture(nil, 'BACKGROUND')
 			end
-			module:UpdateSlotBackground(slot, db)
+			module:UpdateSlotBackground(which, slot)
 		end
 
 		--* Warning
@@ -637,6 +639,10 @@ function module:UpdateInspectPageFonts(which, force)
 				slot.CataArmory_EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
 			end
 			slot.CataArmory_EnchantText:SetShown(enchant.enable)
+
+			if force then
+				module:UpdateSlotBackground(which, slot)
+			end
 		end
 	end
 

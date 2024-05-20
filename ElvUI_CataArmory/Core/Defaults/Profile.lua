@@ -44,6 +44,7 @@ P.cataarmory = {
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
 		slotBackground = {
+			enable = true,
 			color = { .41, .83, 1 },
 		},
 		warningIndicator = {
@@ -62,6 +63,7 @@ P.cataarmory = {
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
 		slotBackground = {
+			enable = true,
 			color = { .41, .83, 1 },
 		},
 		warningIndicator = {
@@ -80,8 +82,8 @@ P.cataarmory.inspect.avgItemLevel.background = {
 	spacing = 0,
 	color = {r = 0.99, g = 0.81, b = 0},
 }
-P.cataarmory.character.avgItemLevel.fontSize = 25
-P.cataarmory.character.avgItemLevel.yOffset = -35
+-- P.cataarmory.character.avgItemLevel.fontSize = 15
+P.cataarmory.character.avgItemLevel.yOffset = -37
 
 --* Enchant
 P.cataarmory.character.enchant.mouseover = false --! NYI

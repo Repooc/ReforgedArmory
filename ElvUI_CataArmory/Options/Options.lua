@@ -27,7 +27,7 @@ local SideSlotGrowthDirection = {
 }
 
 local function actionGroup(info, which, groupName, ...)
-	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel'
+	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel' or groupName == 'slotBackground'
 	if info.type == 'color' then
 		local color = E.db.cataarmory[which][groupName][info[#info]]
 		local r, g, b, a = ...
@@ -83,7 +83,6 @@ local SharedOptions = {
 local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 	local config = ACH:Group(L["Average Item Level"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
 	config.args = CopyTable(SharedOptions)
-	-- config.args.gearScore = ACH:Toggle(L["Show GearScore"], nil, 0)
 	config.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
 	config.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
 	config.args.fontSize = ACH:Range(L["Font Size"], nil, 4, C.Values.FontSize)
@@ -179,6 +178,12 @@ local function GetOptionsTable_LevelText(which, groupName)
 	return config
 end
 
+local function GetOptionsTable_SlotBackground(which, groupName)
+	local config = ACH:Group(L["Slot Background"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
+
+	return config
+end
 local function GetOptionsTable_WarningIndicator(which, groupName)
 	local config = ACH:Group(L["Warning Indicator"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
@@ -204,6 +209,7 @@ local function configTable()
 	Character.args.gems = GetOptionsTable_Gems('character', 'gems')
 	Character.args.itemLevel = GetOptionsTable_ItemLevelGroup('character', 'itemLevel')
 	Character.args.levelText = GetOptionsTable_LevelText('character', 'levelText')
+	Character.args.slotBackground = GetOptionsTable_SlotBackground('character', 'slotBackground')
 	Character.args.warningIndicator = GetOptionsTable_WarningIndicator('character', 'warningIndicator')
 
 	--* Inspect Frame
@@ -215,6 +221,7 @@ local function configTable()
 	Inspect.args.gems = GetOptionsTable_Gems('inspect', 'gems')
 	Inspect.args.itemLevel = GetOptionsTable_ItemLevelGroup('inspect', 'itemLevel')
 	Inspect.args.levelText = GetOptionsTable_LevelText('inspect', 'levelText')
+	Inspect.args.slotBackground = GetOptionsTable_SlotBackground('inspect', 'slotBackground')
 	Inspect.args.warningIndicator = GetOptionsTable_WarningIndicator('inspect', 'warningIndicator')
 end
 
