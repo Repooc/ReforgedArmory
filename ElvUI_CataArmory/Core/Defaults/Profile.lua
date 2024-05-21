@@ -78,6 +78,8 @@ P.cataarmory = {
 		slotBackground = {
 			enable = false,
 			color = {r = 0.41, g = 0.83, b = 1},
+			xOffset = -1,
+			yOffset = 0,
 			warning = {
 				enable = true,
 				color = {r = 1, g = 0.33, b = 0},
@@ -101,6 +103,8 @@ P.cataarmory = {
 		slotBackground = {
 			enable = false,
 			color = {r = 0.41, g = 0.83, b = 1},
+			xOffset = -1,
+			yOffset = 0,
 			warning = {
 				enable = true,
 				color = {r = 1, g = 0.33, b = 0},

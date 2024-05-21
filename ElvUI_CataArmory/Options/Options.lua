@@ -206,8 +206,10 @@ end
 local function GetOptionsTable_SlotBackground(which, groupName)
 	local config = ACH:Group(L["Slot Background"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
-
-	config.args.warning = ACH:Group(L["Warning"], nil, 5, nil, function(info) return actionSubGroup(info, which, groupName, 'warning') end, function(info, ...) actionSubGroup(info, which, groupName, 'warning', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
+	config.args.spacer = ACH:Spacer(1, 'full')
+	config.args.xOffset = ACH:Range(L["X-Offset"], nil, 2, { min = -25, max = 25, step = 1 })
+	config.args.yOffset = ACH:Range(L["Y-Offset"], nil, 3, { min = -25, max = 25, step = 1 })
+	config.args.warning = ACH:Group(L["Warning"], nil, 10, nil, function(info) return actionSubGroup(info, which, groupName, 'warning') end, function(info, ...) actionSubGroup(info, which, groupName, 'warning', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
 	config.args.warning.inline = true
 	config.args.warning.args.enable = ACH:Toggle(L["Enable"], nil, 0)
 	config.args.warning.args.color = ACH:Color(L["Color"], nil, 5, nil, nil, nil, nil, function() return not E.db.cataarmory[which][groupName].enable or not E.db.cataarmory[which][groupName].warning.enable end)

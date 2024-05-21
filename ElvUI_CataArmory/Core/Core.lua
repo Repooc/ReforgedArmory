@@ -91,7 +91,7 @@ function module:UpdateAvgItemLevel(which)
 end
 
 function module:UpdateSlotBackground(which, slot)
-	if not which or not slot.CataArmory_Background then return end
+	if not which or not slot.CataArmory_SlotBackground then return end
 
 	local db = E.db.cataarmory[string.lower(which)]
 	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
@@ -99,19 +99,20 @@ function module:UpdateSlotBackground(which, slot)
 	local direction = info.direction
 	local color = db.slotBackground.color
 
+	local point, relativePoint, x, y = module:GetSlotBackgroundPoints(info.slotID, db)
 	if direction then
-		slot.CataArmory_Background:ClearAllPoints()
-		slot.CataArmory_Background:Point(direction, slot, direction, 0, 0)
-		slot.CataArmory_Background:Size(132, 41)
-		slot.CataArmory_Background:SetTexture(GradientTexture)
-		slot.CataArmory_Background:SetVertexColor(color.r, color.g, color.b)
+		slot.CataArmory_SlotBackground:ClearAllPoints()
+		slot.CataArmory_SlotBackground:Point(point, slot, relativePoint, x, y)
+		slot.CataArmory_SlotBackground:Size(132, 41)
+		slot.CataArmory_SlotBackground:SetTexture(GradientTexture)
+		slot.CataArmory_SlotBackground:SetVertexColor(color.r, color.g, color.b)
 		if direction == 'LEFT' then
-			slot.CataArmory_Background:SetTexCoord(0, 1, 0, 1)
+			slot.CataArmory_SlotBackground:SetTexCoord(0, 1, 0, 1)
 		else
-			slot.CataArmory_Background:SetTexCoord(1, 0, 0, 1)
+			slot.CataArmory_SlotBackground:SetTexCoord(1, 0, 0, 1)
 		end
 
-		slot.CataArmory_Background:SetShown(db.slotBackground.enable)
+		slot.CataArmory_SlotBackground:SetShown(db.slotBackground.enable)
 	end
 end
 
@@ -142,6 +143,18 @@ function module:CreateGemTexture(slot, point, relativePoint, x, y, gemStep, spac
 	return texture, backdrop
 end
 
+function module:GetSlotBackgroundPoints(id, db)
+	if not id or not db then return end
+	local x, y = db.slotBackground.xOffset, db.slotBackground.yOffset
+
+	if id <= 5 or (id == 9 or id == 15) then --* Left Side
+		return 'LEFT', 'LEFT', x, y
+	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) or id == 16 then	--* Right Side
+		return 'RIGHT', 'RIGHT', -x, y
+	else									 --* Left Side (RangedSlot)
+		return 'LEFT', 'LEFT', x, y
+	end
+end
 function module:GetGemPoints(id, db)
 	if not id or not db then return end
 	local x, y, spacing = db.gems.xOffset, db.gems.yOffset, db.gems.spacing
@@ -242,8 +255,8 @@ function module:ClearPageInfo(frame, which)
 				slot['CataArmory_GemSlotBackdrop'..y]:Hide()
 			end
 		end
-		if slot.CataArmory_Background then
-			slot.CataArmory_Background:Hide()
+		if slot.CataArmory_SlotBackground then
+			slot.CataArmory_SlotBackground:Hide()
 		end
 	end
 end
@@ -262,8 +275,8 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 
 	--* Slot Background
 	if direction then
-		if not inspectItem.CataArmory_Background then
-			inspectItem.CataArmory_Background = inspectItem:CreateTexture(nil, 'BACKGROUND')
+		if not inspectItem.CataArmory_SlotBackground then
+			inspectItem.CataArmory_SlotBackground = inspectItem:CreateTexture(nil, 'BACKGROUND')
 		end
 		module:UpdateSlotBackground(which, inspectItem)
 	end
@@ -293,9 +306,9 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 			end
 
 			local showWarning = missingEnchant or missingGem or missingBuckle or false
-			if direction and inspectItem.CataArmory_Background then
+			if direction and inspectItem.CataArmory_SlotBackground then
 				local warnColor = (showWarning and db.slotBackground.warning.enable) and db.slotBackground.warning.color or db.slotBackground.color
-				inspectItem.CataArmory_Background:SetVertexColor(warnColor.r, warnColor.g, warnColor.b)
+				inspectItem.CataArmory_SlotBackground:SetVertexColor(warnColor.r, warnColor.g, warnColor.b)
 			end
 			inspectItem.CataArmory_Warning:SetShown(db.warningIndicator.enable and showWarning)
 
@@ -573,8 +586,8 @@ function module:CreateSlotStrings(frame, which)
 
 		--* Slot Background
 		if info.direction then
-			if not slot.CataArmory_Background then
-				slot.CataArmory_Background = slot:CreateTexture(nil, 'BACKGROUND')
+			if not slot.CataArmory_SlotBackground then
+				slot.CataArmory_SlotBackground = slot:CreateTexture(nil, 'BACKGROUND')
 			end
 			module:UpdateSlotBackground(which, slot)
 		end

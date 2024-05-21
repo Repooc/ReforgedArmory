@@ -66,10 +66,12 @@ module.GearList = {
 		direction = 'LEFT',
 	},
 	ShirtSlot = {
+		slotID = 4,
 		ignored = true,
 		direction = 'LEFT',
 	},
 	TabardSlot = {
+		slotID = 19,
 		ignored = true,
 		direction = 'LEFT',
 	},
