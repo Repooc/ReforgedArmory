@@ -1,6 +1,23 @@
 local _, _, _, P = unpack(ElvUI)
 
-local SharedFontOptions = {
+local AvgItemLevel = {
+	enable = true,
+	text = {
+		font = 'PT Sans Narrow',
+		fontOutline = 'OUTLINE',
+		fontSize = 15,
+		xOffset = 0,
+		yOffset = -2,
+	},
+	frame = {
+		xOffset = 0,
+		yOffset = 0,
+	},
+	color = {r = 0.99, g = 0.81, b = 0},
+	qualityColor = false,
+}
+
+local ItemLevel = {
 	enable = true,
 	font = 'PT Sans Narrow',
 	fontSize = 15,
@@ -11,11 +28,11 @@ local SharedFontOptions = {
 	qualityColor = false,
 }
 
-local AvgItemLevel = {
+local SharedFontOptions = {
 	enable = true,
 	font = 'PT Sans Narrow',
-	fontOutline = 'OUTLINE',
 	fontSize = 15,
+	fontOutline = 'OUTLINE',
 	xOffset = 0,
 	yOffset = 0,
 	color = {r = 0.99, g = 0.81, b = 0},
@@ -57,7 +74,7 @@ P.cataarmory = {
 			autoExpand = true,
 		},
 		gems = CopyTable(SharedGemOptions),
-		itemLevel = CopyTable(SharedFontOptions),
+		itemLevel = CopyTable(ItemLevel),
 		slotBackground = {
 			enable = false,
 			color = {r = 0.41, g = 0.83, b = 1},
@@ -80,7 +97,7 @@ P.cataarmory = {
 		avgItemLevel = CopyTable(AvgItemLevel),
 		enchant = CopyTable(SharedFontOptions),
 		gems = CopyTable(SharedGemOptions),
-		itemLevel = CopyTable(SharedFontOptions),
+		itemLevel = CopyTable(ItemLevel),
 		slotBackground = {
 			enable = false,
 			color = {r = 0.41, g = 0.83, b = 1},
@@ -105,8 +122,8 @@ P.cataarmory.inspect.avgItemLevel.background = {
 	spacing = 0,
 	color = {r = 0.99, g = 0.81, b = 0},
 }
-P.cataarmory.character.avgItemLevel.attachTo = 'CharacterLevelText'
-P.cataarmory.character.avgItemLevel.yOffset = 2
+P.cataarmory.character.avgItemLevel.frame.attachTo = 'CharacterLevelText'
+P.cataarmory.character.avgItemLevel.frame.yOffset = 2
 
 --* Enchant
 P.cataarmory.character.enchant.mouseover = false --! NYI
@@ -141,7 +158,7 @@ P.cataarmory.character.itemLevel.qualityColor = true
 
 --! Inspect
 --* Unit Avg Item Level
-P.cataarmory.inspect.avgItemLevel.attachTo = 'InspectLevelText'
+P.cataarmory.inspect.avgItemLevel.frame.attachTo = 'InspectLevelText'
 
 --* Enchant
 P.cataarmory.inspect.enchant.mouseover = false --! NYI

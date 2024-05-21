@@ -67,6 +67,29 @@ local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
 }
 
+function module:UpdateAvgItemLevel(which)
+	if not which then return end
+	local frame = _G[which..'Frame']
+	if not frame then return end
+
+	local isCharPage = which == 'Character'
+	local db = E.db.cataarmory[string.lower(which)]
+	local textOptions, frameOptions = db.avgItemLevel.text, db.avgItemLevel.frame
+
+	frame.CataArmory_AvgItemLevel:ClearAllPoints()
+	if isCharPage then
+		frame.CataArmory_AvgItemLevel:Point((frameOptions.attachTo == 'CharacterLevelText' or frameOptions.attachTo == 'PaperDollFrame') and 'TOP' or 'BOTTOM', frameOptions.attachTo, (frameOptions.attachTo == 'CharacterLevelText') and 'BOTTOM' or 'TOP', frameOptions.xOffset, frameOptions.yOffset)
+	else
+		frame.CataArmory_AvgItemLevel:Point('TOP', frameOptions.attachTo, (frameOptions.attachTo == 'InspectLevelText') and 'BOTTOM' or 'TOP', frameOptions.xOffset, frameOptions.yOffset)
+	end
+	frame.CataArmory_AvgItemLevel:SetHeight(textOptions.fontSize + 6)
+	frame.CataArmory_AvgItemLevel:SetShown(db.avgItemLevel.enable)
+	frame.CataArmory_AvgItemLevel.Text:FontTemplate(LSM:Fetch('font', textOptions.font), textOptions.fontSize, textOptions.fontOutline)
+
+	frame.CataArmory_AvgItemLevel.Text:ClearAllPoints()
+	frame.CataArmory_AvgItemLevel.Text:SetPoint('CENTER', frame.CataArmory_AvgItemLevel, 'CENTER', textOptions.xOffset, textOptions.yOffset)
+end
+
 function module:UpdateSlotBackground(which, slot)
 	if not which or not slot.CataArmory_Background then return end
 
@@ -92,25 +115,25 @@ function module:UpdateSlotBackground(which, slot)
 	end
 end
 
-function module:UpdateiLvlText(which, slot)
-	if not which or not slot.CataArmory_iLvlText then return end
+function module:UpdateItemLevelText(which, slot)
+	if not which or not slot.CataArmory_ItemLevelText then return end
 
 	local db = E.db.cataarmory[string.lower(which)]
 
-	slot.CataArmory_iLvlText:ClearAllPoints()
-	slot.CataArmory_iLvlText:Point('BOTTOM', slot, db.itemLevel.xOffset, db.itemLevel.yOffset)
-	slot.CataArmory_iLvlText:FontTemplate(LSM:Fetch('font', db.itemLevel.font), db.itemLevel.fontSize, db.itemLevel.fontOutline)
-	slot.CataArmory_iLvlText:SetShown(db.itemLevel.enable)
+	slot.CataArmory_ItemLevelText:ClearAllPoints()
+	slot.CataArmory_ItemLevelText:Point('BOTTOM', slot, db.itemLevel.xOffset, db.itemLevel.yOffset)
+	slot.CataArmory_ItemLevelText:FontTemplate(LSM:Fetch('font', db.itemLevel.font), db.itemLevel.fontSize, db.itemLevel.fontOutline)
+	slot.CataArmory_ItemLevelText:SetShown(db.itemLevel.enable)
 end
 
 function module:CreateGemTexture(slot, point, relativePoint, x, y, gemStep, spacing)
 	local prevGem = gemStep - 1
 	local texture = slot:CreateTexture()
-	texture:Point(point, (gemStep == 1 and slot) or slot['CA_textureSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
+	texture:Point(point, (gemStep == 1 and slot) or slot['CataArmory_GemSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
 	texture:SetTexCoord(unpack(E.TexCoords))
 	texture:Size(14)
 
-	local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['CA_textureSlotBackdrop'..prevGem])
+	local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['CataArmory_GemSlotBackdrop'..prevGem])
 	backdrop:SetTemplate(nil, nil, true)
 	backdrop:SetBackdropColor(0,0,0,0)
 	backdrop:SetOutside(texture)
@@ -185,9 +208,6 @@ function module:UpdateInspectInfo(_, arg1)
 		end
 	end)
 	module:UpdatePageInfo(_G.InspectFrame, 'Inspect', arg1)
-	if _G.InspectFrame and _G.InspectFrame.CataArmory_AvgItemLevel and _G.InspectFrame.CataArmory_AvgItemLevel.Text then
-		_G.InspectFrame.CataArmory_AvgItemLevel.Text:FontTemplate(LSM:Fetch('font', E.db.cataarmory.inspect.avgItemLevel.font), E.db.cataarmory.inspect.avgItemLevel.fontSize, E.db.cataarmory.inspect.avgItemLevel.fontOutline)
-	end
 end
 
 function module:UpdateCharacterInfo(event)
@@ -214,12 +234,12 @@ function module:ClearPageInfo(frame, which)
 
 		if not info.ignored then
 			slot.CataArmory_EnchantText:SetText('')
-			slot.CataArmory_iLvlText:SetText('')
+			slot.CataArmory_ItemLevelText:SetText('')
 			slot.CataArmory_Warning:Hide()
 
 			for y = 1, 5 do
-				slot['CA_textureSlot'..y]:SetTexture()
-				slot['CA_textureSlotBackdrop'..y]:Hide()
+				slot['CataArmory_GemSlot'..y]:SetTexture()
+				slot['CataArmory_GemSlotBackdrop'..y]:Hide()
 			end
 		end
 		if slot.CataArmory_Background then
@@ -288,12 +308,12 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 		end
 	end
 
-	module:UpdateiLvlText(which, inspectItem)
+	module:UpdateItemLevelText(which, inspectItem)
 	local iLvlTextColor = (db.itemLevel.qualityColor and slotInfo.itemQualityColors) or db.itemLevel.color
 	if iLvlTextColor and next(iLvlTextColor) then
-		inspectItem.CataArmory_iLvlText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
+		inspectItem.CataArmory_ItemLevelText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
 	end
-	inspectItem.CataArmory_iLvlText:SetText(slotInfo.iLvl)
+	inspectItem.CataArmory_ItemLevelText:SetText(slotInfo.iLvl)
 
 	if which == 'Inspect' and unit then
 		local quality = GetInventoryItemQuality(unit, i)
@@ -309,12 +329,12 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 		local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
 		local gemStep = 1
 		for index = 1, 5 do
-			local texture = inspectItem['CA_textureSlot'..index]
+			local texture = inspectItem['CataArmory_GemSlot'..index]
 			texture:Size(db.gems.size)
 			texture:ClearAllPoints()
-			texture:Point(point, (index == 1 and inspectItem) or inspectItem['CA_textureSlot'..(index-1)], relativePoint, index == 1 and x or spacing, index == 1 and y or 0)
+			texture:Point(point, (index == 1 and inspectItem) or inspectItem['CataArmory_GemSlot'..(index-1)], relativePoint, index == 1 and x or spacing, index == 1 and y or 0)
 
-			local backdrop = inspectItem['CA_textureSlotBackdrop'..index]
+			local backdrop = inspectItem['CataArmory_GemSlotBackdrop'..index]
 			local gem = slotInfo.gems and slotInfo.gems[gemStep]
 			if gem then
 				texture:SetTexture(gem)
@@ -336,7 +356,8 @@ end
 function module:UpdateAverageString(frame, which, iLevelDB)
 	if not iLevelDB or not frame then return end
 
-	local db = E.db.cataarmory[string.lower(which)].avgItemLevel
+	local db = E.db.cataarmory[string.lower(which)]
+	local textOptions, frameOptions = db.avgItemLevel.text, db.avgItemLevel.frame
 	local isCharPage, avgItemLevel, avgTotal = which == 'Character'
 
 	if isCharPage then
@@ -347,20 +368,14 @@ function module:UpdateAverageString(frame, which, iLevelDB)
 	end
 
 	if avgItemLevel then
-		if isCharPage then
-			frame.CataArmory_AvgItemLevel.Text:SetText(avgItemLevel)
-			frame.CataArmory_AvgItemLevel.Text:SetTextColor(db.color.r, db.color.g, db.color.b)
-		else
-			frame.CataArmory_AvgItemLevel.Text:SetText(avgItemLevel)
-			frame.CataArmory_AvgItemLevel.Text:SetTextColor(db.color.r, db.color.g, db.color.b)
-		end
+		frame.CataArmory_AvgItemLevel.Text:SetText(avgItemLevel)
+		frame.CataArmory_AvgItemLevel.Text:SetTextColor(db.avgItemLevel.color.r, db.avgItemLevel.color.g, db.avgItemLevel.color.b)
 	else
 		frame.CataArmory_AvgItemLevel.Text:SetText('')
 	end
 
-	local avgItemLevelFame = _G['CataArmory_'..which..'_AvgItemLevel'] or CreateFrame('Frame', 'CataArmory_'..which..'_AvgItemLevel', (isCharPage and PaperDollFrame) or InspectPaperDollFrame)
-	avgItemLevelFame:SetHeight(db.fontSize + 6)
-	avgItemLevelFame:SetShown(db.enable)
+	frame.CataArmory_AvgItemLevel:SetHeight(textOptions.fontSize + 6)
+	frame.CataArmory_AvgItemLevel:SetShown(db.avgItemLevel.enable)
 end
 
 function module:TryGearAgain(frame, which, i, iLevelDB, inspectItem)
@@ -378,7 +393,6 @@ end
 do
 	local iLevelDB = {}
 	function module:UpdatePageInfo(frame, which, guid)
-		-- if not (which and frame and frame.ItemLevelText) then return end --for avgilvlstats window
 		if not which or not frame then return end
 		if which == 'Inspect' and (not frame or not frame.unit or (guid and guid ~= 'target' and frame:IsShown() and UnitGUID(frame.unit) ~= guid)) then return end
 
@@ -389,7 +403,7 @@ do
 			local slot = _G[which..slotName]
 			if not info.ignored then
 				slot.CataArmory_EnchantText:SetText('')
-				slot.CataArmory_iLvlText:SetText('')
+				slot.CataArmory_ItemLevelText:SetText('')
 
 				local unit = (which == 'Character' and 'player') or frame.unit
 				local slotInfo = module:GetGearSlotInfo(unit, info.slotID)
@@ -413,16 +427,17 @@ end
 local function CreateAvgItemLevel(frame, which)
 	if not frame or not which then return end
 
-	local db = E.db.cataarmory[string.lower(which)].avgItemLevel
+	local db = E.db.cataarmory[string.lower(which)]
+	local textOptions, frameOptions = db.avgItemLevel.text, db.avgItemLevel.frame
 	local isCharPage = which == 'Character'
 
 	local textFrame = CreateFrame('Frame', 'CataArmory_'..which..'_AvgItemLevel', (isCharPage and PaperDollFrame) or InspectPaperDollFrame)
 	textFrame:Size(170, 30)
 	textFrame:ClearAllPoints()
 	if isCharPage then
-		textFrame:Point((db.attachTo == 'CharacterLevelText' or db.attachTo == 'PaperDollFrame') and 'TOP' or 'BOTTOM', db.attachTo, (db.attachTo == 'CharacterLevelText') and 'BOTTOM' or 'TOP', db.xOffset, db.yOffset)
+		textFrame:Point((frameOptions.attachTo == 'CharacterLevelText' or frameOptions.attachTo == 'PaperDollFrame') and 'TOP' or 'BOTTOM', frameOptions.attachTo, (frameOptions.attachTo == 'CharacterLevelText') and 'BOTTOM' or 'TOP', frameOptions.xOffset, frameOptions.yOffset)
 	else
-		textFrame:Point('TOP', db.attachTo, (db.attachTo == 'InspectLevelText') and 'BOTTOM' or 'TOP', db.xOffset, db.yOffset)
+		textFrame:Point('TOP', frameOptions.attachTo, (frameOptions.attachTo == 'InspectLevelText') and 'BOTTOM' or 'TOP', frameOptions.xOffset, frameOptions.yOffset)
 	end
 
 	if not textFrame.Background then
@@ -457,10 +472,10 @@ local function CreateAvgItemLevel(frame, which)
 	textFrame.BottomLine:Size(textFrame:GetWidth(), 7)
 
 	local text = textFrame:CreateFontString(nil, 'OVERLAY')
-	text:FontTemplate(LSM:Fetch('font', db.font), db.fontSize, db.fontOutline)
+	text:FontTemplate(LSM:Fetch('font', textOptions.font), textOptions.fontSize, textOptions.fontOutline)
 	text:SetText('')
-	text:SetPoint('CENTER', 0, -2)
-	text:SetTextColor(db.color.r, db.color.g, db.color.b)
+	text:SetPoint('CENTER', textOptions.xOffset, textOptions.yOffset)
+	text:SetTextColor(db.avgItemLevel.color.r, db.avgItemLevel.color.g, db.avgItemLevel.color.b)
 
 	frame.CataArmory_AvgItemLevel = textFrame
 	frame.CataArmory_AvgItemLevel.Text = text
@@ -484,16 +499,16 @@ function module:PaperDollFrame_SetLevel()
 	local db = E.db.cataarmory.character.levelText
 	if not db.enable then return end
 
-	CharacterLevelText:ClearAllPoints()
-	CharacterLevelText:Point('TOP', CharacterFrameTitleText, 'BOTTOM', db.xOffset, db.yOffset)
+	_G.CharacterLevelText:ClearAllPoints()
+	_G.CharacterLevelText:Point('TOP', _G.CharacterFrameTitleText, 'BOTTOM', db.xOffset, db.yOffset)
 end
 
 function module:InspectPaperDollFrame_SetLevel()
 	local db = E.db.cataarmory.inspect.levelText
 	if not db.enable or not InspectLevelText then return end
 
-	InspectLevelText:ClearAllPoints()
-	InspectLevelText:Point('TOP', InspectNameText, 'BOTTOM', db.xOffset, db.yOffset)
+	_G.InspectLevelText:ClearAllPoints()
+	_G.InspectLevelText:Point('TOP', _G.InspectNameText, 'BOTTOM', db.xOffset, db.yOffset)
 end
 
 function module:CreateSlotStrings(frame, which)
@@ -510,10 +525,10 @@ function module:CreateSlotStrings(frame, which)
 
 		if not info.ignored then
 			--* Item Level
-			if not slot.CataArmory_iLvlText then
-				slot.CataArmory_iLvlText = slot:CreateFontString(nil, 'OVERLAY')
+			if not slot.CataArmory_ItemLevelText then
+				slot.CataArmory_ItemLevelText = slot:CreateFontString(nil, 'OVERLAY')
 			end
-			module:UpdateiLvlText(which, slot)
+			module:UpdateItemLevelText(which, slot)
 
 			--* Warning
 			if not slot.CataArmory_Warning then
@@ -551,7 +566,7 @@ function module:CreateSlotStrings(frame, which)
 			do
 				local point, relativePoint, x, y, spacing = module:GetGemPoints(info.slotID, db)
 				for u = 1, 5 do
-					slot['CA_textureSlot'..u], slot['CA_textureSlotBackdrop'..u] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
+					slot['CataArmory_GemSlot'..u], slot['CataArmory_GemSlotBackdrop'..u] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
 				end
 			end
 		end
@@ -569,10 +584,8 @@ end
 function module:InspectFrame_OnShow()
 	local frame = _G.InspectFrame
 	if not frame or frame.InspectInfoHooked then return end
-	-- if frame.InspectInfoHooked then return end
 
 	--* Move Rotate Buttons on InspectFrame
-	-- S:HandleFrame(InspectFrame, true, nil, 11, -12, -5, 65)
 	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
 	InspectModelFrameRotateLeftButton:ClearAllPoints()
 	InspectModelFrameRotateLeftButton:Point('TOPLEFT', (isSkinned and frame.backdrop.Center) or frame, 'TOPLEFT', 3, -3)
@@ -619,18 +632,9 @@ function module:UpdateInspectPageFonts(which, force)
 	local unit = (which == 'Character' and 'player') or frame.unit
 	local isCharPage = which == 'Character'
 	local db = E.db.cataarmory[string.lower(which)]
-	local itemLevel, enchant, avgItemLevel = db.itemLevel, db.enchant, db.avgItemLevel
+	local itemLevel, enchant = db.itemLevel, db.enchant
 
-	frame.CataArmory_AvgItemLevel.Text:FontTemplate(LSM:Fetch('font', avgItemLevel.font), avgItemLevel.fontSize, avgItemLevel.fontOutline)
-
-	frame.CataArmory_AvgItemLevel:ClearAllPoints()
-	if isCharPage then
-		frame.CataArmory_AvgItemLevel:Point((avgItemLevel.attachTo == 'CharacterLevelText' or avgItemLevel.attachTo == 'PaperDollFrame') and 'TOP' or 'BOTTOM', avgItemLevel.attachTo, (avgItemLevel.attachTo == 'CharacterLevelText') and 'BOTTOM' or 'TOP', avgItemLevel.xOffset, avgItemLevel.yOffset)
-	else
-		frame.CataArmory_AvgItemLevel:Point('TOP', avgItemLevel.attachTo, (avgItemLevel.attachTo == 'InspectLevelText') and 'BOTTOM' or 'TOP', avgItemLevel.xOffset, avgItemLevel.yOffset)
-	end
-	frame.CataArmory_AvgItemLevel:SetHeight(avgItemLevel.fontSize + 6)
-	frame.CataArmory_AvgItemLevel:SetShown(avgItemLevel.enable)
+	module:UpdateAvgItemLevel(which)
 
 	local slot, quality, iLvlTextColor, enchantTextColor
 	local qualityColor = {}
@@ -643,10 +647,10 @@ function module:UpdateInspectPageFonts(which, force)
 					qualityColor.r, qualityColor.g, qualityColor.b = GetItemQualityColor(quality)
 				end
 
-				module:UpdateiLvlText(which, slot)
+				module:UpdateItemLevelText(which, slot)
 				iLvlTextColor = (itemLevel.qualityColor and qualityColor) or itemLevel.color
 				if iLvlTextColor and next(iLvlTextColor) then
-					slot.CataArmory_iLvlText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
+					slot.CataArmory_ItemLevelText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
 				end
 
 				do

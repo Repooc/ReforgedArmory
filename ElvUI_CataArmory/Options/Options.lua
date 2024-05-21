@@ -82,20 +82,29 @@ local SharedOptions = {
 }
 
 local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
-	local config = ACH:Group(L["Average Item Level"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	local function disableCheck(info) if info and info[#info] == 'avgItemLevel' then return false else return not E.db.cataarmory[which][groupName].enable or not E.db.cataarmory[which].enable end end
+
+	local config = ACH:Group(L["Average Item Level"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end, function(info) return disableCheck(info) end)
 	local unit = which:gsub('^%l', string.upper)
 
-	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
+	config.args.enable = ACH:Toggle(L["Enable"], nil, 0, nil, nil, nil, nil, nil, function() return not E.db.cataarmory[which].enable end)
 	config.args.spacer1 = ACH:Spacer(1, 'full')
-	config.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
-	config.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
-	config.args.fontSize = ACH:Range(L["Font Size"], nil, 4, C.Values.FontSize)
-	config.args.spacer2 = ACH:Spacer(5, 'full')
-	config.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
-	config.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
-	config.args.attachTo = ACH:Select(L["Attach To"], L["The object you want to attach to."], 8, module.AttachToObjects[unit])
-	config.args.spacer3 = ACH:Spacer(10, 'full')
-	config.args.color = ACH:Color(L["Color"], nil, 11)
+	config.args.color = ACH:Color(L["Color"], nil, 2)
+
+	config.args.text = ACH:Group(L["Text Options"], nil, 5, nil, function(info) return actionSubGroup(info, which, groupName, 'text') end, function(info, ...) actionSubGroup(info, which, groupName, 'text', ...) end, nil)
+	config.args.text.inline = true
+	config.args.text.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
+	config.args.text.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
+	config.args.text.args.fontSize = ACH:Range(L["Font Size"], nil, 4, C.Values.FontSize)
+	config.args.text.args.spacer = ACH:Spacer(5, 'full')
+	config.args.text.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -5, max = 5, step = 1 })
+	config.args.text.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -5, max = 5, step = 1 })
+
+	config.args.frame = ACH:Group(L["Frame Options"], nil, 11, nil, function(info) return actionSubGroup(info, which, groupName, 'frame') end, function(info, ...) actionSubGroup(info, which, groupName, 'frame', ...) end, nil)
+	config.args.frame.inline = true
+	config.args.frame.args.attachTo = ACH:Select(L["Attach To"], L["The object you want to attach to."], 11, module.AttachToObjects[unit])
+	config.args.frame.args.xOffset = ACH:Range(L["X-Offset"], nil, 12, { min = -300, max = 300, step = 1 })
+	config.args.frame.args.yOffset = ACH:Range(L["Y-Offset"], nil, 13, { min = -300, max = 300, step = 1 })
 
 	return config
 end
