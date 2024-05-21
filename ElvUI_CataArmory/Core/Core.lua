@@ -732,6 +732,7 @@ function module:AcquireGemInfo(itemLink)
 end
 
 local githubURL = 'https://github.com/Repooc/ElvUI_CataArmory/issues'
+local missingIDs = {}
 function module:GetGearSlotInfo(unit, slot)
 	local tt = E.ScanTooltip
 	tt:SetOwner(_G.UIParent, 'ANCHOR_NONE')
@@ -761,9 +762,10 @@ function module:GetGearSlotInfo(unit, slot)
 	end
 
 	local enchantText = E.Libs.GetEnchant.GetEnchant(enchantID)
-	if enchantID and not enchantText then
-		local msg = format('The enchant id, *%s|r, seems to be missing from our database. Please open a ticket at |cff16c3f2[|r*|Hurl:'..githubURL..'|h'..githubURL..'|h|r|cff16c3f2]|r with the missing id and name of the enchant that found on %s. |cffFF0000If you do not provide the info or post a duplicate ticket, it will be closed without a response.|r', enchantID, itemLink):gsub('*', E.InfoColor)
+	if enchantID and not enchantText and not missingIDs[enchantID] then
+		local msg = format('The enchant id, *%s|r, seems to be missing from our database. Please open a ticket at |cff16c3f2[|r*|Hurl:'..githubURL..'|h'..githubURL..'|h|r|cff16c3f2]|r with the missing id and name of the enchant and/or provide screenshot mousing over the item with enchant that was found on %s. |cffFF0000If you do not provide the info or post a duplicate ticket, it will be closed without a response.|r', enchantID, itemLink):gsub('*', E.InfoColor)
 		module:Print(msg)
+		missingIDs[enchantID] = true
 	end
 	slotInfo.enchantText = enchantText or ''
 
