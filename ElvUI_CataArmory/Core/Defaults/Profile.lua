@@ -11,6 +11,17 @@ local SharedFontOptions = {
 	qualityColor = false,
 }
 
+local AvgItemLevel = {
+	enable = true,
+	font = 'PT Sans Narrow',
+	fontOutline = 'OUTLINE',
+	fontSize = 15,
+	xOffset = 0,
+	yOffset = 0,
+	color = {r = 0.99, g = 0.81, b = 0},
+	qualityColor = false,
+}
+
 local SharedGemOptions = {
 	enable = true,
 	size = 14,
@@ -39,8 +50,12 @@ P.cataarmory = {
 			xOffset = 0,
 			yOffset = 2,
 		},
-		avgItemLevel = CopyTable(SharedFontOptions),
+		avgItemLevel = CopyTable(AvgItemLevel),
 		enchant = CopyTable(SharedFontOptions),
+		expandButton = {
+			hide = false,
+			autoExpand = true,
+		},
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
 		slotBackground = {
@@ -62,7 +77,7 @@ P.cataarmory = {
 			xOffset = 0,
 			yOffset = -3,
 		},
-		avgItemLevel = CopyTable(SharedFontOptions),
+		avgItemLevel = CopyTable(AvgItemLevel),
 		enchant = CopyTable(SharedFontOptions),
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
@@ -90,8 +105,8 @@ P.cataarmory.inspect.avgItemLevel.background = {
 	spacing = 0,
 	color = {r = 0.99, g = 0.81, b = 0},
 }
--- P.cataarmory.character.avgItemLevel.fontSize = 15
-P.cataarmory.character.avgItemLevel.yOffset = -37
+P.cataarmory.character.avgItemLevel.attachTo = 'CharacterLevelText'
+P.cataarmory.character.avgItemLevel.yOffset = 2
 
 --* Enchant
 P.cataarmory.character.enchant.mouseover = false --! NYI
@@ -126,8 +141,7 @@ P.cataarmory.character.itemLevel.qualityColor = true
 
 --! Inspect
 --* Unit Avg Item Level
-P.cataarmory.inspect.avgItemLevel.fontSize = 15
-P.cataarmory.inspect.avgItemLevel.yOffset = -50
+P.cataarmory.inspect.avgItemLevel.attachTo = 'InspectLevelText'
 
 --* Enchant
 P.cataarmory.inspect.enchant.mouseover = false --! NYI

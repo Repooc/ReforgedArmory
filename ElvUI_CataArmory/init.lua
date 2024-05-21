@@ -139,6 +139,18 @@ module.GearList = {
 	},
 }
 
+module.AttachToObjects = {
+	Character = {
+		PaperDollFrame = 'PaperDollFrame',
+		CharacterFrameInset = 'CharacterFrameInset',
+		CharacterLevelText = 'CharacterLevelText',
+	},
+	Inspect = {
+		InspectPaperDollFrame = 'InspectPaperDollFrame',
+		InspectLevelText = 'InspectLevelText',
+	},
+}
+
 local function DisableElvUIInfo(which, db)
 	if E.db.cataarmory[which].enable and E.db.general.itemLevel[db] then
 		E.db.general.itemLevel[db] = false

@@ -73,6 +73,7 @@ local function actionSubGroup(info, which, groupName, subGroup, ...)
 	local unit = which:gsub("^%l", string.upper)
 	module:UpdateOptions(unit, force)
 end
+
 local SharedOptions = {
 	enable = ACH:Toggle(L["Enable"], nil, 0),
 	spacer1 = ACH:Spacer(1, 'full'),
@@ -82,11 +83,18 @@ local SharedOptions = {
 
 local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 	local config = ACH:Group(L["Average Item Level"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
-	config.args = CopyTable(SharedOptions)
+	local unit = which:gsub('^%l', string.upper)
+
+	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
+	config.args.spacer1 = ACH:Spacer(1, 'full')
 	config.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
 	config.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
 	config.args.fontSize = ACH:Range(L["Font Size"], nil, 4, C.Values.FontSize)
 	config.args.spacer2 = ACH:Spacer(5, 'full')
+	config.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
+	config.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
+	config.args.attachTo = ACH:Select(L["Attach To"], L["The object you want to attach to."], 8, module.AttachToObjects[unit])
+	config.args.spacer3 = ACH:Spacer(10, 'full')
 	config.args.color = ACH:Color(L["Color"], nil, 11)
 
 	return config
@@ -127,6 +135,14 @@ local function GetOptionsTable_EnchantGroup(which, groupName)
 	RangedSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
 	RangedSlot.args.growthDirection = ACH:Select(L["Growth Direction"], nil, 8, C.Values.GrowthDirection)
 	RangedSlot.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 9, C.Values.Anchors) --! Change terminology to reference slot instead of frame?
+
+	return config
+end
+
+local function GetOptionsTable_ExpandButton(which, groupName)
+	local config = ACH:Group(L["Expand Button"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	config.args.hide = ACH:Toggle(L["Hide"], nil, 0)
+	config.args.autoExpand = ACH:Toggle(L["Auto Expand"], nil, 1)
 
 	return config
 end
@@ -189,6 +205,7 @@ local function GetOptionsTable_SlotBackground(which, groupName)
 
 	return config
 end
+
 local function GetOptionsTable_WarningIndicator(which, groupName)
 	local config = ACH:Group(L["Warning Indicator"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
@@ -211,6 +228,7 @@ local function configTable()
 	Character.args.enable = ACH:Toggle(L["Enable"], nil, 0, nil, nil, nil, function(info) return E.db.cataarmory.character.enable end, function(info, value) E.db.cataarmory.character.enable = value module:ToggleItemLevelInfo() end)
 	Character.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('character', 'avgItemLevel')
 	Character.args.enchant = GetOptionsTable_EnchantGroup('character', 'enchant')
+	Character.args.expandButton = GetOptionsTable_ExpandButton('character', 'expandButton')
 	Character.args.gems = GetOptionsTable_Gems('character', 'gems')
 	Character.args.itemLevel = GetOptionsTable_ItemLevelGroup('character', 'itemLevel')
 	Character.args.levelText = GetOptionsTable_LevelText('character', 'levelText')
