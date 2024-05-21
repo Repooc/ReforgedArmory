@@ -2785,6 +2785,7 @@ lib.LibGetEnchantDB = {
 	[4432] = 104419, 												-- SpellID: 104419 --! Not In Cata Wowhead
 	[4433] = 104420, 												-- SpellID: 104420 --! Not In Cata Wowhead
 	[4434] = 104445, 												-- SpellID: 104445 --! Not In Cata Wowhead
+	[4440] = '+190 Attack Power & +55 Critical Strike',				-- SpellID: 78171 (Dragonscale Leg Armor)
 	[4441] = 104425, 												-- SpellID: 104425 --! Not In Cata Wowhead
 	[4442] = 104427, 												-- SpellID: 104427 --! Not In Cata Wowhead
 	[4443] = 104430, 												-- SpellID: 104430 --! Not In Cata Wowhead
