@@ -44,8 +44,12 @@ P.cataarmory = {
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
 		slotBackground = {
-			enable = true,
-			color = { .41, .83, 1 },
+			enable = false,
+			color = {r = 0.41, g = 0.83, b = 1},
+			warning = {
+				enable = true,
+				color = {r = 1, g = 0.33, b = 0},
+			},
 		},
 		warningIndicator = {
 			enable = false,
@@ -63,8 +67,12 @@ P.cataarmory = {
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(SharedFontOptions),
 		slotBackground = {
-			enable = true,
-			color = { .41, .83, 1 },
+			enable = false,
+			color = {r = 0.41, g = 0.83, b = 1},
+			warning = {
+				enable = true,
+				color = {r = 1, g = 0.33, b = 0},
+			},
 		},
 		warningIndicator = {
 			enable = false,

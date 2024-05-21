@@ -68,12 +68,13 @@ local whileOpenEvents = {
 }
 
 function module:UpdateSlotBackground(which, slot)
-	if not which then return end
+	if not which or not slot.CataArmory_Background then return end
 
 	local db = E.db.cataarmory[string.lower(which)]
 	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
-	local info = module.GearList[slotName] or module.IgnoredGearList[slotName]
+	local info = module.GearList[slotName]
 	local direction = info.direction
+	local color = db.slotBackground.color
 
 	if direction then
 		slot.CataArmory_Background:ClearAllPoints()
@@ -197,16 +198,21 @@ function module:ClearPageInfo(frame, which)
 		frame.CataArmory_AvgItemLevel.Text:SetText('')
 	end
 
-	for slot in pairs(module.GearList) do
-		local inspectItem = _G[which..slot]
+	for slotName, info in pairs(module.GearList) do
+		local slot = _G[which..slotName]
 
-		inspectItem.CataArmory_EnchantText:SetText('')
-		inspectItem.iLvlText:SetText('')
-		inspectItem.CataArmory_Warning:Hide()
+		if not info.ignored then
+			slot.CataArmory_EnchantText:SetText('')
+			slot.iLvlText:SetText('')
+			slot.CataArmory_Warning:Hide()
 
-		for y = 1, 5 do
-			inspectItem['CA_textureSlot'..y]:SetTexture()
-			inspectItem['CA_textureSlotBackdrop'..y]:Hide()
+			for y = 1, 5 do
+				slot['CA_textureSlot'..y]:SetTexture()
+				slot['CA_textureSlotBackdrop'..y]:Hide()
+			end
+		end
+		if slot.CataArmory_Background then
+			slot.CataArmory_Background:Hide()
 		end
 	end
 end
@@ -220,39 +226,8 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local db = E.db.cataarmory[string.lower(which)]
 	local missingBuckle, missingGem, missingEnchant, warningMsg = false, false, false, ''
 	local slotName = inspectItem:GetName():gsub('Character', ''):gsub('Inspect', '')
-	local info = module.GearList[slotName] or module.IgnoredGearList[slotName]
-	local canEnchant = info.canEnchant
-	local direction = info.direction
-	do
-		local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
-		inspectItem.CataArmory_EnchantText:ClearAllPoints()
-		inspectItem.CataArmory_EnchantText:Point(point, inspectItem, relativePoint, x, y)
-		inspectItem.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
-
-		if itemLink then
-			if slotInfo.enchantText == '' and canEnchant then
-				missingEnchant = true
-				warningMsg = strjoin('', warningMsg, '|cffff0000', L["Not Enchanted"], '|r\n')
-			end
-
-			if #slotInfo.emptySockets > 0 then
-				missingGem = true
-				warningMsg = strjoin('', warningMsg, '|cffff0000', L["Not Fully Gemmed"], '|r\n')
-			end
-			if slotInfo.missingBeltBuckle then
-				missingBuckle = true
-				warningMsg = strjoin('', warningMsg, '|cffff0000', L["Missing Belt Buckle"], '|r\n')
-			end
-			inspectItem.CataArmory_Warning.Reason = warningMsg
-		end
-		inspectItem.CataArmory_Warning:SetShown(db.warningIndicator.enable and (missingEnchant or missingGem or missingBuckle))
-		inspectItem.CataArmory_EnchantText:SetText(slotInfo.enchantText)
-		inspectItem.CataArmory_EnchantText:SetShown(db.enchant.enable)
-		local enchantTextColor = (db.enchant.qualityColor and slotInfo.itemQualityColors) or db.enchant.color
-		if enchantTextColor and next(enchantTextColor) then
-			inspectItem.CataArmory_EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
-		end
-	end
+	local info = module.GearList[slotName]
+	local canEnchant, direction = info.canEnchant, info.direction
 
 	--* Slot Background
 	if direction then
@@ -260,6 +235,46 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 			inspectItem.CataArmory_Background = inspectItem:CreateTexture(nil, 'BACKGROUND')
 		end
 		module:UpdateSlotBackground(which, inspectItem)
+	end
+
+	if not info.ignored then
+		do
+			local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
+			inspectItem.CataArmory_EnchantText:ClearAllPoints()
+			inspectItem.CataArmory_EnchantText:Point(point, inspectItem, relativePoint, x, y)
+			inspectItem.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
+
+			if itemLink then
+				if slotInfo.enchantText == '' and canEnchant then
+					missingEnchant = true
+					warningMsg = strjoin('', warningMsg, '|cffff0000', L["Not Enchanted"], '|r\n')
+				end
+
+				if #slotInfo.emptySockets > 0 then
+					missingGem = true
+					warningMsg = strjoin('', warningMsg, '|cffff0000', L["Not Fully Gemmed"], '|r\n')
+				end
+				if slotInfo.missingBeltBuckle then
+					missingBuckle = true
+					warningMsg = strjoin('', warningMsg, '|cffff0000', L["Missing Belt Buckle"], '|r\n')
+				end
+				inspectItem.CataArmory_Warning.Reason = warningMsg
+			end
+
+			local showWarning = missingEnchant or missingGem or missingBuckle or false
+			if direction and inspectItem.CataArmory_Background then
+				local warnColor = (showWarning and db.slotBackground.warning.enable) and db.slotBackground.warning.color or db.slotBackground.color
+				inspectItem.CataArmory_Background:SetVertexColor(warnColor.r, warnColor.g, warnColor.b)
+			end
+			inspectItem.CataArmory_Warning:SetShown(db.warningIndicator.enable and showWarning)
+
+			inspectItem.CataArmory_EnchantText:SetText(slotInfo.enchantText)
+			inspectItem.CataArmory_EnchantText:SetShown(db.enchant.enable)
+			local enchantTextColor = (db.enchant.qualityColor and slotInfo.itemQualityColors) or db.enchant.color
+			if enchantTextColor and next(enchantTextColor) then
+				inspectItem.CataArmory_EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
+			end
+		end
 	end
 
 	inspectItem.iLvlText:ClearAllPoints()
@@ -365,18 +380,20 @@ do
 		wipe(iLevelDB)
 
 		local waitForItems
-		for slot, info in pairs(module.GearList) do
-			local inspectItem = _G[which..slot]
-			inspectItem.CataArmory_EnchantText:SetText('')
-			inspectItem.iLvlText:SetText('')
+		for slotName, info in pairs(module.GearList) do
+			local slot = _G[which..slotName]
+			if not info.ignored then
+				slot.CataArmory_EnchantText:SetText('')
+				slot.iLvlText:SetText('')
 
-			local unit = (which == 'Character' and 'player') or frame.unit
-			local slotInfo = module:GetGearSlotInfo(unit, info.slotID)
-			if slotInfo == 'tooSoon' then
-				if not waitForItems then waitForItems = true end
-				module:TryGearAgain(frame, which, info.slotID, iLevelDB, inspectItem)
-			else
-				module:UpdatePageStrings(info.slotID, iLevelDB, inspectItem, slotInfo, which)
+				local unit = (which == 'Character' and 'player') or frame.unit
+				local slotInfo = module:GetGearSlotInfo(unit, info.slotID)
+				if slotInfo == 'tooSoon' then
+					if not waitForItems then waitForItems = true end
+					module:TryGearAgain(frame, which, info.slotID, iLevelDB, slot)
+				else
+					module:UpdatePageStrings(info.slotID, iLevelDB, slot, slotInfo, which)
+				end
 			end
 		end
 
@@ -478,24 +495,57 @@ function module:CreateSlotStrings(frame, which)
 
 	CreateAvgItemLevel(frame, which)
 
-	for slotName, info in pairs(module.IgnoredGearList) do
-		local slot = _G[which..slotName]
-		--* Slot Background
-		if info.direction then
-			if not slot.CataArmory_Background then
-				slot.CataArmory_Background = slot:CreateTexture(nil, 'BACKGROUND')
-			end
-			module:UpdateSlotBackground(which, slot)
-		end
-	end
-
 	for slotName, info in pairs(module.GearList) do
 		local slot = _G[which..slotName]
-		if not slot.iLvlText then
-			slot.iLvlText = slot:CreateFontString(nil, 'OVERLAY')
+
+		if not info.ignored then
+			--* Item Level
+			if not slot.iLvlText then
+				slot.iLvlText = slot:CreateFontString(nil, 'OVERLAY')
+			end
+			slot.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
+			slot.iLvlText:Point('BOTTOM', slot, itemLevel.xOffset, itemLevel.yOffset)
+
+			--* Warning
+			if not slot.CataArmory_Warning then
+				slot.CataArmory_Warning = CreateFrame('Frame', nil, slot)
+			end
+
+			do
+				-- local point, relativePoint, x, y = module:GetWarningPoints(info.slotID, db)
+				local point1, relativePoint1, point2, relativePoint2, size, x1, y1, x2, y2, spacing = module:GetWarningPoints(info.slotID, db)
+				slot.CataArmory_Warning:Point(point1, slot, relativePoint1, x1, y1)
+				slot.CataArmory_Warning:Point(point2, slot, relativePoint2, x2, y2)
+				slot.CataArmory_Warning:Size(size)
+				slot.CataArmory_Warning.texture = slot.CataArmory_Warning:CreateTexture(nil, 'BACKGROUND')
+				slot.CataArmory_Warning.texture:SetInside()
+				slot.CataArmory_Warning.texture:SetTexture(WarningTexture)
+				slot.CataArmory_Warning.texture:SetVertexColor(1, 0, 0, 1)
+				slot.CataArmory_Warning:SetFrameLevel(3)
+				slot.CataArmory_Warning:SetScript('OnEnter', Warning_OnEnter)
+				slot.CataArmory_Warning:SetScript('OnLeave', Warning_OnLeave)
+				slot.CataArmory_Warning:Hide()
+			end
+
+			--* Enchant Text
+			if not slot.CataArmory_EnchantText then
+				slot.CataArmory_EnchantText = slot:CreateFontString(nil, 'OVERLAY')
+			end
+			slot.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
+
+			do
+				local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
+				slot.CataArmory_EnchantText:ClearAllPoints()
+				slot.CataArmory_EnchantText:Point(point, slot, relativePoint, x, y)
+			end
+
+			do
+				local point, relativePoint, x, y, spacing = module:GetGemPoints(info.slotID, db)
+				for u = 1, 5 do
+					slot['CA_textureSlot'..u], slot['CA_textureSlotBackdrop'..u] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
+				end
+			end
 		end
-		slot.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
-		slot.iLvlText:Point('BOTTOM', slot, itemLevel.xOffset, itemLevel.yOffset)
 
 		--* Slot Background
 		if info.direction then
@@ -503,45 +553,6 @@ function module:CreateSlotStrings(frame, which)
 				slot.CataArmory_Background = slot:CreateTexture(nil, 'BACKGROUND')
 			end
 			module:UpdateSlotBackground(which, slot)
-		end
-
-		--* Warning
-		if not slot.CataArmory_Warning then
-			slot.CataArmory_Warning = CreateFrame('Frame', nil, slot)
-		end
-		do
-			-- local point, relativePoint, x, y = module:GetWarningPoints(info.slotID, db)
-			local point1, relativePoint1, point2, relativePoint2, size, x1, y1, x2, y2, spacing = module:GetWarningPoints(info.slotID, db)
-			slot.CataArmory_Warning:Point(point1, slot, relativePoint1, x1, y1)
-			slot.CataArmory_Warning:Point(point2, slot, relativePoint2, x2, y2)
-			slot.CataArmory_Warning:Size(size)
-			slot.CataArmory_Warning.texture = slot.CataArmory_Warning:CreateTexture(nil, 'BACKGROUND')
-			slot.CataArmory_Warning.texture:SetInside()
-			slot.CataArmory_Warning.texture:SetTexture(WarningTexture)
-			slot.CataArmory_Warning.texture:SetVertexColor(1, 0, 0, 1)
-			slot.CataArmory_Warning:SetFrameLevel(3)
-			slot.CataArmory_Warning:SetScript('OnEnter', Warning_OnEnter)
-			slot.CataArmory_Warning:SetScript('OnLeave', Warning_OnLeave)
-			slot.CataArmory_Warning:Hide()
-		end
-
-		--* Enchant Text
-		if not slot.CataArmory_EnchantText then
-			slot.CataArmory_EnchantText = slot:CreateFontString(nil, 'OVERLAY')
-		end
-		slot.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
-
-		do
-			local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
-			slot.CataArmory_EnchantText:ClearAllPoints()
-			slot.CataArmory_EnchantText:Point(point, slot, relativePoint, x, y)
-		end
-
-		do
-			local point, relativePoint, x, y, spacing = module:GetGemPoints(info.slotID, db)
-			for u = 1, 5 do
-				slot['CA_textureSlot'..u], slot['CA_textureSlotBackdrop'..u] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
-			end
 		end
 	end
 end
@@ -613,32 +624,34 @@ function module:UpdateInspectPageFonts(which, force)
 	for slotName, info in pairs(module.GearList) do
 		slot = _G[which..slotName]
 		if slot then
-			quality = GetInventoryItemQuality(unit, info.slotID)
-			if quality then
-				qualityColor.r, qualityColor.g, qualityColor.b = GetItemQualityColor(quality)
-			end
+			if not info.ignored then
+				quality = GetInventoryItemQuality(unit, info.slotID)
+				if quality then
+					qualityColor.r, qualityColor.g, qualityColor.b = GetItemQualityColor(quality)
+				end
 
-			slot.iLvlText:ClearAllPoints()
-			slot.iLvlText:Point('BOTTOM', slot, itemLevel.xOffset, itemLevel.yOffset)
-			slot.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
-			iLvlTextColor = (itemLevel.qualityColor and qualityColor) or itemLevel.color
-			if iLvlTextColor and next(iLvlTextColor) then
-				slot.iLvlText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
-			end
-			slot.iLvlText:SetShown(itemLevel.enable)
+				slot.iLvlText:ClearAllPoints()
+				slot.iLvlText:Point('BOTTOM', slot, itemLevel.xOffset, itemLevel.yOffset)
+				slot.iLvlText:FontTemplate(LSM:Fetch('font', itemLevel.font), itemLevel.fontSize, itemLevel.fontOutline)
+				iLvlTextColor = (itemLevel.qualityColor and qualityColor) or itemLevel.color
+				if iLvlTextColor and next(iLvlTextColor) then
+					slot.iLvlText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
+				end
+				slot.iLvlText:SetShown(itemLevel.enable)
 
-			do
-				local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
-				slot.CataArmory_EnchantText:ClearAllPoints()
-				slot.CataArmory_EnchantText:Point(point, slot, relativePoint, x, y)
-			end
+				do
+					local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
+					slot.CataArmory_EnchantText:ClearAllPoints()
+					slot.CataArmory_EnchantText:Point(point, slot, relativePoint, x, y)
+				end
 
-			slot.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
-			enchantTextColor = (enchant.qualityColor and qualityColor) or enchant.color
-			if enchantTextColor and next(enchantTextColor) then
-				slot.CataArmory_EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
+				slot.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
+				enchantTextColor = (enchant.qualityColor and qualityColor) or enchant.color
+				if enchantTextColor and next(enchantTextColor) then
+					slot.CataArmory_EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
+				end
+				slot.CataArmory_EnchantText:SetShown(enchant.enable)
 			end
-			slot.CataArmory_EnchantText:SetShown(enchant.enable)
 
 			if force then
 				module:UpdateSlotBackground(which, slot)

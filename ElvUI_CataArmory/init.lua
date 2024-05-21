@@ -65,6 +65,14 @@ module.GearList = {
 		canEnchant = true,
 		direction = 'LEFT',
 	},
+	ShirtSlot = {
+		ignored = true,
+		direction = 'LEFT',
+	},
+	TabardSlot = {
+		ignored = true,
+		direction = 'LEFT',
+	},
 	WaistSlot = {
 		slotID = 6,
 		canEnchant = false,
@@ -130,18 +138,12 @@ module.GearList = {
 		direction = 'LEFT',
 	},
 }
-module.IgnoredGearList = {
-	ShirtSlot = {
-		direction = 'LEFT',
-	},
-	TabardSlot = {
-		direction = 'LEFT',
-	},
-}
 
 local function DisableElvUIInfo(which, db)
-	if E.db.cataarmory[which].enable then
+	if E.db.cataarmory[which].enable and E.db.general.itemLevel[db] then
 		E.db.general.itemLevel[db] = false
+
+		module:Print(format('ElvUI\'s %sDisplay %s Info|r option was |cffFF3300DISABLED|r automatically to prevent conflict with our module.', E.media.hexvaluecolor or '|cff16c3f2', gsub(which, "^%l", string.upper)))
 	end
 end
 
