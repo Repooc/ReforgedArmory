@@ -4,7 +4,7 @@ on:
     paths-ignore:
       - '.github/**'
     branches:
-      - "**"
+      - "main"
     tags:
       - "!**"
 jobs:
