@@ -8,4 +8,3 @@ manual-changelog:
     markup-type: markdown
 move-folders:
     ElvUI_CataArmory/ElvUI_CataArmory: ElvUI_CataArmory
-enable-toc-creation: yes

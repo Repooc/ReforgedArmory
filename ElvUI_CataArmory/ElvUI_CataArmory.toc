@@ -1,5 +1,4 @@
 ﻿## Interface: 40400
-## Interface-Cata: 40400
 ## Title: |cff1784d1ElvUI|r |cff00FF98Cata|r |cffA330C9Armory|r
 ## Author: Repooc
 ## Version: 1.11
