@@ -97,7 +97,7 @@ module.GearList = {
 	},
 	HandsSlot = {
 		slotID = 10,
-		canEnchant = false,
+		canEnchant = true,
 		direction = 'RIGHT',
 	},
 	Finger0Slot = {

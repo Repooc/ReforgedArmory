@@ -89,9 +89,8 @@ local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0, nil, nil, nil, nil, nil, function() return not E.db.cataarmory[which].enable end)
 	config.args.spacer1 = ACH:Spacer(1, 'full')
-	config.args.color = ACH:Color(L["Color"], nil, 2)
 
-	config.args.text = ACH:Group(L["Text Options"], nil, 5, nil, function(info) return actionSubGroup(info, which, groupName, 'text') end, function(info, ...) actionSubGroup(info, which, groupName, 'text', ...) end, nil)
+	config.args.text = ACH:Group(L["Text Options"], nil, 5, nil, function(info) return actionSubGroup(info, which, groupName, 'text') end, function(info, ...) actionSubGroup(info, which, groupName, 'text', ...) end)
 	config.args.text.inline = true
 	config.args.text.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
 	config.args.text.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
@@ -99,12 +98,17 @@ local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 	config.args.text.args.spacer = ACH:Spacer(5, 'full')
 	config.args.text.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -5, max = 5, step = 1 })
 	config.args.text.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -5, max = 5, step = 1 })
+	config.args.text.args.color = ACH:Color(L["Color"], nil, 8)
 
-	config.args.frame = ACH:Group(L["Frame Options"], nil, 11, nil, function(info) return actionSubGroup(info, which, groupName, 'frame') end, function(info, ...) actionSubGroup(info, which, groupName, 'frame', ...) end, nil)
+	config.args.frame = ACH:Group(L["Frame Options"], nil, 11, nil, function(info) return actionSubGroup(info, which, groupName, 'frame') end, function(info, ...) actionSubGroup(info, which, groupName, 'frame', ...) end)
 	config.args.frame.inline = true
 	config.args.frame.args.attachTo = ACH:Select(L["Attach To"], L["The object you want to attach to."], 11, module.AttachToObjects[unit])
 	config.args.frame.args.xOffset = ACH:Range(L["X-Offset"], nil, 12, { min = -300, max = 300, step = 1 })
 	config.args.frame.args.yOffset = ACH:Range(L["Y-Offset"], nil, 13, { min = -300, max = 300, step = 1 })
+	config.args.frame.args.spacer = ACH:Spacer(15, 'full')
+	config.args.frame.args.showBGTexture = ACH:Toggle(L["Show Background"], nil, 16)
+	config.args.frame.args.showLines = ACH:Toggle(L["Show Lines"], nil, 17)
+	config.args.frame.args.color = ACH:Color(L["Color"], L["This sets the color of the lines.\n\n|cffFF3300Warning:|r |cffFFD100Colors will not be 1 to 1 from the color wheel to the texture as the texture has color itself. This may not be the case for future textures if added as options.|r"], 18)
 
 	return config
 end

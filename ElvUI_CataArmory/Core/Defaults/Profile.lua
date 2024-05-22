@@ -3,6 +3,7 @@ local _, _, _, P = unpack(ElvUI)
 local AvgItemLevel = {
 	enable = true,
 	text = {
+		color = {r = 0.99, g = 0.81, b = 0},
 		font = 'PT Sans Narrow',
 		fontOutline = 'OUTLINE',
 		fontSize = 15,
@@ -10,10 +11,12 @@ local AvgItemLevel = {
 		yOffset = -2,
 	},
 	frame = {
+		color = {r = 1, g = 1, b = 1, a = 1},
+		showBGTexture = true,
+		showLines = true,
 		xOffset = 0,
 		yOffset = 0,
 	},
-	color = {r = 0.99, g = 0.81, b = 0},
 	qualityColor = false,
 }
 
@@ -70,7 +73,7 @@ P.cataarmory = {
 		avgItemLevel = CopyTable(AvgItemLevel),
 		enchant = CopyTable(SharedFontOptions),
 		expandButton = {
-			hide = false,
+			hide = true,
 			autoExpand = true,
 		},
 		gems = CopyTable(SharedGemOptions),
@@ -86,7 +89,7 @@ P.cataarmory = {
 			},
 		},
 		warningIndicator = {
-			enable = false,
+			enable = true,
 		},
 	},
 	inspect = {
@@ -111,21 +114,13 @@ P.cataarmory = {
 			},
 		},
 		warningIndicator = {
-			enable = false,
+			enable = true,
 		},
 	},
 }
 
 --! Character
 --* Unit Avg Item Level
-P.cataarmory.character.avgItemLevel.background = {
-	spacing = 0,
-	color = {r = 0.99, g = 0.81, b = 0},
-}
-P.cataarmory.inspect.avgItemLevel.background = {
-	spacing = 0,
-	color = {r = 0.99, g = 0.81, b = 0},
-}
 P.cataarmory.character.avgItemLevel.frame.attachTo = 'CharacterLevelText'
 P.cataarmory.character.avgItemLevel.frame.yOffset = 2
 
