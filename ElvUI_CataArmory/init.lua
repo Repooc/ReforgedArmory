@@ -11,6 +11,10 @@ module.CleanTitle = GetAddOnMetadata('ElvUI_CataArmory', 'X-CleanTitle')
 module.Version = GetAddOnMetadata('ElvUI_CataArmory', 'Version')
 module.Configs = {}
 
+local TooltipDataType = Enum.TooltipDataType
+local AddTooltipPostCall = TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall
+local GetDisplayedItem = TooltipUtil and TooltipUtil.GetDisplayedItem
+
 do
 	--* Disable the old version which was named WrathArmory
 	local DisableAddOn = (C_AddOns and C_AddOns.DisableAddOn) or DisableAddOn
@@ -172,6 +176,19 @@ function module:ADDON_LOADED(_, addon)
 	end
 end
 
+function module:GameTooltip_OnTooltipSetItem(data)
+	if (self ~= GameTooltip and self ~= _G.ShoppingTooltip1 and self ~= _G.ShoppingTooltip2) or self:IsForbidden() then return end
+
+	local GetItem = GetDisplayedItem or self.GetItem
+	if GetItem then
+		local name, link = GetItem(self)
+		if not link then return end
+		local enchantID = tonumber(string.match(link, 'item:%d+:(%d+):'))
+		if not enchantID then return end
+		self:AddLine(format('|cFFCA3C3C%s:|r %s', 'Enchant ID', enchantID))
+	end
+end
+
 function module:Initialize()
 	EP:RegisterPlugin(AddOnName, GetOptions)
 	E:AddLib('GetEnchant', 'LibGetEnchant-1.0-CataArmory')
@@ -191,6 +208,13 @@ function module:Initialize()
 	end
 
 	module:ToggleItemLevelInfo(true)
+
+	--* In case I am to make this work for retail and classic/sod
+	-- if AddTooltipPostCall and not E.Cata then -- exists but doesn't work atm on Cata
+	-- 	AddTooltipPostCall(TooltipDataType.Item, module.GameTooltip_OnTooltipSetItem)
+	-- else
+		module:SecureHookScript(GameTooltip, 'OnTooltipSetItem', module.GameTooltip_OnTooltipSetItem)
+	-- end
 
 	module:SecureHook('PaperDollFrame_SetLevel', module.PaperDollFrame_SetLevel)
 	module:SecureHook(E, 'UpdateDB', module.UpdateOptions)
