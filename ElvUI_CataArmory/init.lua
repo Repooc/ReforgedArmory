@@ -2,14 +2,15 @@ local E, L = unpack(ElvUI)
 local EP = E.Libs.EP
 local M = E.Misc
 local AddOnName, Engine = ...
-
 local module = E:NewModule(AddOnName, 'AceHook-3.0', 'AceEvent-3.0')
-_G[AddOnName] = Engine
 
 module.Title = GetAddOnMetadata('ElvUI_CataArmory', 'Title')
 module.CleanTitle = GetAddOnMetadata('ElvUI_CataArmory', 'X-CleanTitle')
 module.Version = GetAddOnMetadata('ElvUI_CataArmory', 'Version')
 module.Configs = {}
+Engine.EnchantsTable = {
+	UserReplaced = {},
+}
 
 local TooltipDataType = Enum.TooltipDataType
 local AddTooltipPostCall = TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall
@@ -40,10 +41,10 @@ function module:UpdateOptions(unit, force)
 			module.InspectPaperDollFrame_SetLevel()
 		end
 	else
-		module:UpdateInspectPageFonts('Character')
+		module:UpdateInspectPageFonts('Character', force)
 		module.PaperDollFrame_SetLevel()
 
-		module:UpdateInspectPageFonts('Inspect')
+		module:UpdateInspectPageFonts('Inspect', force)
 		module.InspectPaperDollFrame_SetLevel()
 	end
 end
@@ -178,7 +179,6 @@ end
 
 function module:GameTooltip_OnTooltipSetItem()
 	if (self ~= GameTooltip and self ~= _G.ShoppingTooltip1 and self ~= _G.ShoppingTooltip2) or self:IsForbidden() then return end
-	-- if not E.db.cataarmory
 
 	local owner = self:GetOwner()
 	local ownerName = owner and owner.GetName and owner:GetName()
