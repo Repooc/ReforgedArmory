@@ -81,10 +81,11 @@ local SharedOptions = {
 	yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
 }
 
-local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
-	local function disableCheck(info) if info and info[#info] == 'avgItemLevel' then return false else return not E.db.cataarmory[which][groupName].enable or not E.db.cataarmory[which].enable end end
+local function disableCheck(info, which, groupName) if info and info[#info] == groupName then return false else return not E.db.cataarmory[which][groupName].enable or not E.db.cataarmory[which].enable end end
 
-	local config = ACH:Group(L["Average Item Level"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end, function(info) return disableCheck(info) end)
+local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
+
+	local config = ACH:Group(L["Average Item Level"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end, function(info) return disableCheck(info, which, groupName) end)
 	local unit = which:gsub('^%l', string.upper)
 
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0, nil, nil, nil, nil, nil, function() return not E.db.cataarmory[which].enable end)
@@ -114,8 +115,9 @@ local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 end
 
 local function GetOptionsTable_EnchantGroup(which, groupName)
-	local config = ACH:Group(L["Enchants"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	local config = ACH:Group(L["Enchants"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end, function(info) return disableCheck(info, which, groupName) end)
 	config.args = CopyTable(SharedOptions)
+	config.args.enable.disabled = function() return not E.db.cataarmory[which].enable end
 	config.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
 	config.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
 	config.args.fontSize = ACH:Range(L["Font Size"], nil, 4, C.Values.FontSize)
@@ -125,8 +127,14 @@ local function GetOptionsTable_EnchantGroup(which, groupName)
 	config.args.qualityColor = ACH:Toggle(L["Quality Color"], L["Use the same color as the quality color of the equipped item."], 10)
 	config.args.color = ACH:Color(L["Color"], nil, 11, nil, nil, nil, nil, function() return E.db.cataarmory[which][groupName].qualityColor end)
 
+	local EnchantID = ACH:Group(L["EnchantID Tooltip Info"], 'test', 20, nil, function(info) return actionSubGroup(info, which, groupName, 'enchantID') end, function(info, ...) actionSubGroup(info, which, groupName, 'enchantID', ...) end)
+	config.args.enchantID = EnchantID
+	EnchantID.inline = true
+	EnchantID.args.enable = ACH:Toggle(L["Enable"], L["Displays the enchant id in the tooltip of gear that has an enchant id in the itemlink."], 0)
+	EnchantID.args.missingOnly = ACH:Toggle(L["Missing Only"], L["Only show the enchant id if it is missing from the addon database."], 1, nil, nil, nil, nil, nil, function() return not E.db.cataarmory[which][groupName].enchantID.enable or not E.db.cataarmory[which][groupName].enable end)
+
 	--* Main Hand Slot
-	local MainHandSlot = ACH:Group(L["Main Hand Slot"], nil, 10, nil, function(info) return actionSubGroup(info, which, groupName, 'MainHandSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'MainHandSlot', ...) end)
+	local MainHandSlot = ACH:Group(L["Main Hand Slot"], nil, 30, nil, function(info) return actionSubGroup(info, which, groupName, 'MainHandSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'MainHandSlot', ...) end)
 	config.args.MainHandSlot = MainHandSlot
 	MainHandSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 	MainHandSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
@@ -134,7 +142,7 @@ local function GetOptionsTable_EnchantGroup(which, groupName)
 	MainHandSlot.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 9, C.Values.Anchors) --! Change terminology to reference slot instead of frame?
 
 	--* Secondary Hand Slot
-	local SecondaryHandSlot = ACH:Group(L["Secondary Hand Slot"], nil, 11, nil, function(info) return actionSubGroup(info, which, groupName, 'SecondaryHandSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'SecondaryHandSlot', ...) end)
+	local SecondaryHandSlot = ACH:Group(L["Secondary Hand Slot"], nil, 31, nil, function(info) return actionSubGroup(info, which, groupName, 'SecondaryHandSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'SecondaryHandSlot', ...) end)
 	config.args.SecondaryHandSlot = SecondaryHandSlot
 	SecondaryHandSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 	SecondaryHandSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
@@ -142,7 +150,7 @@ local function GetOptionsTable_EnchantGroup(which, groupName)
 	SecondaryHandSlot.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 9, C.Values.Anchors) --! Change terminology to reference slot instead of frame?
 
 	--* Ranged Slot
-	local RangedSlot = ACH:Group(L["Ranged Slot"], nil, 12, nil, function(info) return actionSubGroup(info, which, groupName, 'RangedSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'RangedSlot', ...) end)
+	local RangedSlot = ACH:Group(L["Ranged Slot"], nil, 32, nil, function(info) return actionSubGroup(info, which, groupName, 'RangedSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'RangedSlot', ...) end)
 	config.args.RangedSlot = RangedSlot
 	RangedSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 	RangedSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })

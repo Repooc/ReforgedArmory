@@ -20,7 +20,7 @@ local AvgItemLevel = {
 	qualityColor = false,
 }
 
-local ItemLevel = {
+local Enchant = {
 	enable = true,
 	font = 'PT Sans Narrow',
 	fontSize = 15,
@@ -29,9 +29,13 @@ local ItemLevel = {
 	yOffset = 0,
 	color = {r = 0.99, g = 0.81, b = 0},
 	qualityColor = false,
+	enchantID = {
+		enable = true,
+		missingOnly = false,
+	},
 }
 
-local SharedFontOptions = {
+local ItemLevel = {
 	enable = true,
 	font = 'PT Sans Narrow',
 	fontSize = 15,
@@ -71,7 +75,7 @@ P.cataarmory = {
 			yOffset = 2,
 		},
 		avgItemLevel = CopyTable(AvgItemLevel),
-		enchant = CopyTable(SharedFontOptions),
+		enchant = CopyTable(Enchant),
 		expandButton = {
 			hide = true,
 			autoExpand = true,
@@ -100,7 +104,7 @@ P.cataarmory = {
 			yOffset = -3,
 		},
 		avgItemLevel = CopyTable(AvgItemLevel),
-		enchant = CopyTable(SharedFontOptions),
+		enchant = CopyTable(Enchant),
 		gems = CopyTable(SharedGemOptions),
 		itemLevel = CopyTable(ItemLevel),
 		slotBackground = {

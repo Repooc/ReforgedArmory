@@ -176,22 +176,34 @@ function module:ADDON_LOADED(_, addon)
 	end
 end
 
-function module:GameTooltip_OnTooltipSetItem(data)
+function module:GameTooltip_OnTooltipSetItem()
 	if (self ~= GameTooltip and self ~= _G.ShoppingTooltip1 and self ~= _G.ShoppingTooltip2) or self:IsForbidden() then return end
+	-- if not E.db.cataarmory
+
+	local owner = self:GetOwner()
+	local ownerName = owner and owner.GetName and owner:GetName()
+	if not ownerName then return end
+	if ownerName and not (strfind(ownerName, 'Character') or strfind(ownerName, 'Inspect')) then return end
+
+	local unit = string.match(ownerName, 'Character') or string.match(ownerName, 'Inspect')
+	if not unit then return end
+	unit = string.lower(unit)
+	if not E.db.cataarmory[unit].enchant.enchantID.enable then return end
 
 	local GetItem = GetDisplayedItem or self.GetItem
 	if GetItem then
 		local name, link = GetItem(self)
 		if not link then return end
 		local enchantID = tonumber(string.match(link, 'item:%d+:(%d+):'))
-		if not enchantID then return end
+		if not enchantID or (E.db.cataarmory[unit].enchant.enchantID.missingOnly and E.Libs.GetEnchantList.GetEnchant(enchantID)) then return end
+
 		self:AddLine(format('|cFFCA3C3C%s:|r %s', 'Enchant ID', enchantID))
 	end
 end
 
 function module:Initialize()
 	EP:RegisterPlugin(AddOnName, GetOptions)
-	E:AddLib('GetEnchant', 'LibGetEnchant-1.0-CataArmory')
+	E:AddLib('GetEnchantList', 'LibGetEnchant-1.0-CataArmory')
 
 	DisableElvUIInfo('character', 'displayCharacterInfo')
 	DisableElvUIInfo('inspect', 'displayInspectInfo')
