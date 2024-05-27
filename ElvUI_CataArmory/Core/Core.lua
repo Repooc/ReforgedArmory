@@ -781,6 +781,17 @@ function module:GetGearSlotInfo(unit, slot)
 	return slotInfo
 end
 
+local function HandleCharacterFrameExpand()
+	local frame = _G.CharacterFrame
+	local showStatus = E.db.cataarmory.character.expandButton.autoExpand
+	if _G.PaperDollFrame:IsVisible() or _G.PetPaperDollFrame:IsVisible() then
+		if _G.CharacterStatsPane:IsShown() ~= showStatus then
+			_G.CharacterFrameExpandButton:Click()
+		end
+	end
+	_G.CharacterFrameExpandButton:SetShown(not E.db.cataarmory.character.expandButton.hide)
+end
+
 local function CharacterFrame_OnShow()
 	module.UpdateCharacterInfo()
 	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
@@ -808,19 +819,17 @@ local function CharacterFrame_OnShow()
 			_G.CharacterModelScene.BackgroundBotRight:Hide()
 			_G.CharacterModelScene.backdrop:Hide()
 			_G.CharacterModelScene.BackgroundOverlay:Hide() --! Maybe use this over background images?
-
-			frame.BottomLeftCorner:ClearAllPoints()
-			frame.BottomLeftCorner:SetPoint('BOTTOMLEFT', frame, 'BOTTOMLEFT', 0, -26)
-			frame.BottomRightCorner:ClearAllPoints()
-			frame.BottomRightCorner:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, -26)
 		end
+
+		frame.BottomLeftCorner:ClearAllPoints()
+		frame.BottomLeftCorner:SetPoint('BOTTOMLEFT', frame, 'BOTTOMLEFT', 0, -26)
+		frame.BottomRightCorner:ClearAllPoints()
+		frame.BottomRightCorner:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, -26)
+
 		frame.CataArmory_Hooked = true
 	end
-	if E.db.cataarmory.character.expandButton.autoExpand and not frame.Expanded then
-		SetCVar('characterFrameCollapsed', '0')
-		frame:Expand()
-	end
-	_G.CharacterFrameExpandButton:SetShown(not E.db.cataarmory.character.expandButton.hide)
+
+	HandleCharacterFrameExpand()
 end
 
 function module:ToggleItemLevelInfo(setupCharacterPage)
@@ -836,6 +845,9 @@ function module:ToggleItemLevelInfo(setupCharacterPage)
 		if not module:IsHooked(_G.CharacterFrame, 'OnShow') then
 			module:SecureHookScript(_G.CharacterFrame, 'OnShow', CharacterFrame_OnShow)
 		end
+		if not module:IsHooked(_G.CharacterFrame, 'ShowSubFrame') then
+			module:SecureHook(_G.CharacterFrame, 'ShowSubFrame', HandleCharacterFrameExpand)
+		end
 
 		if not setupCharacterPage then
 			module:UpdateCharacterInfo()
@@ -847,7 +859,9 @@ function module:ToggleItemLevelInfo(setupCharacterPage)
 		if module:IsHooked(_G.CharacterFrame, 'OnShow') then
 			module:Unhook(_G.CharacterFrame, 'OnShow')
 		end
-
+		if not module:IsHooked(_G.CharacterFrame, 'ShowSubFrame') then
+			module:Unhook(_G.CharacterFrame, 'ShowSubFrame')
+		end
 		module:ClearPageInfo(_G.CharacterFrame, 'Character')
 	end
 
