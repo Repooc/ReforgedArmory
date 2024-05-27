@@ -49,6 +49,29 @@ function module:UpdateOptions(unit, force)
 	end
 end
 
+local ProfessionIDs = {
+	Blacksmithing = 164,
+	Enchanting = 333,
+	Engineering = 202,
+}
+
+local function CheckProf(profession)
+	local profID = ProfessionIDs[profession]
+	if not profID then return false end
+
+	local prof1Name, prof1ID, prof2Name, prof2ID
+	local prof1, prof2 = GetProfessions()
+
+	if prof1 then
+		prof1Name, _, _, _, _, _, prof1ID = GetProfessionInfo(prof1)
+	end
+	if prof2 then
+		prof2Name, _, _, _, _, _, prof2ID = GetProfessionInfo(prof2)
+	end
+
+	return ((prof1ID and prof1ID == profID) and prof1Name) or ((prof2ID and prof2ID == profID) and prof2Name) or false
+end
+
 module.GearList = {
 	HeadSlot = {
 		slotID = 1,
@@ -107,12 +130,12 @@ module.GearList = {
 	},
 	Finger0Slot = {
 		slotID = 11,
-		canEnchant = true,
+		canEnchant = CheckProf('Enchanting'),
 		direction = 'RIGHT',
 	},
 	Finger1Slot = {
 		slotID = 12,
-		canEnchant = true,
+		canEnchant = CheckProf('Enchanting'),
 		direction = 'RIGHT',
 	},
 	Trinket0Slot = {
