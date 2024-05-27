@@ -627,10 +627,15 @@ function module:InspectFrame_OnShow()
 
 		frame.backdrop:ClearAllPoints()
 		frame.backdrop:SetPoint('TOPLEFT', frame, 'TOPLEFT', 11, -12)
-		frame.backdrop:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', -32, 50)
+		frame.backdrop:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, 50)
 
 		InspectFrameTab1:ClearAllPoints(); InspectFrameTab1:SetPoint('TOPLEFT', frame, 'BOTTOMLEFT', 1, 26)
 		InspectFrameTab1:SetPoint('TOPLEFT', InspectFrame, 'BOTTOMLEFT', 1, 52)
+
+		InspectHeadSlot:ClearAllPoints()
+		InspectHeadSlot:SetPoint('TOPLEFT', _G.InspectPaperDollItemsFrame, 'TOPLEFT', 26, -74)
+		InspectHandsSlot:ClearAllPoints()
+		InspectHandsSlot:SetPoint('TOPRIGHT', _G.InspectPaperDollItemsFrame, 'TOPRIGHT', -15, -74)
 	end
 
 	frame.InspectInfoHooked = true
