@@ -19,7 +19,7 @@ jobs:
       RR_AUTHOR_SUPPORT_INFO_NAME: "general-info"
       RR_AUTHOR_SUPPORT_INFO_URL: "https://discord.com/channels/1162274244487561216/1171940634672767128"
       RR_ADDON_CHANNEL_NAME: "cata-armory"
-      RR_ADDON_CHANNEL_URL: "https://discord.com/channels/1162274244487561216/1162288082427576340"
+      RR_ADDON_CHANNEL_URL: "https://discord.com/channels/1162274244487561216/1244708563734237207"
     steps:
       - name: Clone Project
         uses: actions/checkout@v4
