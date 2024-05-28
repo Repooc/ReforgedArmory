@@ -80,7 +80,6 @@ module.GearList = {
 	},
 	NeckSlot = {
 		slotID = 2,
-		canEnchant = false,
 		direction = 'LEFT',
 	},
 	ShoulderSlot = {
@@ -105,7 +104,6 @@ module.GearList = {
 	},
 	WaistSlot = {
 		slotID = 6,
-		canEnchant = false,
 		direction = 'RIGHT',
 	},
 	LegsSlot = {
@@ -130,27 +128,24 @@ module.GearList = {
 	},
 	Finger0Slot = {
 		slotID = 11,
-		canEnchant = CheckProf('Enchanting'),
+		canEnchant = CheckProf,
 		direction = 'RIGHT',
 	},
 	Finger1Slot = {
 		slotID = 12,
-		canEnchant = CheckProf('Enchanting'),
+		canEnchant = CheckProf,
 		direction = 'RIGHT',
 	},
 	Trinket0Slot = {
 		slotID = 13,
-		canEnchant = false,
 		direction = 'RIGHT',
 	},
 	Trinket1Slot = {
 		slotID = 14,
-		canEnchant = false,
 		direction = 'RIGHT',
 	},
 	BackSlot = {
 		slotID = 15,
-		canEnchant = false,
 		direction = 'LEFT',
 	},
 	MainHandSlot = {
@@ -164,7 +159,6 @@ module.GearList = {
 	},
 	RangedSlot = {
 		slotID = 18,
-		canEnchant = false,
 		direction = 'LEFT',
 	},
 }

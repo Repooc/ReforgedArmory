@@ -295,7 +295,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 			inspectItem.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
 
 			if itemLink then
-				if slotInfo.enchantText == '' and canEnchant then
+				if slotInfo.enchantText == '' and (canEnchant and (canEnchant == true or canEnchant('Enchanting'))) then
 					missingEnchant = true
 					warningMsg = strjoin('', warningMsg, '|cffff0000', L["Not Enchanted"], '|r\n')
 				end
