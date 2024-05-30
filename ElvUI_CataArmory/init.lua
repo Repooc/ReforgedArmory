@@ -146,6 +146,7 @@ module.GearList = {
 	},
 	BackSlot = {
 		slotID = 15,
+		canEnchant = true,
 		direction = 'LEFT',
 	},
 	MainHandSlot = {
