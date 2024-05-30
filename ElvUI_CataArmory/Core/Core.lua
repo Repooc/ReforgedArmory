@@ -2,6 +2,7 @@ local E, L = unpack(ElvUI)
 local module = E:GetModule('ElvUI_CataArmory')
 local S = E:GetModule('Skins')
 local LSM = E.Libs.LSM
+local GetItemQualityColor = C_Item and C_Item.GetItemQualityColor
 
 local values = {
 	SIDE_SLOTS_ANCHORPOINTS = {
@@ -278,6 +279,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local slotName = inspectItem:GetName():gsub('Character', ''):gsub('Inspect', '')
 	local info = module.GearList[slotName]
 	local canEnchant, direction = info.canEnchant, info.direction
+	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
 
 	--* Slot Background
 	if direction then
@@ -334,13 +336,24 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	end
 	inspectItem.CataArmory_ItemLevelText:SetText(slotInfo.iLvl)
 
-	if which == 'Inspect' and unit then
-		local quality = GetInventoryItemQuality(unit, i)
+	local quality = GetInventoryItemQuality(unit, i)
+	local r, g, b
+
+	if which == 'Inspect' and isSkinned then
 		if quality and quality > 1 then
-			local r, g, b = GetItemQualityColor(quality)
+			r, g, b = GetItemQualityColor(quality)
 			inspectItem.backdrop:SetBackdropBorderColor(r, g, b, 1)
 		else
 			inspectItem.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
+		end
+	else
+		if quality and quality > 1 then
+			r, g, b = GetItemQualityColor(quality)
+			inspectItem.IconBorder:SetVertexColor(r, g, b)
+			inspectItem.IconBorder:Show()
+		else
+			inspectItem.IconBorder:SetVertexColor(1, 1, 1)
+			inspectItem.IconBorder:SetShown(itemLink and true or false)
 		end
 	end
 
