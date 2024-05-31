@@ -617,38 +617,45 @@ end
 function module:InspectFrame_OnShow()
 	local frame = _G.InspectFrame
 	if not frame or frame.InspectInfoHooked then return end
+	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
 
 	--* Move Rotate Buttons on InspectFrame
-	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
-	InspectModelFrameRotateLeftButton:ClearAllPoints()
-	InspectModelFrameRotateLeftButton:SetPoint('TOPLEFT', (isSkinned and frame.backdrop.Center) or frame, 'TOPLEFT', 3, -3)
+	if isSkinned then
+		_G.InspectModelFrameRotateLeftButton:ClearAllPoints()
+		_G.InspectModelFrameRotateLeftButton:SetPoint('TOPLEFT', frame.backdrop.Center, 'TOPLEFT', 3, -3)
 
-	InspectModelFrame:ClearAllPoints()
-	InspectModelFrame:SetPoint('TOP', 0, -78)
+		_G.InspectModelFrame:ClearAllPoints()
+		_G.InspectModelFrame:SetPoint('TOP', 0, -78)
 
-	InspectSecondaryHandSlot:ClearAllPoints()
-	InspectSecondaryHandSlot:SetPoint('BOTTOM', (isSkinned and frame.backdrop.Center) or InspectPaperDollItemsFrame, 'BOTTOM', 0, 20)
-	InspectMainHandSlot:ClearAllPoints()
-	InspectMainHandSlot:SetPoint('TOPRIGHT', (isSkinned and InspectSecondaryHandSlot) or InspectPaperDollItemsFrame, 'TOPLEFT', -5, 0)
+		_G.InspectSecondaryHandSlot:ClearAllPoints()
+		_G.InspectSecondaryHandSlot:SetPoint('BOTTOM', (isSkinned and frame.backdrop.Center) or InspectPaperDollItemsFrame, 'BOTTOM', 0, 20)
+		_G.InspectMainHandSlot:ClearAllPoints()
+		_G.InspectMainHandSlot:SetPoint('TOPRIGHT', (isSkinned and InspectSecondaryHandSlot) or InspectPaperDollItemsFrame, 'TOPLEFT', -5, 0)
 
-	_G.InspectFrameCloseButton:ClearAllPoints()
-	_G.InspectFrameCloseButton:SetPoint('TOPRIGHT', (isSkinned and frame.backdrop.Center) or frame, 'TOPRIGHT', -4, -4)
+		_G.InspectFrameCloseButton:ClearAllPoints()
+		_G.InspectFrameCloseButton:SetPoint('TOPRIGHT', (isSkinned and frame.backdrop.Center) or frame, 'TOPRIGHT', -4, -4)
 
-	if isSkinned and frame.backdrop then
-		InspectModelFrame:ClearAllPoints()
-		InspectModelFrame:SetPoint('TOP', InspectPaperDollFrame, 'TOP', -5, -88)
+		if frame.backdrop then
+			_G.InspectModelFrame:ClearAllPoints()
+			_G.InspectModelFrame:SetPoint('TOP', InspectPaperDollFrame, 'TOP', -5, -88)
 
-		frame.backdrop:ClearAllPoints()
-		frame.backdrop:SetPoint('TOPLEFT', frame, 'TOPLEFT', 11, -12)
-		frame.backdrop:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, 50)
+			frame.backdrop:ClearAllPoints()
+			frame.backdrop:SetPoint('TOPLEFT', frame, 'TOPLEFT', 11, -12)
+			frame.backdrop:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, 50)
 
-		InspectFrameTab1:ClearAllPoints(); InspectFrameTab1:SetPoint('TOPLEFT', frame, 'BOTTOMLEFT', 1, 26)
-		InspectFrameTab1:SetPoint('TOPLEFT', InspectFrame, 'BOTTOMLEFT', 1, 52)
+			_G.InspectFrameTab1:ClearAllPoints(); InspectFrameTab1:SetPoint('TOPLEFT', frame, 'BOTTOMLEFT', 1, 26)
+			_G.InspectFrameTab1:SetPoint('TOPLEFT', InspectFrame, 'BOTTOMLEFT', 1, 52)
 
-		InspectHeadSlot:ClearAllPoints()
-		InspectHeadSlot:SetPoint('TOPLEFT', _G.InspectPaperDollItemsFrame, 'TOPLEFT', 26, -74)
-		InspectHandsSlot:ClearAllPoints()
-		InspectHandsSlot:SetPoint('TOPRIGHT', _G.InspectPaperDollItemsFrame, 'TOPRIGHT', -15, -74)
+			_G.InspectHeadSlot:ClearAllPoints()
+			_G.InspectHeadSlot:SetPoint('TOPLEFT', _G.InspectPaperDollItemsFrame, 'TOPLEFT', 26, -74)
+			_G.InspectHandsSlot:ClearAllPoints()
+			_G.InspectHandsSlot:SetPoint('TOPRIGHT', _G.InspectPaperDollItemsFrame, 'TOPRIGHT', -15, -74)
+		end
+	else
+		_G.InspectModelFrameRotateLeftButton:ClearAllPoints()
+		_G.InspectModelFrameRotateLeftButton:SetPoint('BOTTOMLEFT', _G.InspectModelFrame, 'TOPLEFT', 0, -1)
+		_G.InspectModelFrameRotateRightButton:ClearAllPoints()
+		_G.InspectModelFrameRotateRightButton:Point('TOPLEFT', _G.InspectModelFrameRotateLeftButton, 'TOPRIGHT', -6, 0)
 	end
 
 	frame.InspectInfoHooked = true
