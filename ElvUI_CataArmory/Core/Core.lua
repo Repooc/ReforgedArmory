@@ -628,23 +628,23 @@ function module:InspectFrame_OnShow()
 		_G.InspectModelFrame:SetPoint('TOP', 0, -78)
 
 		_G.InspectSecondaryHandSlot:ClearAllPoints()
-		_G.InspectSecondaryHandSlot:SetPoint('BOTTOM', (isSkinned and frame.backdrop.Center) or InspectPaperDollItemsFrame, 'BOTTOM', 0, 20)
+		_G.InspectSecondaryHandSlot:SetPoint('BOTTOM', frame.backdrop.Center, 'BOTTOM', 0, 20)
 		_G.InspectMainHandSlot:ClearAllPoints()
-		_G.InspectMainHandSlot:SetPoint('TOPRIGHT', (isSkinned and InspectSecondaryHandSlot) or InspectPaperDollItemsFrame, 'TOPLEFT', -5, 0)
+		_G.InspectMainHandSlot:SetPoint('TOPRIGHT', _G.InspectSecondaryHandSlot, 'TOPLEFT', -5, 0)
 
 		_G.InspectFrameCloseButton:ClearAllPoints()
-		_G.InspectFrameCloseButton:SetPoint('TOPRIGHT', (isSkinned and frame.backdrop.Center) or frame, 'TOPRIGHT', -4, -4)
+		_G.InspectFrameCloseButton:SetPoint('TOPRIGHT', frame.backdrop.Center, 'TOPRIGHT', -4, -4)
 
 		if frame.backdrop then
 			_G.InspectModelFrame:ClearAllPoints()
-			_G.InspectModelFrame:SetPoint('TOP', InspectPaperDollFrame, 'TOP', -5, -88)
+			_G.InspectModelFrame:SetPoint('TOP', _G.InspectPaperDollFrame, 'TOP', -5, -88)
 
 			frame.backdrop:ClearAllPoints()
 			frame.backdrop:SetPoint('TOPLEFT', frame, 'TOPLEFT', 11, -12)
 			frame.backdrop:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, 50)
 
-			_G.InspectFrameTab1:ClearAllPoints(); InspectFrameTab1:SetPoint('TOPLEFT', frame, 'BOTTOMLEFT', 1, 26)
-			_G.InspectFrameTab1:SetPoint('TOPLEFT', InspectFrame, 'BOTTOMLEFT', 1, 52)
+			_G.InspectFrameTab1:ClearAllPoints(); _G.InspectFrameTab1:SetPoint('TOPLEFT', frame, 'BOTTOMLEFT', 1, 26)
+			_G.InspectFrameTab1:SetPoint('TOPLEFT', frame, 'BOTTOMLEFT', 1, 52)
 
 			_G.InspectHeadSlot:ClearAllPoints()
 			_G.InspectHeadSlot:SetPoint('TOPLEFT', _G.InspectPaperDollItemsFrame, 'TOPLEFT', 26, -74)
