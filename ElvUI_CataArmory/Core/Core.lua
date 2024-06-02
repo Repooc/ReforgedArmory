@@ -269,7 +269,7 @@ function module:ClearPageInfo(frame, which)
 end
 
 function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
-	iLevelDB[i] = slotInfo.iLvl
+	iLevelDB[i] = slotInfo.itemLevel
 	local frame = _G[which..'Frame']
 	local unit = (which == 'Character' and 'player') or frame.unit or 'target'
 
@@ -334,7 +334,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	if iLvlTextColor and next(iLvlTextColor) then
 		inspectItem.CataArmory_ItemLevelText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
 	end
-	inspectItem.CataArmory_ItemLevelText:SetText(slotInfo.iLvl)
+	inspectItem.CataArmory_ItemLevelText:SetText(slotInfo.itemLevel)
 
 	local quality = GetInventoryItemQuality(unit, i)
 	local r, g, b
@@ -789,7 +789,7 @@ function module:GetGearSlotInfo(unit, slot)
 		end
 
 		local itemLevel = GetDetailedItemLevelInfo(itemLink)
-		slotInfo.iLvl = tonumber(itemLevel)
+		slotInfo.itemLevel = tonumber(itemLevel)
 		enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
 	end
 
