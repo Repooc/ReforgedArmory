@@ -1,0 +1,18 @@
+## Interface: 100207
+## Title: |cff00FF98Reforged|r|cffA330C9Armory|r
+## Author: Repooc
+## Version: 2.0
+## SavedVariables: RADB
+## OptionalDeps: ElvUI, ElvUI_WrathArmory, ElvUI_CataArmory
+## DefaultState: Enabled
+## X-CleanTitle: ReforgedArmory
+## X-Curse-Project-ID: 678586
+## X-Wago-ID: e56nlmG9
+## IconTexture: Interface\AddOns\ReforgedArmory\Media\Logos\Logo
+
+Libs\Load_Libs.xml
+init.lua
+Utils\Utils.lua
+Locales\Load_Locales.xml
+Core\Load_Core.xml
+Options\Load_Options.xml
