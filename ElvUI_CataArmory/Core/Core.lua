@@ -279,7 +279,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local slotName = inspectItem:GetName():gsub('Character', ''):gsub('Inspect', '')
 	local info = module.GearList[slotName]
 	local canEnchant, direction = info.canEnchant, info.direction
-	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
+	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.inpsect
 
 	--* Slot Background
 	if direction then
