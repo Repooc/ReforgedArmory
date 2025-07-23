@@ -2798,6 +2798,7 @@ lib.LibGetEnchantDB = {
 	[4747] = "+16 Agility",											-- SpellID: 44500
 	[4748] = "+16 Agility",											-- SpellID: 44589
 	[4750] = "Spinal Healing Injector",								-- SpellID: 82200
+	[4883] = "+95 Agility & +55 Critical Strike",					-- SpellID: UNKNOWN (Primal Leg Reinforcements)
 	[5183] = "+15 Spell Power",										-- SpellID: 27911
 	[5184] = "+15 Spell Power",										-- SpellID: 27917
 	[5237] = "+15 Spirit",											-- SpellID: 33990
