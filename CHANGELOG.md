@@ -1,3 +1,4 @@
-v1.11 5/17/2024
+v1.12 7/23/2025
 
-• Basic Conversion to Cata (No GearScore and need to disable elvui's display character and inspect options)
+• bump toc for MoP
+• Fix a backdrop is nil error (I hope)
