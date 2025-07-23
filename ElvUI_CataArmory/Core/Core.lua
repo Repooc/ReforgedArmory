@@ -622,18 +622,18 @@ function module:InspectFrame_OnShow()
 	--* Move Rotate Buttons on InspectFrame
 	if isSkinned then
 		_G.InspectModelFrameRotateLeftButton:ClearAllPoints()
-		_G.InspectModelFrameRotateLeftButton:SetPoint('TOPLEFT', frame.backdrop.Center, 'TOPLEFT', 3, -3)
+		_G.InspectModelFrameRotateLeftButton:SetPoint('TOPLEFT', frame, 'TOPLEFT', 3, -3)
 
 		_G.InspectModelFrame:ClearAllPoints()
 		_G.InspectModelFrame:SetPoint('TOP', 0, -78)
 
 		_G.InspectSecondaryHandSlot:ClearAllPoints()
-		_G.InspectSecondaryHandSlot:SetPoint('BOTTOM', frame.backdrop.Center, 'BOTTOM', 0, 20)
+		_G.InspectSecondaryHandSlot:SetPoint('BOTTOM', frame, 'BOTTOM', 0, 20)
 		_G.InspectMainHandSlot:ClearAllPoints()
 		_G.InspectMainHandSlot:SetPoint('TOPRIGHT', _G.InspectSecondaryHandSlot, 'TOPLEFT', -5, 0)
 
 		_G.InspectFrameCloseButton:ClearAllPoints()
-		_G.InspectFrameCloseButton:SetPoint('TOPRIGHT', frame.backdrop.Center, 'TOPRIGHT', -4, -4)
+		_G.InspectFrameCloseButton:SetPoint('TOPRIGHT', frame, 'TOPRIGHT', -4, -4)
 
 		if frame.backdrop then
 			_G.InspectModelFrame:ClearAllPoints()
