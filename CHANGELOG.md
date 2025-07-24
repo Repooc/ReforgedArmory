@@ -1,4 +1,5 @@
-v1.12 7/23/2025
+v1.13 7/??/2025
 
-• bump toc for MoP
-• Fix a backdrop is nil error (I hope)
+• Update missing enchant ids (thanks to Translit)
+• fixed some issues where skin is disabled
+• can now see rotate buttons again on inspect frame
