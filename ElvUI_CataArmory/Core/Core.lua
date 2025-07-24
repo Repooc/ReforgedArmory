@@ -617,7 +617,7 @@ end
 function module:InspectFrame_OnShow()
 	local frame = _G.InspectFrame
 	if not frame or frame.InspectInfoHooked then return end
-	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
+	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.inspect
 
 	--* Move Rotate Buttons on InspectFrame
 	if isSkinned then
