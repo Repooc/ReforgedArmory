@@ -75,7 +75,7 @@ end
 module.GearList = {
 	HeadSlot = {
 		slotID = 1,
-		canEnchant = true,
+		canEnchant = false,
 		direction = 'LEFT',
 	},
 	NeckSlot = {
