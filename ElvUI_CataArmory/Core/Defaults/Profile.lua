@@ -78,11 +78,11 @@ P.cataarmory = {
 		durability = {
 			enable = true,
 			bar = {
-				mouseover = false,
+				mouseover = true,
 				offset = 0,
 				position = 'TOP',
 				size = 5,
-				edgeOffset = 5,
+				edgeOffset = 0,
 			},
 			text = {
 				font = 'PT Sans Narrow',
