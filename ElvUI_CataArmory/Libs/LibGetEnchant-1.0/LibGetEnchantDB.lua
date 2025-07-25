@@ -2799,6 +2799,7 @@ lib.LibGetEnchantDB = {
 	[4444] = "Dancing Steel", --WEAPON
 	[4445] = "Colossus", --WEAPON
 	[4445] = "River's Song", --WEAPON
+	[4699] = "Lord Blastington's Scope of Doom",					-- SpellID: 127115
 	[4720] = "+5 Health",											-- SpellID: 7418
 	[4721] = "+1 Stamina",											-- SpellID: 7457
 	[4722] = "+1 Stamina",											-- SpellID: 13378
