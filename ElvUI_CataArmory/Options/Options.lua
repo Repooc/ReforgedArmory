@@ -4,6 +4,11 @@ local RRP = LibStub('RepoocReforged-1.0'):LoadMainCategory()
 local ACH = E.Libs.ACH
 local C
 
+local MIN_EDGE_OFFSET = -10
+local MAX_EDGE_OFFSET = 10
+local MIN_BAR_OFFSET = -15
+local MAX_BAR_OFFSET = 15
+
 local AllPoints = {
 	BOTTOM = 'BOTTOM',
 	BOTTOMOUTSIDE = 'BOTTOMOUTSIDE',
@@ -15,6 +20,7 @@ local AllPoints = {
 	TOPOUTSIDE = 'TOPOUTSIDE',
 	TOPINSIDE = 'TOPINSIDE',
 }
+
 local SideSlotGrowthDirection = {
 	DOWN_INSIDE = format(L["%s and then %s"], L["Down"], L["Inside"]),
 	DOWN_OUTSIDE = format(L["%s and then %s"], L["Down"], L["Outside"]),
@@ -27,7 +33,7 @@ local SideSlotGrowthDirection = {
 }
 
 local function actionGroup(info, which, groupName, ...)
-	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel' or groupName == 'slotBackground'
+	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel' or groupName == 'slotBackground' or groupName == 'durability'
 	if info.type == 'color' then
 		local color = E.db.cataarmory[which][groupName][info[#info]]
 		local r, g, b, a = ...
@@ -51,7 +57,7 @@ local function actionGroup(info, which, groupName, ...)
 end
 
 local function actionSubGroup(info, which, groupName, subGroup, ...)
-	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'slotBackground'
+	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'slotBackground' or groupName == 'durability'
 	if info.type == 'color' then
 		local color = E.db.cataarmory[which][groupName][subGroup][info[#info]]
 		local r, g, b, a = ...
@@ -229,6 +235,18 @@ local function GetOptionsTable_SlotBackground(which, groupName)
 	return config
 end
 
+local function GetOptionsTable_DurabilityGroup(which, groupName)
+	local config = ACH:Group(L["Durability"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
+
+	config.args.bar = ACH:Group(L["Bar"], nil, 5, nil, function(info) return actionSubGroup(info, which, groupName, 'bar') end, function(info, ...) actionSubGroup(info, which, groupName, 'bar', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
+	config.args.bar.args.position = ACH:Select(L["Position"], nil, 1, C.Values.EdgePositions)
+	config.args.bar.args.mouseover = ACH:Toggle(L["Mouseover"], nil, 1)
+	config.args.text = ACH:Group(L["Text"], nil, 5, nil, function(info) return actionSubGroup(info, which, groupName, 'text') end, function(info, ...) actionSubGroup(info, which, groupName, 'text', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
+
+	return config
+end
+
 local function GetOptionsTable_WarningIndicator(which, groupName)
 	local config = ACH:Group(L["Warning Indicator"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
@@ -256,7 +274,7 @@ local function configTable()
 	local rrp = E.Options.args.rrp
 	if not rrp then print("Error Loading Repooc Reforged Plugin Library") return end
 
-	local Armory = ACH:Group('|cff00FF98Cata|r |cffA330C9Armory|r', nil, 6, 'tab')
+	local Armory = ACH:Group(module.Title, nil, 6, 'tab')
 	rrp.args.cataarmory = Armory
 
 	--* Character Frame
@@ -264,6 +282,7 @@ local function configTable()
 	Armory.args.character = Character
 	Character.args.enable = ACH:Toggle(L["Enable"], nil, 0, nil, nil, nil, function(info) return E.db.cataarmory.character.enable end, function(info, value) E.db.cataarmory.character.enable = value module:ToggleItemLevelInfo() end)
 	Character.args.avgItemLevel = GetOptionsTable_AvgItemLevelGroup('character', 'avgItemLevel')
+	Character.args.durability = GetOptionsTable_DurabilityGroup('character', 'durability')
 	Character.args.enchant = GetOptionsTable_EnchantGroup('character', 'enchant')
 	Character.args.expandButton = GetOptionsTable_ExpandButton('character', 'expandButton')
 	Character.args.gems = GetOptionsTable_Gems('character', 'gems')

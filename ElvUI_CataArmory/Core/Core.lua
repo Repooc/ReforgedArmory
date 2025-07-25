@@ -68,6 +68,140 @@ local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
 }
 
+local function SetDurabilityColor(element, percent)
+	if not element then return end
+	local bar = element.bar
+	local text = bar.text
+	local db = E.db.cataarmory.character.durability
+
+	percent = math.min(math.max(percent * 0.01, 0), 1)
+
+	-- RGB gradient: green → yellow → red
+	local r, g, b = E:ColorGradient(percent, 1, 0.1, 0.1, 1, 1, 0.1, 0.1, 1, 0.1)
+
+	bar:SetStatusBarColor(r, g, b)
+
+	if text then
+		if db.text.durabilityColor then
+			text:SetTextColor(r, g, b)
+		else
+			text:SetTextColor(1, 1, 1)
+		end
+	end
+end
+
+local function UpdateSlotDurabilityBar(element, db, slotInfo)
+	if not element then return end
+
+	local bar = element.bar
+	local text = bar.text
+	local durability = slotInfo.durability
+	local current, max, percent = durability.current, durability.max, durability.percent
+
+	element.current = current
+	element.max = max
+	element.percent = percent
+
+	if current and max and max > 0 then
+		text:SetFormattedText('%d%%', percent)
+
+		bar:SetMinMaxValues(0, max)
+		bar:SetValue(current)
+		SetDurabilityColor(element, percent)
+		element:SetAlpha(db.bar.mouseover and 0 or 1)
+	else
+		if text then
+			text:SetText('')
+		end
+
+		bar:SetValue(0)
+		SetDurabilityColor(element, 0)
+	end
+end
+
+local MIN_BAR_THICKNESS = 2
+local DEFAULT_BAR_THICKNESS = 5
+local MIN_EDGE_OFFSET = -10
+local MAX_EDGE_OFFSET = 10
+local MIN_BAR_OFFSET = -15
+local MAX_BAR_OFFSET = 15
+
+local function CreateBlizzardBarForSlot(slot)
+	if not slot then return end
+	if slot.ReforgedArmory.Durability then return end
+
+	local db = E.db.cataarmory.character.durability
+	local position = db.bar.position or 'BOTTOM'
+	local thickness = math.max(db.bar.size or DEFAULT_BAR_THICKNESS, MIN_BAR_THICKNESS)
+	local offset, edgeOffset = math.max(MIN_BAR_OFFSET, math.min(db.bar.offset or 0, MAX_BAR_OFFSET)), math.max(MIN_EDGE_OFFSET, math.min(db.bar.edgeOffset or 0, MAX_EDGE_OFFSET))
+
+	local f = CreateFrame('Frame', nil, slot)
+	-- f:SetFrameLevel(slot:GetFrameLevel() + 1)
+	-- f:SetFrameStrata(slot:GetFrameStrata())
+    f:SetFrameStrata('HIGH')
+    f:SetFrameLevel(5)
+	f:CreateBackdrop('Transparent')
+
+	if position == 'TOP' or position == 'BOTTOM' then
+		f:SetSize(slot:GetWidth() + edgeOffset, thickness)
+		f:SetPoint(position, slot, position, 0, offset)
+	elseif position == 'LEFT' or position == 'RIGHT' then
+		f:SetSize(thickness, slot:GetHeight() + edgeOffset)
+		f:SetPoint(position, slot, position, offset, 0)
+	else
+		print('Invalid position: ' .. tostring(position))
+		f:SetSize(slot:GetWidth() + edgeOffset, thickness)
+		f:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
+	end
+	f:SetAlpha(0)
+
+	local bar = CreateFrame('StatusBar', nil, f)
+	f.bar = bar
+
+	bar:SetAllPoints()
+	bar:SetStatusBarTexture([[Interface\RaidFrame\Raid-Bar-Hp-Fill]])
+	-- bar:SetStatusBarColor(1, 0, 0)
+	local colorTbl = E.media.rgbvaluecolor
+	bar:SetStatusBarColor(colorTbl.r, colorTbl.g, colorTbl.b)
+	bar:SetMinMaxValues(0, 1)
+	bar:SetValue(0)
+
+	if position == 'LEFT' or position == 'RIGHT' then
+		bar:SetOrientation('VERTICAL')
+	elseif position == 'TOP' or position == 'BOTTOM' then
+		bar:SetOrientation('HORIZONTAL')
+	end
+
+	local text = bar:CreateFontString(nil, 'OVERLAY', 'GameFontHighlightSmall')
+	text:SetPoint('CENTER')
+	text:SetText('')
+	bar.text = text
+
+	local function OnEnter()
+		if f.max and f.max > 0 then
+			f:SetAlpha(1)
+		end
+	end
+
+	local function OnLeave()
+		C_Timer.After(0.1, function()
+			if db.bar.mouseover and not f:IsMouseOver() and not slot:IsMouseOver() then
+				f:SetAlpha(0)
+			end
+		end)
+	end
+
+	slot:HookScript('OnEnter', OnEnter)
+    slot:HookScript('OnLeave', OnLeave)
+
+    f:HookScript('OnEnter', OnEnter)
+    f:HookScript('OnLeave', OnLeave)
+
+	slot.ReforgedArmory.Durability = f
+
+	return f, bar, text
+end
+
 function module:UpdateAvgItemLevel(which)
 	if not which then return end
 	local frame = _G[which..'Frame']
@@ -355,6 +489,9 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 			inspectItem.IconBorder:SetVertexColor(1, 1, 1)
 			inspectItem.IconBorder:SetShown(itemLink and true or false)
 		end
+
+		--* Durability
+		UpdateSlotDurabilityBar(inspectItem.ReforgedArmory.Durability, db.durability, slotInfo)
 	end
 
 	do
@@ -549,13 +686,14 @@ function module:CreateSlotStrings(frame, which)
 	if not frame or not which then return end
 
 	local db = E.db.cataarmory[string.lower(which)]
-	local itemLevel = db.itemLevel
-	local enchant = db.enchant
+	local itemLevel, enchant = db.itemLevel, db.enchant
+	frame.ReforgedArmory = frame.ReforgedArmory or {}
 
 	CreateAvgItemLevel(frame, which)
 
 	for slotName, info in pairs(module.GearList) do
 		local slot = _G[which..slotName]
+		slot.ReforgedArmory = slot.ReforgedArmory or {}
 
 		if not info.ignored then
 			--* Item Level
@@ -601,6 +739,11 @@ function module:CreateSlotStrings(frame, which)
 				for u = 1, 5 do
 					slot['CataArmory_GemSlot'..u], slot['CataArmory_GemSlotBackdrop'..u] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
 				end
+			end
+
+			--* Durability Bar
+			if which == 'Character' then
+				CreateBlizzardBarForSlot(slot)
 			end
 		end
 
@@ -681,7 +824,7 @@ function module:UpdateInspectPageFonts(which, force)
 	local unit = (which == 'Character' and 'player') or frame.unit
 	local isCharPage = which == 'Character'
 	local db = E.db.cataarmory[string.lower(which)]
-	local itemLevel, enchant = db.itemLevel, db.enchant
+	local itemLevel, enchant, durability = db.itemLevel, db.enchant, db.durability
 
 	module:UpdateAvgItemLevel(which)
 
@@ -718,6 +861,30 @@ function module:UpdateInspectPageFonts(which, force)
 
 			if force then
 				module:UpdateSlotBackground(which, slot)
+
+				--* Durability
+				if slot.ReforgedArmory.Durability then
+					local thickness = math.max(durability.bar.size or DEFAULT_BAR_THICKNESS, MIN_BAR_THICKNESS)
+					local offset, edgeOffset = math.max(MIN_BAR_OFFSET, math.min(durability.bar.offset or 0, MAX_BAR_OFFSET)), math.max(MIN_EDGE_OFFSET, math.min(durability.bar.edgeOffset or 0, MAX_EDGE_OFFSET))
+
+					slot.ReforgedArmory.Durability:ClearAllPoints()
+					if durability.bar.position == 'TOP' or durability.bar.position == 'BOTTOM' then
+						slot.ReforgedArmory.Durability:SetSize(slot:GetWidth() + edgeOffset, thickness)
+						slot.ReforgedArmory.Durability:SetPoint(durability.bar.position, slot, durability.bar.position, 0, offset)
+						slot.ReforgedArmory.Durability.bar:SetOrientation('HORIZONTAL')
+					elseif durability.bar.position == 'LEFT' or durability.bar.position == 'RIGHT' then
+						slot.ReforgedArmory.Durability:SetSize(thickness, slot:GetHeight() + edgeOffset)
+						slot.ReforgedArmory.Durability:SetPoint(durability.bar.position, slot, durability.bar.position, offset, 0)
+						slot.ReforgedArmory.Durability.bar:SetOrientation('VERTICAL')
+					else
+						print('Invalid position: ' .. tostring(durability.bar.position))
+						slot.ReforgedArmory.Durability:SetSize(slot:GetWidth() + edgeOffset, thickness)
+						slot.ReforgedArmory.Durability:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
+						slot.ReforgedArmory.Durability.bar:SetOrientation('HORIZONTAL')
+					end
+
+					slot.ReforgedArmory.Durability:SetShown(durability.enable)
+				end
 			end
 		end
 	end
@@ -780,6 +947,8 @@ function module:GetGearSlotInfo(unit, slot)
 	slotInfo.gems, slotInfo.emptySockets, slotInfo.filledSockets, slotInfo.baseSocketCount = module:AcquireGemInfo(itemLink)
 	slotInfo.itemQualityColors = {}
 	slotInfo.missingBeltBuckle = false
+	slotInfo.durability = {}
+
 	local enchantID
 
 	if itemLink then
@@ -787,14 +956,31 @@ function module:GetGearSlotInfo(unit, slot)
 			slotInfo.missingBeltBuckle = true
 		end
 
+		--* Get Item Quality Info
 		local quality = GetInventoryItemQuality(unit, slot)
 		if quality then
 			slotInfo.itemQualityColors.r, slotInfo.itemQualityColors.g, slotInfo.itemQualityColors.b = GetItemQualityColor(quality)
 		end
 
+		--* Get Item Level Info
 		local itemLevel = GetDetailedItemLevelInfo(itemLink)
 		slotInfo.itemLevel = tonumber(itemLevel)
 		enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
+
+		do
+			--* Get Durability Info
+			local current, max = GetInventoryItemDurability(slot)
+			if current and max and max > 0 then
+				local percent = current / max * 100
+				slotInfo.durability.current = current
+				slotInfo.durability.max = max
+				slotInfo.durability.percent = percent
+			else
+				slotInfo.durability.current = 0
+				slotInfo.durability.max = 0
+				slotInfo.durability.percent = 0
+			end
+		end
 	end
 
 	local enchantText = E.global.cataarmory.enchantStrings.UserReplaced[enchantID] or E.Libs.GetEnchantList.GetEnchant(enchantID)
@@ -841,7 +1027,7 @@ local function CharacterFrame_OnShow()
 		CharacterFrameTab1:ClearAllPoints()
 		CharacterFrameTab1:SetPoint('TOPLEFT', frame, 'BOTTOMLEFT', -10, -24)
 
-		if not frame.CataArmory_Hooked then
+		if not frame.ReforgedArmory_Hooked then
 			_G.CharacterModelScene.BackgroundTopLeft:Hide()
 			_G.CharacterModelScene.BackgroundTopRight:Hide()
 			_G.CharacterModelScene.BackgroundBotLeft:Hide()
@@ -855,7 +1041,7 @@ local function CharacterFrame_OnShow()
 		frame.BottomRightCorner:ClearAllPoints()
 		frame.BottomRightCorner:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, -26)
 
-		frame.CataArmory_Hooked = true
+		frame.ReforgedArmory_Hooked = true
 	end
 
 	HandleCharacterFrameExpand()

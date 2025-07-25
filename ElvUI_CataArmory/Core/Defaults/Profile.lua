@@ -75,6 +75,24 @@ P.cataarmory = {
 			yOffset = 2,
 		},
 		avgItemLevel = CopyTable(AvgItemLevel),
+		durability = {
+			enable = true,
+			bar = {
+				mouseover = false,
+				offset = 0,
+				position = 'TOP',
+				size = 5,
+				edgeOffset = 5,
+			},
+			text = {
+				font = 'PT Sans Narrow',
+				fontSize = 15,
+				fontOutline = 'OUTLINE',
+				color = { r = 1, g = 0, b = 0 },
+				durabilityColor = true, --* Text shows as the color of durability if true, color settings if false
+				format = 'PERCENT', --* Valid options PERCENT, FULL, BOTH
+			},
+		},
 		enchant = CopyTable(Enchant),
 		expandButton = {
 			hide = true,
