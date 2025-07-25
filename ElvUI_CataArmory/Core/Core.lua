@@ -211,28 +211,28 @@ function module:UpdateAvgItemLevel(which)
 	local db = E.db.cataarmory[string.lower(which)]
 	local textOptions, frameOptions = db.avgItemLevel.text, db.avgItemLevel.frame
 
-	frame.CataArmory_AvgItemLevel:ClearAllPoints()
+	frame.ReforgedArmory.AvgItemLevel:ClearAllPoints()
 	if isCharPage then
-		frame.CataArmory_AvgItemLevel:SetPoint((frameOptions.attachTo == 'CharacterLevelText' or frameOptions.attachTo == 'PaperDollFrame') and 'TOP' or 'BOTTOM', frameOptions.attachTo, (frameOptions.attachTo == 'CharacterLevelText') and 'BOTTOM' or 'TOP', frameOptions.xOffset, frameOptions.yOffset)
+		frame.ReforgedArmory.AvgItemLevel:SetPoint((frameOptions.attachTo == 'CharacterLevelText' or frameOptions.attachTo == 'PaperDollFrame') and 'TOP' or 'BOTTOM', frameOptions.attachTo, (frameOptions.attachTo == 'CharacterLevelText') and 'BOTTOM' or 'TOP', frameOptions.xOffset, frameOptions.yOffset)
 	else
-		frame.CataArmory_AvgItemLevel:SetPoint('TOP', frameOptions.attachTo, (frameOptions.attachTo == 'InspectLevelText') and 'BOTTOM' or 'TOP', frameOptions.xOffset, frameOptions.yOffset)
+		frame.ReforgedArmory.AvgItemLevel:SetPoint('TOP', frameOptions.attachTo, (frameOptions.attachTo == 'InspectLevelText') and 'BOTTOM' or 'TOP', frameOptions.xOffset, frameOptions.yOffset)
 	end
-	frame.CataArmory_AvgItemLevel:SetHeight(textOptions.fontSize + 6)
-	frame.CataArmory_AvgItemLevel:SetShown(db.avgItemLevel.enable)
+	frame.ReforgedArmory.AvgItemLevel:SetHeight(textOptions.fontSize + 6)
+	frame.ReforgedArmory.AvgItemLevel:SetShown(db.avgItemLevel.enable)
 
-	frame.CataArmory_AvgItemLevel.Background:SetShown(frameOptions.showBGTexture)
-	frame.CataArmory_AvgItemLevel.BottomLine:SetVertexColor(frameOptions.color.r, frameOptions.color.g, frameOptions.color.b, frameOptions.color.a)
-	frame.CataArmory_AvgItemLevel.BottomLine:SetShown(frameOptions.showLines)
-	frame.CataArmory_AvgItemLevel.TopLine:SetVertexColor(frameOptions.color.r, frameOptions.color.g, frameOptions.color.b, frameOptions.color.a)
-	frame.CataArmory_AvgItemLevel.TopLine:SetShown(frameOptions.showLines)
+	frame.ReforgedArmory.AvgItemLevel.Background:SetShown(frameOptions.showBGTexture)
+	frame.ReforgedArmory.AvgItemLevel.BottomLine:SetVertexColor(frameOptions.color.r, frameOptions.color.g, frameOptions.color.b, frameOptions.color.a)
+	frame.ReforgedArmory.AvgItemLevel.BottomLine:SetShown(frameOptions.showLines)
+	frame.ReforgedArmory.AvgItemLevel.TopLine:SetVertexColor(frameOptions.color.r, frameOptions.color.g, frameOptions.color.b, frameOptions.color.a)
+	frame.ReforgedArmory.AvgItemLevel.TopLine:SetShown(frameOptions.showLines)
 
-	frame.CataArmory_AvgItemLevel.Text:FontTemplate(LSM:Fetch('font', textOptions.font), textOptions.fontSize, textOptions.fontOutline)
-	frame.CataArmory_AvgItemLevel.Text:ClearAllPoints()
-	frame.CataArmory_AvgItemLevel.Text:SetPoint('CENTER', frame.CataArmory_AvgItemLevel, 'CENTER', textOptions.xOffset, textOptions.yOffset)
+	frame.ReforgedArmory.AvgItemLevel.Text:FontTemplate(LSM:Fetch('font', textOptions.font), textOptions.fontSize, textOptions.fontOutline)
+	frame.ReforgedArmory.AvgItemLevel.Text:ClearAllPoints()
+	frame.ReforgedArmory.AvgItemLevel.Text:SetPoint('CENTER', frame.ReforgedArmory.AvgItemLevel, 'CENTER', textOptions.xOffset, textOptions.yOffset)
 end
 
 function module:UpdateSlotBackground(which, slot)
-	if not which or not slot.CataArmory_SlotBackground then return end
+	if not which or not slot.ReforgedArmory.SlotBackground then return end
 
 	local db = E.db.cataarmory[string.lower(which)]
 	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
@@ -242,40 +242,40 @@ function module:UpdateSlotBackground(which, slot)
 
 	local point, relativePoint, x, y = module:GetSlotBackgroundPoints(info.slotID, db)
 	if direction then
-		slot.CataArmory_SlotBackground:ClearAllPoints()
-		slot.CataArmory_SlotBackground:SetPoint(point, slot, relativePoint, x, y)
-		slot.CataArmory_SlotBackground:Size(132, 41)
-		slot.CataArmory_SlotBackground:SetTexture(GradientTexture)
-		slot.CataArmory_SlotBackground:SetVertexColor(color.r, color.g, color.b)
+		slot.ReforgedArmory.SlotBackground:ClearAllPoints()
+		slot.ReforgedArmory.SlotBackground:SetPoint(point, slot, relativePoint, x, y)
+		slot.ReforgedArmory.SlotBackground:Size(132, 41)
+		slot.ReforgedArmory.SlotBackground:SetTexture(GradientTexture)
+		slot.ReforgedArmory.SlotBackground:SetVertexColor(color.r, color.g, color.b)
 		if direction == 'LEFT' then
-			slot.CataArmory_SlotBackground:SetTexCoord(0, 1, 0, 1)
+			slot.ReforgedArmory.SlotBackground:SetTexCoord(0, 1, 0, 1)
 		else
-			slot.CataArmory_SlotBackground:SetTexCoord(1, 0, 0, 1)
+			slot.ReforgedArmory.SlotBackground:SetTexCoord(1, 0, 0, 1)
 		end
 
-		slot.CataArmory_SlotBackground:SetShown(db.slotBackground.enable)
+		slot.ReforgedArmory.SlotBackground:SetShown(db.slotBackground.enable)
 	end
 end
 
 function module:UpdateItemLevelText(which, slot)
-	if not which or not slot.CataArmory_ItemLevelText then return end
+	if not which or not slot.ReforgedArmory.ItemLevelText then return end
 
 	local db = E.db.cataarmory[string.lower(which)]
 
-	slot.CataArmory_ItemLevelText:ClearAllPoints()
-	slot.CataArmory_ItemLevelText:SetPoint('BOTTOM', slot, db.itemLevel.xOffset, db.itemLevel.yOffset)
-	slot.CataArmory_ItemLevelText:FontTemplate(LSM:Fetch('font', db.itemLevel.font), db.itemLevel.fontSize, db.itemLevel.fontOutline)
-	slot.CataArmory_ItemLevelText:SetShown(db.itemLevel.enable)
+	slot.ReforgedArmory.ItemLevelText:ClearAllPoints()
+	slot.ReforgedArmory.ItemLevelText:SetPoint('BOTTOM', slot, db.itemLevel.xOffset, db.itemLevel.yOffset)
+	slot.ReforgedArmory.ItemLevelText:FontTemplate(LSM:Fetch('font', db.itemLevel.font), db.itemLevel.fontSize, db.itemLevel.fontOutline)
+	slot.ReforgedArmory.ItemLevelText:SetShown(db.itemLevel.enable)
 end
 
 function module:CreateGemTexture(slot, point, relativePoint, x, y, gemStep, spacing)
 	local prevGem = gemStep - 1
 	local texture = slot:CreateTexture()
-	texture:SetPoint(point, (gemStep == 1 and slot) or slot['CataArmory_GemSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
+	texture:SetPoint(point, (gemStep == 1 and slot) or slot['ReforgedArmory.GemSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
 	texture:SetTexCoord(unpack(E.TexCoords))
 	texture:Size(14)
 
-	local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['CataArmory_GemSlotBackdrop'..prevGem])
+	local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['ReforgedArmory.GemSlotBackdrop'..prevGem])
 	backdrop:SetTemplate(nil, nil, true)
 	backdrop:SetBackdropColor(0,0,0,0)
 	backdrop:SetOutside(texture)
@@ -378,26 +378,26 @@ end
 function module:ClearPageInfo(frame, which)
 	if not frame or not which then return end
 
-	if frame.CataArmory_AvgItemLevel then
-		frame.CataArmory_AvgItemLevel:Hide()
-		frame.CataArmory_AvgItemLevel.Text:SetText('')
+	if frame.ReforgedArmory.AvgItemLevel then
+		frame.ReforgedArmory.AvgItemLevel:Hide()
+		frame.ReforgedArmory.AvgItemLevel.Text:SetText('')
 	end
 
 	for slotName, info in pairs(module.GearList) do
 		local slot = _G[which..slotName]
 
 		if not info.ignored then
-			slot.CataArmory_EnchantText:SetText('')
-			slot.CataArmory_ItemLevelText:SetText('')
-			slot.CataArmory_Warning:Hide()
+			slot.ReforgedArmory.EnchantText:SetText('')
+			slot.ReforgedArmory.ItemLevelText:SetText('')
+			slot.ReforgedArmory.Warning:Hide()
 
 			for y = 1, 5 do
-				slot['CataArmory_GemSlot'..y]:SetTexture()
-				slot['CataArmory_GemSlotBackdrop'..y]:Hide()
+				slot['ReforgedArmory.GemSlot'..y]:SetTexture()
+				slot['ReforgedArmory.GemSlotBackdrop'..y]:Hide()
 			end
 		end
-		if slot.CataArmory_SlotBackground then
-			slot.CataArmory_SlotBackground:Hide()
+		if slot.ReforgedArmory.SlotBackground then
+			slot.ReforgedArmory.SlotBackground:Hide()
 		end
 	end
 end
@@ -417,8 +417,8 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 
 	--* Slot Background
 	if direction then
-		if not inspectItem.CataArmory_SlotBackground then
-			inspectItem.CataArmory_SlotBackground = inspectItem:CreateTexture(nil, 'BACKGROUND')
+		if not inspectItem.ReforgedArmory.SlotBackground then
+			inspectItem.ReforgedArmory.SlotBackground = inspectItem:CreateTexture(nil, 'BACKGROUND')
 		end
 		module:UpdateSlotBackground(which, inspectItem)
 	end
@@ -426,9 +426,9 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	if not info.ignored then
 		do
 			local point, relativePoint, x, y = module:GetEnchantPoints(i, db)
-			inspectItem.CataArmory_EnchantText:ClearAllPoints()
-			inspectItem.CataArmory_EnchantText:SetPoint(point, inspectItem, relativePoint, x, y)
-			inspectItem.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
+			inspectItem.ReforgedArmory.EnchantText:ClearAllPoints()
+			inspectItem.ReforgedArmory.EnchantText:SetPoint(point, inspectItem, relativePoint, x, y)
+			inspectItem.ReforgedArmory.EnchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
 
 			if itemLink then
 				if slotInfo.enchantText == '' and (canEnchant and (canEnchant == true or canEnchant('Enchanting'))) then
@@ -444,21 +444,21 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 					missingBuckle = true
 					warningMsg = strjoin('', warningMsg, '|cffff0000', L["Missing Belt Buckle"], '|r\n')
 				end
-				inspectItem.CataArmory_Warning.Reason = warningMsg
+				inspectItem.ReforgedArmory.Warning.Reason = warningMsg
 			end
 
 			local showWarning = missingEnchant or missingGem or missingBuckle or false
-			if direction and inspectItem.CataArmory_SlotBackground then
+			if direction and inspectItem.ReforgedArmory.SlotBackground then
 				local warnColor = (showWarning and db.slotBackground.warning.enable) and db.slotBackground.warning.color or db.slotBackground.color
-				inspectItem.CataArmory_SlotBackground:SetVertexColor(warnColor.r, warnColor.g, warnColor.b)
+				inspectItem.ReforgedArmory.SlotBackground:SetVertexColor(warnColor.r, warnColor.g, warnColor.b)
 			end
-			inspectItem.CataArmory_Warning:SetShown(db.warningIndicator.enable and showWarning)
+			inspectItem.ReforgedArmory.Warning:SetShown(db.warningIndicator.enable and showWarning)
 
-			inspectItem.CataArmory_EnchantText:SetText(slotInfo.enchantText)
-			inspectItem.CataArmory_EnchantText:SetShown(db.enchant.enable)
+			inspectItem.ReforgedArmory.EnchantText:SetText(slotInfo.enchantText)
+			inspectItem.ReforgedArmory.EnchantText:SetShown(db.enchant.enable)
 			local enchantTextColor = (db.enchant.qualityColor and slotInfo.itemQualityColors) or db.enchant.color
 			if enchantTextColor and next(enchantTextColor) then
-				inspectItem.CataArmory_EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
+				inspectItem.ReforgedArmory.EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
 			end
 		end
 	end
@@ -466,9 +466,9 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	module:UpdateItemLevelText(which, inspectItem)
 	local iLvlTextColor = (db.itemLevel.qualityColor and slotInfo.itemQualityColors) or db.itemLevel.color
 	if iLvlTextColor and next(iLvlTextColor) then
-		inspectItem.CataArmory_ItemLevelText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
+		inspectItem.ReforgedArmory.ItemLevelText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
 	end
-	inspectItem.CataArmory_ItemLevelText:SetText(slotInfo.itemLevel)
+	inspectItem.ReforgedArmory.ItemLevelText:SetText(slotInfo.itemLevel)
 
 	local quality = GetInventoryItemQuality(unit, i)
 	local r, g, b
@@ -498,12 +498,12 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 		local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
 		local gemStep = 1
 		for index = 1, 5 do
-			local texture = inspectItem['CataArmory_GemSlot'..index]
+			local texture = inspectItem['ReforgedArmory.GemSlot'..index]
 			texture:Size(db.gems.size)
 			texture:ClearAllPoints()
-			texture:SetPoint(point, (index == 1 and inspectItem) or inspectItem['CataArmory_GemSlot'..(index-1)], relativePoint, index == 1 and x or spacing, index == 1 and y or 0)
+			texture:SetPoint(point, (index == 1 and inspectItem) or inspectItem['ReforgedArmory.GemSlot'..(index-1)], relativePoint, index == 1 and x or spacing, index == 1 and y or 0)
 
-			local backdrop = inspectItem['CataArmory_GemSlotBackdrop'..index]
+			local backdrop = inspectItem['ReforgedArmory.GemSlotBackdrop'..index]
 			local gem = slotInfo.gems and slotInfo.gems[gemStep]
 			if gem then
 				texture:SetTexture(gem)
@@ -537,14 +537,14 @@ function module:UpdateAverageString(frame, which, iLevelDB)
 	end
 
 	if avgItemLevel then
-		frame.CataArmory_AvgItemLevel.Text:SetText(avgItemLevel)
-		frame.CataArmory_AvgItemLevel.Text:SetTextColor(textOptions.color.r, textOptions.color.g, textOptions.color.b)
+		frame.ReforgedArmory.AvgItemLevel.Text:SetText(avgItemLevel)
+		frame.ReforgedArmory.AvgItemLevel.Text:SetTextColor(textOptions.color.r, textOptions.color.g, textOptions.color.b)
 	else
-		frame.CataArmory_AvgItemLevel.Text:SetText('')
+		frame.ReforgedArmory.AvgItemLevel.Text:SetText('')
 	end
 
-	frame.CataArmory_AvgItemLevel:SetHeight(textOptions.fontSize + 6)
-	frame.CataArmory_AvgItemLevel:SetShown(db.avgItemLevel.enable)
+	frame.ReforgedArmory.AvgItemLevel:SetHeight(textOptions.fontSize + 6)
+	frame.ReforgedArmory.AvgItemLevel:SetShown(db.avgItemLevel.enable)
 end
 
 function module:TryGearAgain(frame, which, i, iLevelDB, inspectItem)
@@ -571,8 +571,8 @@ do
 		for slotName, info in pairs(module.GearList) do
 			local slot = _G[which..slotName]
 			if not info.ignored then
-				slot.CataArmory_EnchantText:SetText('')
-				slot.CataArmory_ItemLevelText:SetText('')
+				slot.ReforgedArmory.EnchantText:SetText('')
+				slot.ReforgedArmory.ItemLevelText:SetText('')
 
 				local unit = (which == 'Character' and 'player') or frame.unit
 				local slotInfo = module:GetGearSlotInfo(unit, info.slotID)
@@ -600,7 +600,7 @@ local function CreateAvgItemLevel(frame, which)
 	local textOptions, frameOptions = db.avgItemLevel.text, db.avgItemLevel.frame
 	local isCharPage = which == 'Character'
 
-	local textFrame = CreateFrame('Frame', 'CataArmory_'..which..'_AvgItemLevel', (isCharPage and PaperDollFrame) or InspectPaperDollFrame)
+	local textFrame = CreateFrame('Frame', 'ReforgedArmory.'..which..'_AvgItemLevel', (isCharPage and PaperDollFrame) or InspectPaperDollFrame)
 	textFrame:Size(170, 30)
 	textFrame:ClearAllPoints()
 	if isCharPage then
@@ -648,8 +648,8 @@ local function CreateAvgItemLevel(frame, which)
 	text:SetPoint('CENTER', textOptions.xOffset, textOptions.yOffset)
 	text:SetTextColor(textOptions.color.r, textOptions.color.g, textOptions.color.b)
 
-	frame.CataArmory_AvgItemLevel = textFrame
-	frame.CataArmory_AvgItemLevel.Text = text
+	frame.ReforgedArmory.AvgItemLevel = textFrame
+	frame.ReforgedArmory.AvgItemLevel.Text = text
 
 	textFrame:Hide()
 end
@@ -697,47 +697,47 @@ function module:CreateSlotStrings(frame, which)
 
 		if not info.ignored then
 			--* Item Level
-			if not slot.CataArmory_ItemLevelText then
-				slot.CataArmory_ItemLevelText = slot:CreateFontString(nil, 'OVERLAY')
+			if not slot.ReforgedArmory.ItemLevelText then
+				slot.ReforgedArmory.ItemLevelText = slot:CreateFontString(nil, 'OVERLAY')
 			end
 			module:UpdateItemLevelText(which, slot)
 
 			--* Warning
-			if not slot.CataArmory_Warning then
-				slot.CataArmory_Warning = CreateFrame('Frame', nil, slot)
+			if not slot.ReforgedArmory.Warning then
+				slot.ReforgedArmory.Warning = CreateFrame('Frame', nil, slot)
 			end
 
 			do
 				local point1, relativePoint1, point2, relativePoint2, size, x1, y1, x2, y2, spacing = module:GetWarningPoints(info.slotID, db)
-				slot.CataArmory_Warning:SetPoint(point1, slot, relativePoint1, x1, y1)
-				slot.CataArmory_Warning:SetPoint(point2, slot, relativePoint2, x2, y2)
-				slot.CataArmory_Warning:Size(size)
-				slot.CataArmory_Warning.texture = slot.CataArmory_Warning:CreateTexture(nil, 'BACKGROUND')
-				slot.CataArmory_Warning.texture:SetInside()
-				slot.CataArmory_Warning.texture:SetTexture(WarningTexture)
-				slot.CataArmory_Warning.texture:SetVertexColor(1, 0, 0, 1)
-				slot.CataArmory_Warning:SetFrameLevel(3)
-				slot.CataArmory_Warning:SetScript('OnEnter', Warning_OnEnter)
-				slot.CataArmory_Warning:SetScript('OnLeave', Warning_OnLeave)
-				slot.CataArmory_Warning:Hide()
+				slot.ReforgedArmory.Warning:SetPoint(point1, slot, relativePoint1, x1, y1)
+				slot.ReforgedArmory.Warning:SetPoint(point2, slot, relativePoint2, x2, y2)
+				slot.ReforgedArmory.Warning:Size(size)
+				slot.ReforgedArmory.Warning.texture = slot.ReforgedArmory.Warning:CreateTexture(nil, 'BACKGROUND')
+				slot.ReforgedArmory.Warning.texture:SetInside()
+				slot.ReforgedArmory.Warning.texture:SetTexture(WarningTexture)
+				slot.ReforgedArmory.Warning.texture:SetVertexColor(1, 0, 0, 1)
+				slot.ReforgedArmory.Warning:SetFrameLevel(3)
+				slot.ReforgedArmory.Warning:SetScript('OnEnter', Warning_OnEnter)
+				slot.ReforgedArmory.Warning:SetScript('OnLeave', Warning_OnLeave)
+				slot.ReforgedArmory.Warning:Hide()
 			end
 
 			--* Enchant Text
-			if not slot.CataArmory_EnchantText then
-				slot.CataArmory_EnchantText = slot:CreateFontString(nil, 'OVERLAY')
+			if not slot.ReforgedArmory.EnchantText then
+				slot.ReforgedArmory.EnchantText = slot:CreateFontString(nil, 'OVERLAY')
 			end
-			slot.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
+			slot.ReforgedArmory.EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
 
 			do
 				local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
-				slot.CataArmory_EnchantText:ClearAllPoints()
-				slot.CataArmory_EnchantText:SetPoint(point, slot, relativePoint, x, y)
+				slot.ReforgedArmory.EnchantText:ClearAllPoints()
+				slot.ReforgedArmory.EnchantText:SetPoint(point, slot, relativePoint, x, y)
 			end
 
 			do
 				local point, relativePoint, x, y, spacing = module:GetGemPoints(info.slotID, db)
 				for u = 1, 5 do
-					slot['CataArmory_GemSlot'..u], slot['CataArmory_GemSlotBackdrop'..u] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
+					slot['ReforgedArmory.GemSlot'..u], slot['ReforgedArmory.GemSlotBackdrop'..u] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
 				end
 			end
 
@@ -749,8 +749,8 @@ function module:CreateSlotStrings(frame, which)
 
 		--* Slot Background
 		if info.direction then
-			if not slot.CataArmory_SlotBackground then
-				slot.CataArmory_SlotBackground = slot:CreateTexture(nil, 'BACKGROUND')
+			if not slot.ReforgedArmory.SlotBackground then
+				slot.ReforgedArmory.SlotBackground = slot:CreateTexture(nil, 'BACKGROUND')
 			end
 			module:UpdateSlotBackground(which, slot)
 		end
@@ -842,21 +842,21 @@ function module:UpdateInspectPageFonts(which, force)
 				module:UpdateItemLevelText(which, slot)
 				iLvlTextColor = (itemLevel.qualityColor and qualityColor) or itemLevel.color
 				if iLvlTextColor and next(iLvlTextColor) then
-					slot.CataArmory_ItemLevelText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
+					slot.ReforgedArmory.ItemLevelText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
 				end
 
 				do
 					local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
-					slot.CataArmory_EnchantText:ClearAllPoints()
-					slot.CataArmory_EnchantText:SetPoint(point, slot, relativePoint, x, y)
+					slot.ReforgedArmory.EnchantText:ClearAllPoints()
+					slot.ReforgedArmory.EnchantText:SetPoint(point, slot, relativePoint, x, y)
 				end
 
-				slot.CataArmory_EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
+				slot.ReforgedArmory.EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
 				enchantTextColor = (enchant.qualityColor and qualityColor) or enchant.color
 				if enchantTextColor and next(enchantTextColor) then
-					slot.CataArmory_EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
+					slot.ReforgedArmory.EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
 				end
-				slot.CataArmory_EnchantText:SetShown(enchant.enable)
+				slot.ReforgedArmory.EnchantText:SetShown(enchant.enable)
 			end
 
 			if force then

@@ -32,47 +32,41 @@ local SideSlotGrowthDirection = {
 	OUTSIDE_UP = format(L["%s and then %s"], L["Outside"], L["Up"]),
 }
 
-local function actionGroup(info, which, groupName, ...)
+local function actionPath(info, which, groupName, subPath, ...)
 	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel' or groupName == 'slotBackground' or groupName == 'durability'
-	if info.type == 'color' then
-		local color = E.db.cataarmory[which][groupName][info[#info]]
-		local r, g, b, a = ...
-		if r then
-			color.r, color.g, color.b, color.a = r, g, b, a
-		else
-			local d = P.cataarmory[which][groupName][info[#info]]
-			return color.r, color.g, color.b, color.a, d.r, d.g, d.b, d.a
-		end
-	else
-		local value = ...
-		if value ~= nil then
-			E.db.cataarmory[which][groupName][info[#info]] = value
-		else
-			return E.db.cataarmory[which][groupName][info[#info]]
+
+	-- Split the path into keys
+	local path = {strsplit(',', subPath or '')}
+	local db = E.db.cataarmory[which][groupName]
+	local defaultDB = P.cataarmory[which][groupName]
+
+	-- Drill down into the DB using the subPath
+	if path and path ~= '' then
+		for i = 1, #path do
+			if path[i] ~= '' then
+				db = db[path[i]]
+				defaultDB = defaultDB[path[i]]
+			end
 		end
 	end
 
-	local unit = which:gsub("^%l", string.upper)
-	module:UpdateOptions(unit, force)
-end
+	local key = info[#info]
 
-local function actionSubGroup(info, which, groupName, subGroup, ...)
-	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'slotBackground' or groupName == 'durability'
 	if info.type == 'color' then
-		local color = E.db.cataarmory[which][groupName][subGroup][info[#info]]
+		local color = db[key]
 		local r, g, b, a = ...
 		if r then
 			color.r, color.g, color.b, color.a = r, g, b, a
 		else
-			local d = P.cataarmory[which][groupName][subGroup][info[#info]]
+			local d = defaultDB[key]
 			return color.r, color.g, color.b, color.a, d.r, d.g, d.b, d.a
 		end
 	else
 		local value = ...
 		if value ~= nil then
-			E.db.cataarmory[which][groupName][subGroup][info[#info]] = value
+			db[key] = value
 		else
-			return E.db.cataarmory[which][groupName][subGroup][info[#info]]
+			return db[key]
 		end
 	end
 
@@ -91,13 +85,13 @@ local function disableCheck(info, which, groupName) if info and info[#info] == g
 
 local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 
-	local config = ACH:Group(L["Average Item Level"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end, function(info) return disableCheck(info, which, groupName) end)
+	local config = ACH:Group(L["Average Item Level"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end, function(info) return disableCheck(info, which, groupName) end)
 	local unit = which:gsub('^%l', string.upper)
 
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0, nil, nil, nil, nil, nil, function() return not E.db.cataarmory[which].enable end)
 	config.args.spacer1 = ACH:Spacer(1, 'full')
 
-	config.args.text = ACH:Group(L["Text Options"], nil, 5, nil, function(info) return actionSubGroup(info, which, groupName, 'text') end, function(info, ...) actionSubGroup(info, which, groupName, 'text', ...) end)
+	config.args.text = ACH:Group(L["Text Options"], nil, 5, nil, function(info) return actionPath(info, which, groupName, 'text') end, function(info, ...) actionPath(info, which, groupName, 'text', ...) end)
 	config.args.text.inline = true
 	config.args.text.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
 	config.args.text.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
@@ -107,7 +101,7 @@ local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 	config.args.text.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -5, max = 5, step = 1 })
 	config.args.text.args.color = ACH:Color(L["Color"], nil, 8)
 
-	config.args.frame = ACH:Group(L["Frame Options"], nil, 11, nil, function(info) return actionSubGroup(info, which, groupName, 'frame') end, function(info, ...) actionSubGroup(info, which, groupName, 'frame', ...) end)
+	config.args.frame = ACH:Group(L["Frame Options"], nil, 11, nil, function(info) return actionPath(info, which, groupName, 'frame') end, function(info, ...) actionPath(info, which, groupName, 'frame', ...) end)
 	config.args.frame.inline = true
 	config.args.frame.args.attachTo = ACH:Select(L["Attach To"], L["The object you want to attach to."], 11, module.AttachToObjects[unit])
 	config.args.frame.args.xOffset = ACH:Range(L["X-Offset"], nil, 12, { min = -300, max = 300, step = 1 })
@@ -121,7 +115,7 @@ local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 end
 
 local function GetOptionsTable_EnchantGroup(which, groupName)
-	local config = ACH:Group(L["Enchants"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end, function(info) return disableCheck(info, which, groupName) end)
+	local config = ACH:Group(L["Enchants"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end, function(info) return disableCheck(info, which, groupName) end)
 	config.args = CopyTable(SharedOptions)
 	config.args.enable.disabled = function() return not E.db.cataarmory[which].enable end
 	config.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
@@ -133,14 +127,14 @@ local function GetOptionsTable_EnchantGroup(which, groupName)
 	config.args.qualityColor = ACH:Toggle(L["Quality Color"], L["Use the same color as the quality color of the equipped item."], 10)
 	config.args.color = ACH:Color(L["Color"], nil, 11, nil, nil, nil, nil, function() return E.db.cataarmory[which][groupName].qualityColor end)
 
-	local EnchantID = ACH:Group(L["EnchantID Tooltip Info"], 'test', 20, nil, function(info) return actionSubGroup(info, which, groupName, 'enchantID') end, function(info, ...) actionSubGroup(info, which, groupName, 'enchantID', ...) end)
+	local EnchantID = ACH:Group(L["EnchantID Tooltip Info"], 'test', 20, nil, function(info) return actionPath(info, which, groupName, 'enchantID') end, function(info, ...) actionPath(info, which, groupName, 'enchantID', ...) end)
 	config.args.enchantID = EnchantID
 	EnchantID.inline = true
 	EnchantID.args.enable = ACH:Toggle(L["Enable"], L["Displays the enchant id in the tooltip of gear that has an enchant id in the itemlink."], 0)
 	EnchantID.args.missingOnly = ACH:Toggle(L["Missing Only"], L["Only show the enchant id if it is missing from the addon database."], 1, nil, nil, nil, nil, nil, function() return not E.db.cataarmory[which][groupName].enchantID.enable or not E.db.cataarmory[which][groupName].enable end)
 
 	--* Main Hand Slot
-	local MainHandSlot = ACH:Group(L["Main Hand Slot"], nil, 30, nil, function(info) return actionSubGroup(info, which, groupName, 'MainHandSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'MainHandSlot', ...) end)
+	local MainHandSlot = ACH:Group(L["Main Hand Slot"], nil, 30, nil, function(info) return actionPath(info, which, groupName, 'MainHandSlot') end, function(info, ...) actionPath(info, which, groupName, 'MainHandSlot', ...) end)
 	config.args.MainHandSlot = MainHandSlot
 	MainHandSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 	MainHandSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
@@ -148,7 +142,7 @@ local function GetOptionsTable_EnchantGroup(which, groupName)
 	MainHandSlot.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 9, C.Values.Anchors) --! Change terminology to reference slot instead of frame?
 
 	--* Secondary Hand Slot
-	local SecondaryHandSlot = ACH:Group(L["Secondary Hand Slot"], nil, 31, nil, function(info) return actionSubGroup(info, which, groupName, 'SecondaryHandSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'SecondaryHandSlot', ...) end)
+	local SecondaryHandSlot = ACH:Group(L["Secondary Hand Slot"], nil, 31, nil, function(info) return actionPath(info, which, groupName, 'SecondaryHandSlot') end, function(info, ...) actionPath(info, which, groupName, 'SecondaryHandSlot', ...) end)
 	config.args.SecondaryHandSlot = SecondaryHandSlot
 	SecondaryHandSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 	SecondaryHandSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
@@ -156,7 +150,7 @@ local function GetOptionsTable_EnchantGroup(which, groupName)
 	SecondaryHandSlot.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 9, C.Values.Anchors) --! Change terminology to reference slot instead of frame?
 
 	--* Ranged Slot
-	local RangedSlot = ACH:Group(L["Ranged Slot"], nil, 32, nil, function(info) return actionSubGroup(info, which, groupName, 'RangedSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'RangedSlot', ...) end)
+	local RangedSlot = ACH:Group(L["Ranged Slot"], nil, 32, nil, function(info) return actionPath(info, which, groupName, 'RangedSlot') end, function(info, ...) actionPath(info, which, groupName, 'RangedSlot', ...) end)
 	config.args.RangedSlot = RangedSlot
 	RangedSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 	RangedSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
@@ -167,7 +161,7 @@ local function GetOptionsTable_EnchantGroup(which, groupName)
 end
 
 local function GetOptionsTable_ExpandButton(which, groupName)
-	local config = ACH:Group(L["Expand Button"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	local config = ACH:Group(L["Expand Button"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end)
 	config.args.hide = ACH:Toggle(L["Hide"], nil, 0)
 	config.args.autoExpand = ACH:Toggle(L["Auto Expand"], nil, 1)
 
@@ -175,25 +169,25 @@ local function GetOptionsTable_ExpandButton(which, groupName)
 end
 
 local function GetOptionsTable_Gems(which, groupName)
-	local config = ACH:Group(L["Gems"], nil, 10, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	local config = ACH:Group(L["Gems"], nil, 10, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end)
 	config.args = CopyTable(SharedOptions)
 	config.args.size = ACH:Range(L["Size"], nil, 2, {min = 8, softMax = 75, max = 50, step = 1 })
 	config.args.spacing = ACH:Range(L["Spacing"], nil, 3, {min = 0, softMax = 15, max = 100, step = 1 })
 
 	--* Main Hand Slot
-	local MainHandSlot = ACH:Group(L["Main Hand Slot"], nil, 10, nil, function(info) return actionSubGroup(info, which, groupName, 'MainHandSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'MainHandSlot', ...) end)
+	local MainHandSlot = ACH:Group(L["Main Hand Slot"], nil, 10, nil, function(info) return actionPath(info, which, groupName, 'MainHandSlot') end, function(info, ...) actionPath(info, which, groupName, 'MainHandSlot', ...) end)
 	config.args.MainHandSlot = MainHandSlot
 	MainHandSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 	MainHandSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
 
 	--* Secondary Hand Slot
-	local SecondaryHandSlot = ACH:Group(L["Secondary Hand Slot"], nil, 11, nil, function(info) return actionSubGroup(info, which, groupName, 'SecondaryHandSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'SecondaryHandSlot', ...) end)
+	local SecondaryHandSlot = ACH:Group(L["Secondary Hand Slot"], nil, 11, nil, function(info) return actionPath(info, which, groupName, 'SecondaryHandSlot') end, function(info, ...) actionPath(info, which, groupName, 'SecondaryHandSlot', ...) end)
 	config.args.SecondaryHandSlot = SecondaryHandSlot
 	SecondaryHandSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 	SecondaryHandSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
 
 	--* Ranged Slot
-	local RangedSlot = ACH:Group(L["Ranged Slot"], nil, 12, nil, function(info) return actionSubGroup(info, which, groupName, 'RangedSlot') end, function(info, ...) actionSubGroup(info, which, groupName, 'RangedSlot', ...) end)
+	local RangedSlot = ACH:Group(L["Ranged Slot"], nil, 12, nil, function(info) return actionPath(info, which, groupName, 'RangedSlot') end, function(info, ...) actionPath(info, which, groupName, 'RangedSlot', ...) end)
 	config.args.RangedSlot = RangedSlot
 	RangedSlot.args.xOffset = ACH:Range(L["X-Offset"], nil, 6, { min = -300, max = 300, step = 1 })
 	RangedSlot.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
@@ -202,7 +196,7 @@ local function GetOptionsTable_Gems(which, groupName)
 end
 
 local function GetOptionsTable_ItemLevelGroup(which, groupName)
-	local config = ACH:Group(L["Equipment Item Levels"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	local config = ACH:Group(L["Item Level"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end)
 	config.args = CopyTable(SharedOptions)
 	config.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
 	config.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
@@ -215,19 +209,19 @@ local function GetOptionsTable_ItemLevelGroup(which, groupName)
 end
 
 local function GetOptionsTable_LevelText(which, groupName)
-	local config = ACH:Group(L["Level Text"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	local config = ACH:Group(L["Level Text"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end)
 	config.args = CopyTable(SharedOptions)
 
 	return config
 end
 
 local function GetOptionsTable_SlotBackground(which, groupName)
-	local config = ACH:Group(L["Slot Background"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	local config = ACH:Group(L["Slot Background"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end)
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
 	config.args.spacer = ACH:Spacer(1, 'full')
 	config.args.xOffset = ACH:Range(L["X-Offset"], nil, 2, { min = -25, max = 25, step = 1 })
 	config.args.yOffset = ACH:Range(L["Y-Offset"], nil, 3, { min = -25, max = 25, step = 1 })
-	config.args.warning = ACH:Group(L["Warning"], nil, 10, nil, function(info) return actionSubGroup(info, which, groupName, 'warning') end, function(info, ...) actionSubGroup(info, which, groupName, 'warning', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
+	config.args.warning = ACH:Group(L["Warning"], nil, 10, nil, function(info) return actionPath(info, which, groupName, 'warning') end, function(info, ...) actionPath(info, which, groupName, 'warning', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
 	config.args.warning.inline = true
 	config.args.warning.args.enable = ACH:Toggle(L["Enable"], nil, 0)
 	config.args.warning.args.color = ACH:Color(L["Color"], nil, 5, nil, nil, nil, nil, function() return not E.db.cataarmory[which][groupName].enable or not E.db.cataarmory[which][groupName].warning.enable end)
@@ -236,19 +230,26 @@ local function GetOptionsTable_SlotBackground(which, groupName)
 end
 
 local function GetOptionsTable_DurabilityGroup(which, groupName)
-	local config = ACH:Group(L["Durability"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	local config = ACH:Group(L["Durability"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end)
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
 
-	config.args.bar = ACH:Group(L["Bar"], nil, 5, nil, function(info) return actionSubGroup(info, which, groupName, 'bar') end, function(info, ...) actionSubGroup(info, which, groupName, 'bar', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
-	config.args.bar.args.position = ACH:Select(L["Position"], nil, 1, C.Values.EdgePositions)
-	config.args.bar.args.mouseover = ACH:Toggle(L["Mouseover"], nil, 1)
-	config.args.text = ACH:Group(L["Text"], nil, 5, nil, function(info) return actionSubGroup(info, which, groupName, 'text') end, function(info, ...) actionSubGroup(info, which, groupName, 'text', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
+	local bar = ACH:Group(L["Bar"], nil, 5, nil, function(info) return actionPath(info, which, groupName, 'bar') end, function(info, ...) actionPath(info, which, groupName, 'bar', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
+	config.args.bar = bar
+	bar.args.position = ACH:Select(L["Position"], nil, 1, C.Values.EdgePositions)
+	bar.args.mouseover = ACH:Toggle(L["Mouseover"], nil, 1)
+	bar.args.edgeOffset = ACH:Range(L["Edge Offset"], L["This will allow you to slightly adjust the length of the durability bar to line up better with your layout."], 1, { min = MIN_EDGE_OFFSET, max = MAX_EDGE_OFFSET, step = 1 })
+	bar.args.offset = ACH:Range(L["Offset"], L["This will allow you to slightly adjust the placement of the durability bar along the equipment slot."], 1, { min = MIN_BAR_OFFSET, max = MAX_BAR_OFFSET, step = 1 })
+
+	-- ACH:Range(name, desc, order, values, width, get, set, disabled, hidden)
+
+	local text = ACH:Group(L["Text"], nil, 5, nil, function(info) return actionPath(info, which, groupName, 'text') end, function(info, ...) actionPath(info, which, groupName, 'text', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
+	config.args.text = text
 
 	return config
 end
 
 local function GetOptionsTable_WarningIndicator(which, groupName)
-	local config = ACH:Group(L["Warning Indicator"], nil, 5, 'tab', function(info) return actionGroup(info, which, groupName) end, function(info, ...) actionGroup(info, which, groupName, ...) end)
+	local config = ACH:Group(L["Warning Indicator"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end)
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
 
 	return config

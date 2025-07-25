@@ -1,5 +1,5 @@
 ﻿## Interface: 50500
-## Title: |cff1784d1ElvUI|r |cff00FF98MoP|r |cffA330C9Armory|r
+## Title: |cff00FF98MoP|r |cffA330C9Armory|r
 ## Author: Repooc
 ## Version: 1.12
 ## RequiredDeps: ElvUI
