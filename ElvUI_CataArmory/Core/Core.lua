@@ -117,6 +117,7 @@ local function UpdateSlotDurabilityBar(element, db, slotInfo)
 		bar:SetValue(0)
 		SetDurabilityColor(element, 0)
 	end
+	element:SetShown(durability.enable)
 end
 
 local MIN_BAR_THICKNESS = 2
