@@ -70,7 +70,7 @@ local function actionPath(info, which, groupName, subPath, ...)
 		end
 	end
 
-	local unit = which:gsub("^%l", string.upper)
+	local unit = which:gsub('^%l', string.upper)
 	module:UpdateOptions(unit, force)
 end
 

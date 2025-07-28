@@ -1,5 +1,5 @@
-local MAJOR, MINOR = "LibGetEnchant-1.0-CataArmory", 5
-assert(LibStub, MAJOR.." requires LibStub")
+local MAJOR, MINOR = 'LibGetEnchant-1.0-ReforgedArmory', 5
+assert(LibStub, MAJOR..' requires LibStub')
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 

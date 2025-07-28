@@ -1,4 +1,4 @@
-local lib = LibStub:GetLibrary("LibGetEnchant-1.0-CataArmory")
+local lib = LibStub:GetLibrary("LibGetEnchant-1.0-ReforgedArmory")
 if not lib then return end
 
 lib.LibGetEnchantDB = {

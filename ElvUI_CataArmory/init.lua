@@ -180,7 +180,7 @@ local function DisableElvUIInfo(which, db)
 	if E.db.cataarmory[which].enable and E.db.general.itemLevel[db] then
 		E.db.general.itemLevel[db] = false
 
-		module:Print(format('ElvUI\'s %sDisplay %s Info|r option was |cffFF3300DISABLED|r automatically to prevent conflict with our module.', E.media.hexvaluecolor or '|cff16c3f2', gsub(which, "^%l", string.upper)))
+		module:Print(format('ElvUI\'s %sDisplay %s Info|r option was |cffFF3300DISABLED|r automatically to prevent conflict with our module.', E.media.hexvaluecolor or '|cff16c3f2', gsub(which, '^%l', string.upper)))
 	end
 end
 
@@ -221,7 +221,7 @@ end
 
 function module:Initialize()
 	EP:RegisterPlugin(AddOnName, GetOptions)
-	E:AddLib('GetEnchantList', 'LibGetEnchant-1.0-CataArmory')
+	E:AddLib('GetEnchantList', 'LibGetEnchant-1.0-ReforgedArmory')
 
 	DisableElvUIInfo('character', 'displayCharacterInfo')
 	DisableElvUIInfo('inspect', 'displayInspectInfo')
