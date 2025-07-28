@@ -4,10 +4,9 @@ local RRP = LibStub('RepoocReforged-1.0'):LoadMainCategory()
 local ACH = E.Libs.ACH
 local C
 
-local MIN_EDGE_OFFSET = -10
-local MAX_EDGE_OFFSET = 10
-local MIN_BAR_OFFSET = -15
-local MAX_BAR_OFFSET = 15
+local MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET = -15, 15
+local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = -10, 10
+local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = 2, 42
 
 local AllPoints = {
 	BOTTOM = 'BOTTOM',
@@ -110,6 +109,24 @@ local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 	config.args.frame.args.showBGTexture = ACH:Toggle(L["Show Background"], nil, 16)
 	config.args.frame.args.showLines = ACH:Toggle(L["Show Lines"], nil, 17)
 	config.args.frame.args.color = ACH:Color(L["Color"], L["This sets the color of the lines.\n\n|cffFF3300Warning:|r |cffFFD100Colors will not be 1 to 1 from the color wheel to the texture as the texture has color itself. This may not be the case for future textures if added as options.|r"], 18)
+
+	return config
+end
+
+local function GetOptionsTable_DurabilityGroup(which, groupName)
+	local config = ACH:Group(L["Durability"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end)
+	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
+
+	local bar = ACH:Group(L["Bar"], nil, 5, nil, function(info) return actionPath(info, which, groupName, 'bar') end, function(info, ...) actionPath(info, which, groupName, 'bar', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
+	config.args.bar = bar
+	bar.args.position = ACH:Select(L["Position"], nil, 1, C.Values.EdgePositions)
+	bar.args.mouseover = ACH:Toggle(L["Mouseover"], nil, 1)
+	bar.args.lengthOffset = ACH:Range(L["Length Offset"], L["This will allow you to adjust the length of the durability bar to fit better with the border of the equipment slot."], 1, { min = MIN_BAR_LENGTHOFFSET, max = MAX_BAR_LENGTHOFFSET, step = 1 })
+	bar.args.edgeOffset = ACH:Range(L["Edge Offset"], L["This will allow you to slightly adjust the placement of the durability bar along the equipment slot edge."], 1, { min = MIN_BAR_EDGEOFFSET, max = MAX_BAR_EDGEOFFSET, step = 1 })
+	bar.args.thickness = ACH:Range(L["Thickness"], L["This will be how thick the bar is."], 1, { min = MIN_BAR_THICKNESS, max = MAX_BAR_THICKNESS, step = 1 })
+
+	local text = ACH:Group(L["Text"], nil, 5, nil, function(info) return actionPath(info, which, groupName, 'text') end, function(info, ...) actionPath(info, which, groupName, 'text', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
+	config.args.text = text
 
 	return config
 end
@@ -225,25 +242,6 @@ local function GetOptionsTable_SlotBackground(which, groupName)
 	config.args.warning.inline = true
 	config.args.warning.args.enable = ACH:Toggle(L["Enable"], nil, 0)
 	config.args.warning.args.color = ACH:Color(L["Color"], nil, 5, nil, nil, nil, nil, function() return not E.db.cataarmory[which][groupName].enable or not E.db.cataarmory[which][groupName].warning.enable end)
-
-	return config
-end
-
-local function GetOptionsTable_DurabilityGroup(which, groupName)
-	local config = ACH:Group(L["Durability"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end)
-	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
-
-	local bar = ACH:Group(L["Bar"], nil, 5, nil, function(info) return actionPath(info, which, groupName, 'bar') end, function(info, ...) actionPath(info, which, groupName, 'bar', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
-	config.args.bar = bar
-	bar.args.position = ACH:Select(L["Position"], nil, 1, C.Values.EdgePositions)
-	bar.args.mouseover = ACH:Toggle(L["Mouseover"], nil, 1)
-	bar.args.edgeOffset = ACH:Range(L["Edge Offset"], L["This will allow you to slightly adjust the length of the durability bar to line up better with your layout."], 1, { min = MIN_EDGE_OFFSET, max = MAX_EDGE_OFFSET, step = 1 })
-	bar.args.offset = ACH:Range(L["Offset"], L["This will allow you to slightly adjust the placement of the durability bar along the equipment slot."], 1, { min = MIN_BAR_OFFSET, max = MAX_BAR_OFFSET, step = 1 })
-
-	-- ACH:Range(name, desc, order, values, width, get, set, disabled, hidden)
-
-	local text = ACH:Group(L["Text"], nil, 5, nil, function(info) return actionPath(info, which, groupName, 'text') end, function(info, ...) actionPath(info, which, groupName, 'text', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
-	config.args.text = text
 
 	return config
 end

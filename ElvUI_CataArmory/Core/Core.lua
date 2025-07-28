@@ -68,6 +68,10 @@ local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
 }
 
+function module:Clamp(value, min, max)
+	return math.min(max, math.max(value, min))
+end
+
 local function SetDurabilityColor(element, percent)
 	if not element then return end
 	local bar = element.bar
@@ -120,12 +124,9 @@ local function UpdateSlotDurabilityBar(element, db, slotInfo)
 	element:SetShown(db.enable)
 end
 
-local MIN_BAR_THICKNESS = 2
-local DEFAULT_BAR_THICKNESS = 5
-local MIN_EDGE_OFFSET = -10
-local MAX_EDGE_OFFSET = 10
-local MIN_BAR_OFFSET = -15
-local MAX_BAR_OFFSET = 15
+local MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET = -15, 15
+local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = -10, 10
+local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = 2, 42
 
 local function CreateBlizzardBarForSlot(slot)
 	if not slot then return end
@@ -133,8 +134,8 @@ local function CreateBlizzardBarForSlot(slot)
 
 	local db = E.db.cataarmory.character.durability
 	local position = db.bar.position or 'BOTTOM'
-	local thickness = math.max(db.bar.size or DEFAULT_BAR_THICKNESS, MIN_BAR_THICKNESS)
-	local offset, edgeOffset = math.max(MIN_BAR_OFFSET, math.min(db.bar.offset or 0, MAX_BAR_OFFSET)), math.max(MIN_EDGE_OFFSET, math.min(db.bar.edgeOffset or 0, MAX_EDGE_OFFSET))
+	local thickness = module:Clamp(db.bar.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
+	local edgeOffset, lengthOffset = module:Clamp(db.bar.edgeOffset or 0, MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET), module:Clamp(db.bar.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
 
 	local f = CreateFrame('Frame', nil, slot)
 	-- f:SetFrameLevel(slot:GetFrameLevel() + 1)
@@ -144,14 +145,14 @@ local function CreateBlizzardBarForSlot(slot)
 	f:CreateBackdrop('Transparent')
 
 	if position == 'TOP' or position == 'BOTTOM' then
-		f:SetSize(slot:GetWidth() + edgeOffset, thickness)
-		f:SetPoint(position, slot, position, 0, offset)
+		f:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
+		f:SetPoint(position, slot, position, 0, edgeOffset)
 	elseif position == 'LEFT' or position == 'RIGHT' then
-		f:SetSize(thickness, slot:GetHeight() + edgeOffset)
-		f:SetPoint(position, slot, position, offset, 0)
+		f:SetSize(thickness, slot:GetHeight() - (E.Border * 2) + lengthOffset)
+		f:SetPoint(position, slot, position, edgeOffset, 0)
 	else
 		print('Invalid position: ' .. tostring(position))
-		f:SetSize(slot:GetWidth() + edgeOffset, thickness)
+		f:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
 		f:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
 	end
 	f:SetAlpha(0)
@@ -230,6 +231,36 @@ function module:UpdateAvgItemLevel(which)
 	frame.ReforgedArmory.AvgItemLevel.Text:FontTemplate(LSM:Fetch('font', textOptions.font), textOptions.fontSize, textOptions.fontOutline)
 	frame.ReforgedArmory.AvgItemLevel.Text:ClearAllPoints()
 	frame.ReforgedArmory.AvgItemLevel.Text:SetPoint('CENTER', frame.ReforgedArmory.AvgItemLevel, 'CENTER', textOptions.xOffset, textOptions.yOffset)
+end
+
+function module:UpdateSlotDurability(slot)
+	if not slot or not slot.ReforgedArmory.Durability then return end
+	local db = E.db.cataarmory.character.durability
+
+	--* Durability
+	if slot.ReforgedArmory.Durability then
+		--! Attached to slot
+		local thickness = module:Clamp(db.bar.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
+		local edgeOffset, lengthOffset = module:Clamp(db.bar.edgeOffset or 0, MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET), module:Clamp(db.bar.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
+
+		slot.ReforgedArmory.Durability:ClearAllPoints()
+		if db.bar.position == 'TOP' or db.bar.position == 'BOTTOM' then
+			slot.ReforgedArmory.Durability:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
+			slot.ReforgedArmory.Durability:SetPoint(db.bar.position, slot, db.bar.position, 0, edgeOffset)
+			slot.ReforgedArmory.Durability.bar:SetOrientation('HORIZONTAL')
+		elseif db.bar.position == 'LEFT' or db.bar.position == 'RIGHT' then
+			slot.ReforgedArmory.Durability:SetSize(thickness, slot:GetHeight() - (E.Border * 2) + lengthOffset)
+			slot.ReforgedArmory.Durability:SetPoint(db.bar.position, slot, db.bar.position, edgeOffset, 0)
+			slot.ReforgedArmory.Durability.bar:SetOrientation('VERTICAL')
+		else
+			print('Invalid position: ' .. tostring(db.bar.position))
+			slot.ReforgedArmory.Durability:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
+			slot.ReforgedArmory.Durability:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
+			slot.ReforgedArmory.Durability.bar:SetOrientation('HORIZONTAL')
+		end
+
+		slot.ReforgedArmory.Durability:SetShown(db.enable)
+	end
 end
 
 function module:UpdateSlotBackground(which, slot)
@@ -862,30 +893,7 @@ function module:UpdateInspectPageFonts(which, force)
 
 			if force then
 				module:UpdateSlotBackground(which, slot)
-
-				--* Durability
-				if slot.ReforgedArmory.Durability then
-					local thickness = math.max(durability.bar.size or DEFAULT_BAR_THICKNESS, MIN_BAR_THICKNESS)
-					local offset, edgeOffset = math.max(MIN_BAR_OFFSET, math.min(durability.bar.offset or 0, MAX_BAR_OFFSET)), math.max(MIN_EDGE_OFFSET, math.min(durability.bar.edgeOffset or 0, MAX_EDGE_OFFSET))
-
-					slot.ReforgedArmory.Durability:ClearAllPoints()
-					if durability.bar.position == 'TOP' or durability.bar.position == 'BOTTOM' then
-						slot.ReforgedArmory.Durability:SetSize(slot:GetWidth() + edgeOffset, thickness)
-						slot.ReforgedArmory.Durability:SetPoint(durability.bar.position, slot, durability.bar.position, 0, offset)
-						slot.ReforgedArmory.Durability.bar:SetOrientation('HORIZONTAL')
-					elseif durability.bar.position == 'LEFT' or durability.bar.position == 'RIGHT' then
-						slot.ReforgedArmory.Durability:SetSize(thickness, slot:GetHeight() + edgeOffset)
-						slot.ReforgedArmory.Durability:SetPoint(durability.bar.position, slot, durability.bar.position, offset, 0)
-						slot.ReforgedArmory.Durability.bar:SetOrientation('VERTICAL')
-					else
-						print('Invalid position: ' .. tostring(durability.bar.position))
-						slot.ReforgedArmory.Durability:SetSize(slot:GetWidth() + edgeOffset, thickness)
-						slot.ReforgedArmory.Durability:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
-						slot.ReforgedArmory.Durability.bar:SetOrientation('HORIZONTAL')
-					end
-
-					slot.ReforgedArmory.Durability:SetShown(durability.enable)
-				end
+				module:UpdateSlotDurability(slot)
 			end
 		end
 	end

@@ -79,10 +79,10 @@ P.cataarmory = {
 			enable = true,
 			bar = {
 				mouseover = true,
-				offset = 0,
-				position = 'TOP',
-				size = 5,
 				edgeOffset = 0,
+				position = 'TOP',
+				thickness = 5,
+				lengthOffset = 0,
 			},
 			text = {
 				font = 'PT Sans Narrow',
