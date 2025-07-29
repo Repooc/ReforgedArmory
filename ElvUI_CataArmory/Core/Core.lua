@@ -190,7 +190,7 @@ function module:UpdateSlotDurability(slot)
 
 	bar:SetFrameStrata(db.bar.frameStrata)
     bar:SetFrameLevel(db.bar.frameLevel)
-	bar:SetStatusBarTexture(GradientTexture)
+	bar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
 
 	bar.Holder:ClearAllPoints()
 	if db.bar.position == 'TOP' or db.bar.position == 'BOTTOM' then
