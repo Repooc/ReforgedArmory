@@ -131,6 +131,9 @@ local function GetOptionsTable_DurabilityGroup(which, groupName)
 	text.args.fontSize = ACH:Range(L["Font Size"], nil, 2, { min = 4, max = 32, step = 1 })
 	text.args.fontOutline = ACH:FontFlags(L["Font Outline"], L["Set the font outline."], 3)
 
+	text.args.useCustomColor = ACH:Toggle(L["Custom Color"], L["Use a custom color instead of the default \"gradient\" style that goes from green to yellow to red based on the percentage."])
+	text.args.customColor = ACH:Color(L["Color"], L["Sets the durability text to the custom color."], 4, nil, 120)
+
 	return config
 end
 

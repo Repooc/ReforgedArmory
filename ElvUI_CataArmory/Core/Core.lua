@@ -81,14 +81,14 @@ local function SetDurabilityColor(bar, percent)
 
 	-- RGB gradient: green → yellow → red
 	local r, g, b = E:ColorGradient(percent, 1, 0.1, 0.1, 1, 1, 0.1, 0.1, 1, 0.1)
-
 	bar:SetStatusBarColor(r, g, b)
 
 	if text then
-		if db.text.durabilityColor then
+		if not db.text.useCustomColor then
 			text:SetTextColor(r, g, b)
 		else
-			text:SetTextColor(1, 1, 1)
+			local customColor = db.text.customColor
+			text:SetTextColor(customColor.r, customColor.g, customColor.b)
 		end
 	end
 end
