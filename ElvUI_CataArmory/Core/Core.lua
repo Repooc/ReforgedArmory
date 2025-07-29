@@ -72,10 +72,10 @@ function module:Clamp(value, min, max)
 	return math.min(max, math.max(value, min))
 end
 
-local function SetDurabilityColor(element, percent)
-	if not element then return end
-	local bar = element.bar
-	local text = bar.text
+local function SetDurabilityColor(bar, percent)
+	if not bar then return end
+	-- local bar = element.bar
+	local text = bar.Text
 	local db = E.db.cataarmory.character.durability
 
 	percent = math.min(math.max(percent * 0.01, 0), 1)
@@ -94,101 +94,94 @@ local function SetDurabilityColor(element, percent)
 	end
 end
 
-local function UpdateSlotDurabilityBar(element, db, slotInfo)
-	if not element then return end
+local function UpdateSlotDurabilityBar(bar, db, slotInfo)
+	if not bar then return end
 
-	local bar = element.bar
-	local text = bar.text
+	local text = bar.Text
 	local durability = slotInfo.durability
 	local current, max, percent = durability.current, durability.max, durability.percent
 
-	element.current = current
-	element.max = max
-	element.percent = percent
+	bar.current = current
+	bar.max = max
+	bar.percent = percent
 
 	if current and max and max > 0 then
 		text:SetFormattedText('%d%%', percent)
 
 		bar:SetMinMaxValues(0, max)
 		bar:SetValue(current)
-		SetDurabilityColor(element, percent)
-		element:SetAlpha(db.bar.mouseover and 0 or 1)
+		SetDurabilityColor(bar, percent)
+		bar:SetAlpha(db.bar.mouseover and 0 or 1)
 	else
 		if text then
 			text:SetText('')
 		end
 
 		bar:SetValue(0)
-		SetDurabilityColor(element, 0)
+		bar:SetAlpha(0)
 	end
-	element:SetShown(db.enable)
+	bar:SetShown(db.enable)
 end
 
 local MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET = -15, 15
 local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = -10, 10
 local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = 2, 42
 
-local function CreateBlizzardBarForSlot(slot)
+local function CreateDurabilitySlot(slot)
 	if not slot then return end
-	if slot.ReforgedArmory.Durability then return end
+	if slot.RA_DurabilityBar then return end
 
 	local db = E.db.cataarmory.character.durability
 	local position = db.bar.position or 'BOTTOM'
 	local thickness = module:Clamp(db.bar.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
 	local edgeOffset, lengthOffset = module:Clamp(db.bar.edgeOffset or 0, MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET), module:Clamp(db.bar.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
 
-	local f = CreateFrame('Frame', nil, slot)
-	-- f:SetFrameLevel(slot:GetFrameLevel() + 1)
-	-- f:SetFrameStrata(slot:GetFrameStrata())
-    f:SetFrameStrata('HIGH')
-    f:SetFrameLevel(5)
-	f:CreateBackdrop('Transparent')
+	local bar = CreateFrame('StatusBar', '$parent_RA_DurabilityBar', slot)
+	slot.RA_DurabilityBar = bar
+
+	bar:Hide()
+	bar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
+	bar:SetFrameStrata(db.bar.frameStrata)
+    bar:SetFrameLevel(db.bar.frameLevel)
+	bar:CreateBackdrop('Transparent')
+
+	bar.Text = bar:CreateFontString(nil, 'OVERLAY')
+	bar.Text:FontTemplate()
+	bar.Text:SetPoint('CENTER')
+	bar.Text:SetText('')
+
+	bar.bg = bar:CreateTexture(nil, 'BORDER')
+	bar.bg:SetTexture(E.media.blankTex)
+	bar.bg:SetAllPoints()
+	bar.bg:Show()
+
+	local holder = CreateFrame('Frame', nil, bar)
+	bar.Holder = holder
 
 	if position == 'TOP' or position == 'BOTTOM' then
-		f:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
-		f:SetPoint(position, slot, position, 0, edgeOffset)
+		bar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
+		bar.Holder:SetPoint(position, slot, position, 0, edgeOffset)
 	elseif position == 'LEFT' or position == 'RIGHT' then
-		f:SetSize(thickness, slot:GetHeight() - (E.Border * 2) + lengthOffset)
-		f:SetPoint(position, slot, position, edgeOffset, 0)
+		bar.Holder:SetSize(thickness, slot:GetHeight() - (E.Border * 2) + lengthOffset)
+		bar.Holder:SetPoint(position, slot, position, edgeOffset, 0)
 	else
 		print('Invalid position: ' .. tostring(position))
-		f:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
-		f:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
-	end
-	f:SetAlpha(0)
-
-	local bar = CreateFrame('StatusBar', nil, f)
-	f.bar = bar
-
-	bar:SetAllPoints()
-	bar:SetStatusBarTexture([[Interface\RaidFrame\Raid-Bar-Hp-Fill]])
-	-- bar:SetStatusBarColor(1, 0, 0)
-	local colorTbl = E.media.rgbvaluecolor
-	bar:SetStatusBarColor(colorTbl.r, colorTbl.g, colorTbl.b)
-	bar:SetMinMaxValues(0, 1)
-	bar:SetValue(0)
-
-	if position == 'LEFT' or position == 'RIGHT' then
-		bar:SetOrientation('VERTICAL')
-	elseif position == 'TOP' or position == 'BOTTOM' then
-		bar:SetOrientation('HORIZONTAL')
+		bar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
+		bar.Holder:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
 	end
 
-	local text = bar:CreateFontString(nil, 'OVERLAY', 'GameFontHighlightSmall')
-	text:SetPoint('CENTER')
-	text:SetText('')
-	bar.text = text
+	bar:SetAllPoints(bar.Holder)
 
 	local function OnEnter()
-		if f.max and f.max > 0 then
-			f:SetAlpha(1)
+		if bar.max and bar.max > 0 then
+			bar:SetAlpha(1)
 		end
 	end
 
 	local function OnLeave()
 		C_Timer.After(0.1, function()
-			if db.bar.mouseover and not f:IsMouseOver() and not slot:IsMouseOver() then
-				f:SetAlpha(0)
+			if db.bar.mouseover and not bar:IsMouseOver() and not slot:IsMouseOver() then
+				bar:SetAlpha(0)
 			end
 		end)
 	end
@@ -196,12 +189,33 @@ local function CreateBlizzardBarForSlot(slot)
 	slot:HookScript('OnEnter', OnEnter)
     slot:HookScript('OnLeave', OnLeave)
 
-    f:HookScript('OnEnter', OnEnter)
-    f:HookScript('OnLeave', OnLeave)
+    bar:HookScript('OnEnter', OnEnter)
+    bar:HookScript('OnLeave', OnLeave)
+end
 
-	slot.ReforgedArmory.Durability = f
+function module:UpdateSlotDurability(slot)
+	if not slot or not slot.RA_DurabilityBar then return end
+	local db = E.db.cataarmory.character.durability
+	local thickness = module:Clamp(db.bar.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
+	local edgeOffset, lengthOffset = module:Clamp(db.bar.edgeOffset or 0, MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET), module:Clamp(db.bar.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
 
-	return f, bar, text
+	slot.RA_DurabilityBar.Holder:ClearAllPoints()
+	if db.bar.position == 'TOP' or db.bar.position == 'BOTTOM' then
+		slot.RA_DurabilityBar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
+		slot.RA_DurabilityBar.Holder:SetPoint(db.bar.position, slot, db.bar.position, 0, edgeOffset)
+		slot.RA_DurabilityBar:SetOrientation('HORIZONTAL')
+	elseif db.bar.position == 'LEFT' or db.bar.position == 'RIGHT' then
+		slot.RA_DurabilityBar.Holder:SetSize(thickness, slot:GetHeight() - (E.Border * 2) + lengthOffset)
+		slot.RA_DurabilityBar.Holder:SetPoint(db.bar.position, slot, db.bar.position, edgeOffset, 0)
+		slot.RA_DurabilityBar:SetOrientation('VERTICAL')
+	else
+		print('Invalid position: ' .. tostring(db.bar.position))
+		slot.RA_DurabilityBar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
+		slot.RA_DurabilityBar.Holder:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
+		slot.RA_DurabilityBar:SetOrientation('HORIZONTAL')
+	end
+
+	slot.RA_DurabilityBar:SetShown(db.enable)
 end
 
 function module:UpdateAvgItemLevel(which)
@@ -231,36 +245,6 @@ function module:UpdateAvgItemLevel(which)
 	frame.ReforgedArmory.AvgItemLevel.Text:FontTemplate(LSM:Fetch('font', textOptions.font), textOptions.fontSize, textOptions.fontOutline)
 	frame.ReforgedArmory.AvgItemLevel.Text:ClearAllPoints()
 	frame.ReforgedArmory.AvgItemLevel.Text:SetPoint('CENTER', frame.ReforgedArmory.AvgItemLevel, 'CENTER', textOptions.xOffset, textOptions.yOffset)
-end
-
-function module:UpdateSlotDurability(slot)
-	if not slot or not slot.ReforgedArmory.Durability then return end
-	local db = E.db.cataarmory.character.durability
-
-	--* Durability
-	if slot.ReforgedArmory.Durability then
-		--! Attached to slot
-		local thickness = module:Clamp(db.bar.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
-		local edgeOffset, lengthOffset = module:Clamp(db.bar.edgeOffset or 0, MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET), module:Clamp(db.bar.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
-
-		slot.ReforgedArmory.Durability:ClearAllPoints()
-		if db.bar.position == 'TOP' or db.bar.position == 'BOTTOM' then
-			slot.ReforgedArmory.Durability:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
-			slot.ReforgedArmory.Durability:SetPoint(db.bar.position, slot, db.bar.position, 0, edgeOffset)
-			slot.ReforgedArmory.Durability.bar:SetOrientation('HORIZONTAL')
-		elseif db.bar.position == 'LEFT' or db.bar.position == 'RIGHT' then
-			slot.ReforgedArmory.Durability:SetSize(thickness, slot:GetHeight() - (E.Border * 2) + lengthOffset)
-			slot.ReforgedArmory.Durability:SetPoint(db.bar.position, slot, db.bar.position, edgeOffset, 0)
-			slot.ReforgedArmory.Durability.bar:SetOrientation('VERTICAL')
-		else
-			print('Invalid position: ' .. tostring(db.bar.position))
-			slot.ReforgedArmory.Durability:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
-			slot.ReforgedArmory.Durability:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
-			slot.ReforgedArmory.Durability.bar:SetOrientation('HORIZONTAL')
-		end
-
-		slot.ReforgedArmory.Durability:SetShown(db.enable)
-	end
 end
 
 function module:UpdateSlotBackground(which, slot)
@@ -523,7 +507,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 		end
 
 		--* Durability
-		UpdateSlotDurabilityBar(inspectItem.ReforgedArmory.Durability, db.durability, slotInfo)
+		UpdateSlotDurabilityBar(inspectItem.RA_DurabilityBar, db.durability, slotInfo)
 	end
 
 	do
@@ -775,7 +759,8 @@ function module:CreateSlotStrings(frame, which)
 
 			--* Durability Bar
 			if which == 'Character' then
-				CreateBlizzardBarForSlot(slot)
+				CreateDurabilitySlot(slot)
+				module:UpdateSlotDurability(slot)
 			end
 		end
 
