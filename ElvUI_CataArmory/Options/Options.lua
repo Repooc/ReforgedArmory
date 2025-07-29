@@ -127,6 +127,9 @@ local function GetOptionsTable_DurabilityGroup(which, groupName)
 
 	local text = ACH:Group(L["Text"], nil, 5, nil, function(info) return actionPath(info, which, groupName, 'text') end, function(info, ...) actionPath(info, which, groupName, 'text', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
 	config.args.text = text
+	text.args.font = ACH:SharedMediaFont(L["Font"], nil, 1)
+	text.args.fontSize = ACH:Range(L["Font Size"], nil, 2, { min = 4, max = 32, step = 1 })
+	text.args.fontOutline = ACH:FontFlags(L["Font Outline"], L["Set the font outline."], 3)
 
 	return config
 end

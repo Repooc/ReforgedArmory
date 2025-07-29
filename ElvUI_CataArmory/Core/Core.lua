@@ -74,7 +74,6 @@ end
 
 local function SetDurabilityColor(bar, percent)
 	if not bar then return end
-	-- local bar = element.bar
 	local text = bar.Text
 	local db = E.db.cataarmory.character.durability
 
@@ -132,43 +131,29 @@ local function CreateDurabilitySlot(slot)
 	if slot.RA_DurabilityBar then return end
 
 	local db = E.db.cataarmory.character.durability
-	local position = db.bar.position or 'BOTTOM'
-	local thickness = module:Clamp(db.bar.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
-	local edgeOffset, lengthOffset = module:Clamp(db.bar.edgeOffset or 0, MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET), module:Clamp(db.bar.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
-
 	local bar = CreateFrame('StatusBar', '$parent_RA_DurabilityBar', slot)
 	slot.RA_DurabilityBar = bar
 
 	bar:Hide()
 	bar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
-	bar:SetFrameStrata(db.bar.frameStrata)
-    bar:SetFrameLevel(db.bar.frameLevel)
+	bar:SetFrameStrata('HIGH')
+    bar:SetFrameLevel(5)
 	bar:CreateBackdrop('Transparent')
 
 	bar.Text = bar:CreateFontString(nil, 'OVERLAY')
-	bar.Text:FontTemplate()
+	bar.Text:FontTemplate(LSM:Fetch('font', db.text.font), db.text.fontSize, db.text.fontOutline)
 	bar.Text:SetPoint('CENTER')
 	bar.Text:SetText('')
 
 	bar.bg = bar:CreateTexture(nil, 'BORDER')
-	bar.bg:SetTexture(E.media.blankTex)
 	bar.bg:SetAllPoints()
 	bar.bg:Show()
 
 	local holder = CreateFrame('Frame', nil, bar)
 	bar.Holder = holder
 
-	if position == 'TOP' or position == 'BOTTOM' then
-		bar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
-		bar.Holder:SetPoint(position, slot, position, 0, edgeOffset)
-	elseif position == 'LEFT' or position == 'RIGHT' then
-		bar.Holder:SetSize(thickness, slot:GetHeight() - (E.Border * 2) + lengthOffset)
-		bar.Holder:SetPoint(position, slot, position, edgeOffset, 0)
-	else
-		print('Invalid position: ' .. tostring(position))
-		bar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
-		bar.Holder:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
-	end
+	bar.Holder:SetSize(slot:GetWidth() - (E.Border * 2), 5)
+	bar.Holder:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
 
 	bar:SetAllPoints(bar.Holder)
 
@@ -195,27 +180,36 @@ end
 
 function module:UpdateSlotDurability(slot)
 	if not slot or not slot.RA_DurabilityBar then return end
+	local bar = slot.RA_DurabilityBar
 	local db = E.db.cataarmory.character.durability
+	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
+	local info = module.GearList[slotName]
+	local direction = info.direction
 	local thickness = module:Clamp(db.bar.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
 	local edgeOffset, lengthOffset = module:Clamp(db.bar.edgeOffset or 0, MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET), module:Clamp(db.bar.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
 
-	slot.RA_DurabilityBar.Holder:ClearAllPoints()
+	bar:SetFrameStrata(db.bar.frameStrata)
+    bar:SetFrameLevel(db.bar.frameLevel)
+	bar:SetStatusBarTexture(GradientTexture)
+
+	bar.Holder:ClearAllPoints()
 	if db.bar.position == 'TOP' or db.bar.position == 'BOTTOM' then
-		slot.RA_DurabilityBar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
-		slot.RA_DurabilityBar.Holder:SetPoint(db.bar.position, slot, db.bar.position, 0, edgeOffset)
-		slot.RA_DurabilityBar:SetOrientation('HORIZONTAL')
+		bar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
+		bar.Holder:SetPoint(db.bar.position, slot, db.bar.position, 0, edgeOffset)
+		bar:SetOrientation('HORIZONTAL')
 	elseif db.bar.position == 'LEFT' or db.bar.position == 'RIGHT' then
-		slot.RA_DurabilityBar.Holder:SetSize(thickness, slot:GetHeight() - (E.Border * 2) + lengthOffset)
-		slot.RA_DurabilityBar.Holder:SetPoint(db.bar.position, slot, db.bar.position, edgeOffset, 0)
-		slot.RA_DurabilityBar:SetOrientation('VERTICAL')
+		bar.Holder:SetSize(thickness, slot:GetHeight() - (E.Border * 2) + lengthOffset)
+		bar.Holder:SetPoint(db.bar.position, slot, db.bar.position, edgeOffset, 0)
+		bar:SetOrientation('VERTICAL')
 	else
 		print('Invalid position: ' .. tostring(db.bar.position))
-		slot.RA_DurabilityBar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
-		slot.RA_DurabilityBar.Holder:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
-		slot.RA_DurabilityBar:SetOrientation('HORIZONTAL')
+		bar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
+		bar.Holder:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
+		bar:SetOrientation('HORIZONTAL')
 	end
+	bar.Text:FontTemplate(LSM:Fetch('font', db.text.font), db.text.fontSize, db.text.fontOutline)
 
-	slot.RA_DurabilityBar:SetShown(db.enable)
+	bar:SetShown(db.enable)
 end
 
 function module:UpdateAvgItemLevel(which)
