@@ -209,6 +209,7 @@ function module:UpdateSlotDurability(slot)
 	end
 	bar.Text:FontTemplate(LSM:Fetch('font', db.text.font), db.text.fontSize, db.text.fontOutline)
 
+	bar.Text:SetShown(db.text.enable)
 	bar:SetShown(db.enable)
 end
 

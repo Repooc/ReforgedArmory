@@ -127,12 +127,14 @@ local function GetOptionsTable_DurabilityGroup(which, groupName)
 
 	local text = ACH:Group(L["Text"], nil, 5, nil, function(info) return actionPath(info, which, groupName, 'text') end, function(info, ...) actionPath(info, which, groupName, 'text', ...) end, function() return not E.db.cataarmory[which][groupName].enable end)
 	config.args.text = text
-	text.args.font = ACH:SharedMediaFont(L["Font"], nil, 1)
-	text.args.fontSize = ACH:Range(L["Font Size"], nil, 2, { min = 4, max = 32, step = 1 })
-	text.args.fontOutline = ACH:FontFlags(L["Font Outline"], L["Set the font outline."], 3)
-
-	text.args.useCustomColor = ACH:Toggle(L["Custom Color"], L["Use a custom color instead of the default \"gradient\" style that goes from green to yellow to red based on the percentage."])
-	text.args.customColor = ACH:Color(L["Color"], L["Sets the durability text to the custom color."], 4, nil, 120)
+	text.args.enable = ACH:Toggle(L["Enable"], nil, 0)
+	text.args.spacer1 = ACH:Spacer(1, 'full')
+	text.args.font = ACH:SharedMediaFont(L["Font"], nil, 2)
+	text.args.fontSize = ACH:Range(L["Font Size"], nil, 3, { min = 4, max = 32, step = 1 })
+	text.args.fontOutline = ACH:FontFlags(L["Font Outline"], L["Set the font outline."], 4)
+	text.args.spacer2 = ACH:Spacer(5, 'full')
+	text.args.useCustomColor = ACH:Toggle(L["Custom Color"], L["Use a custom color instead of the default \"gradient\" style that goes from green to yellow to red based on the percentage."], 6)
+	text.args.customColor = ACH:Color(L["Color"], L["Sets the durability text to the custom color."], 7, nil, 120)
 
 	return config
 end

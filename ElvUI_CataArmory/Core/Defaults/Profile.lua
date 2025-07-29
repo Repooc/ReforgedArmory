@@ -87,6 +87,7 @@ P.cataarmory = {
 				thickness = 5,
 			},
 			text = {
+				enable = true,
 				font = 'PT Sans Narrow',
 				fontSize = 15,
 				fontOutline = 'OUTLINE',
