@@ -784,6 +784,14 @@ function module:UpdateInspectPageFonts(which, force)
 	local itemLevel, enchant, durability = db.itemLevel, db.enchant, db.durability
 
 	module:UpdateAvgItemLevel(which)
+	if isCharPage then
+		local controlsDisplayMode = db.model.controlsDisplayMode
+		if controlsDisplayMode == 'SHOW' then
+			_G.CharacterModelScene.ControlFrame:Show()
+		else
+			_G.CharacterModelScene.ControlFrame:Hide()
+		end
+	end
 
 	local slot, quality, iLvlTextColor, enchantTextColor
 	local qualityColor = {}
@@ -941,6 +949,33 @@ local function HandleCharacterFrameExpand()
 	_G.CharacterFrameExpandButton:SetShown(not E.db.cataarmory.character.expandButton.hide)
 end
 
+local function ControlFrame_OnShow(frame)
+	local db = E.db.cataarmory.character.model
+	local controlsDisplayMode = db.controlsDisplayMode
+	if controlsDisplayMode == 'SHOW' then
+		frame:Show()
+	elseif controlsDisplayMode == 'HIDE' then
+		frame:Hide()
+	end
+end
+
+local function ControlFrame_OnEnter(frame)
+	local db = E.db.cataarmory.character.model
+	local controlsDisplayMode = db.controlsDisplayMode
+	if controlsDisplayMode == 'HIDE' then
+		frame:Hide()
+	end
+
+end
+
+local function ControlFrame_OnLeave()
+	local db = E.db.cataarmory.character.model
+	local controlsDisplayMode = db.controlsDisplayMode
+	if controlsDisplayMode == 'SHOW' then
+		_G.CharacterModelScene.ControlFrame:Show()
+	end
+end
+
 local function CharacterFrame_OnShow()
 	module.UpdateCharacterInfo()
 	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
@@ -968,8 +1003,16 @@ local function CharacterFrame_OnShow()
 			_G.CharacterModelScene.BackgroundBotRight:Hide()
 			_G.CharacterModelScene.backdrop:Hide()
 			_G.CharacterModelScene.BackgroundOverlay:Hide() --! Maybe use this over background images?
+			_G.CharacterModelScene.ControlFrame:HookScript('OnEnter', ControlFrame_OnEnter)
+			_G.CharacterModelScene.ControlFrame:HookScript('OnLeave', ControlFrame_OnLeave)
+			_G.CharacterModelScene.ControlFrame:HookScript('OnShow', ControlFrame_OnShow)
+			_G.CharacterModelScene:HookScript('OnLeave', ControlFrame_OnLeave)
+		end
 
-			--* TODO: Make this an option
+		local controlsDisplayMode = E.db.cataarmory.character.model.controlsDisplayMode
+		if controlsDisplayMode == 'SHOW' then
+			_G.CharacterModelScene.ControlFrame:Show()
+		else
 			_G.CharacterModelScene.ControlFrame:Hide()
 		end
 

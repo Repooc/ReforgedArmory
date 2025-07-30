@@ -102,6 +102,9 @@ P.cataarmory = {
 			autoExpand = true,
 		},
 		gems = CopyTable(SharedGemOptions),
+		model = {
+			controlsDisplayMode = 'MOUSEOVER',
+		},
 		itemLevel = CopyTable(ItemLevel),
 		slotBackground = {
 			enable = false,
