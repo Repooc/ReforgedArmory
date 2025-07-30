@@ -89,7 +89,7 @@ P.cataarmory = {
 			text = {
 				enable = true,
 				font = 'PT Sans Narrow',
-				fontSize = 15,
+				fontSize = 9,
 				fontOutline = 'OUTLINE',
 				customColor = { r = 1, g = 1, b = 1 },
 				useCustomColor = false, --* Text shows as the color of durability if true, color settings if false

@@ -1,12 +1,13 @@
 local E, L = unpack(ElvUI)
-local module = E:GetModule('ElvUI_CataArmory')
+local module = E:GetModule('ReforgedArmory')
 local S = E:GetModule('Skins')
 local LSM = E.Libs.LSM
 local _, Engine = ...
 
 local GetItemQualityColor = C_Item and C_Item.GetItemQualityColor
 
-local GradientTexture = [[Interface\AddOns\ElvUI_CataArmory\Media\Gradient]]
+local GradientTexture = [[Interface\AddOns\ReforgedArmory\Media\Gradient]]
+local ReversedGradientTexture = [[Interface\AddOns\ReforgedArmory\Media\Gradient-Reversed]]
 local WarningTexture = [[Interface\AddOns\ElvUI\Core\Media\Textures\Minimalist]]
 
 local DurabilityConstants = Engine.Durability
@@ -81,6 +82,7 @@ local function CreateDurabilitySlot(slot)
 	bar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
 	bar:SetFrameStrata('HIGH')
     bar:SetFrameLevel(5)
+	-- bar:CreateBackdrop()
 	bar:CreateBackdrop('Transparent')
 
 	bar.Text = bar:CreateFontString(nil, 'OVERLAY')
@@ -94,7 +96,6 @@ local function CreateDurabilitySlot(slot)
 
 	local holder = CreateFrame('Frame', nil, bar)
 	bar.Holder = holder
-
 	bar.Holder:SetSize(slot:GetWidth() - (E.Border * 2), 5)
 	bar.Holder:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
 
@@ -128,12 +129,13 @@ function module:UpdateSlotDurability(slot)
 	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
 	local info = module.GearList[slotName]
 	local direction = info.direction
+
+	--! Attached to slot
 	local thickness = module:Clamp(db.bar.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
 	local edgeOffset, lengthOffset = module:Clamp(db.bar.edgeOffset or 0, MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET), module:Clamp(db.bar.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
 
 	bar:SetFrameStrata(db.bar.frameStrata)
     bar:SetFrameLevel(db.bar.frameLevel)
-	bar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
 
 	bar.Holder:ClearAllPoints()
 	if db.bar.position == 'TOP' or db.bar.position == 'BOTTOM' then
@@ -866,7 +868,7 @@ function module:AcquireGemInfo(itemLink)
 	return temp.gems, temp.emptySockets, temp.filledSockets, temp.baseSocketCount
 end
 
-local githubURL = 'https://github.com/Repooc/ElvUI_CataArmory/issues'
+local githubURL = 'https://github.com/Repooc/ReforgedArmory/issues'
 local missingIDs = {}
 function module:GetGearSlotInfo(unit, slot)
 	local tt = E.ScanTooltip

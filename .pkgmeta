@@ -1,10 +1,10 @@
-package-as: ElvUI_CataArmory
+package-as: ReforgedArmory
 enable-nolib-creation: no
 externals:
-  ElvUI_CataArmory/Libs/RepoocReforged-1.0:
+  ReforgedArmory/Libs/RepoocReforged-1.0:
     url: https://github.com/Repooc/RepoocReforged-1.0
 manual-changelog:
     filename: CHANGELOG.md
     markup-type: markdown
 move-folders:
-    ElvUI_CataArmory/ElvUI_CataArmory: ElvUI_CataArmory
+    ReforgedArmory/ReforgedArmory: ReforgedArmory

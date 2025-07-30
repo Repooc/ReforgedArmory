@@ -2,11 +2,13 @@ local E, L = unpack(ElvUI)
 local EP = E.Libs.EP
 local M = E.Misc
 local AddOnName, Engine = ...
-local module = E:NewModule(AddOnName, 'AceHook-3.0', 'AceEvent-3.0')
 
-module.Title = GetAddOnMetadata('ElvUI_CataArmory', 'Title')
-module.CleanTitle = GetAddOnMetadata('ElvUI_CataArmory', 'X-CleanTitle')
-module.Version = GetAddOnMetadata('ElvUI_CataArmory', 'Version')
+local DisableAddOn = C_AddOns.DisableAddOn
+
+local module = E:NewModule(AddOnName, 'AceHook-3.0', 'AceEvent-3.0')
+module.Title = GetAddOnMetadata('ReforgedArmory', 'Title')
+module.CleanTitle = GetAddOnMetadata('ReforgedArmory', 'X-CleanTitle')
+module.Version = GetAddOnMetadata('ReforgedArmory', 'Version')
 module.Configs = {}
 
 Engine.EnchantsTable = {
@@ -88,14 +90,20 @@ local TooltipDataType = Enum.TooltipDataType
 local AddTooltipPostCall = TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall
 local GetDisplayedItem = TooltipUtil and TooltipUtil.GetDisplayedItem
 
+local oldArmoryNames = {
+	'ElvUI_WrathArmory',
+	'ElvUI_CataArmory',
+}
+
 do
-	--* Disable the old version which was named WrathArmory
-	local DisableAddOn = (C_AddOns and C_AddOns.DisableAddOn) or DisableAddOn
-	DisableAddOn('ElvUI_WrathArmory')
+	--* Disable the old versions which were named differently
+	for _, addon in next, oldArmoryNames do
+		DisableAddOn(addon)
+	end
 end
 
 function module:Print(...)
-	(E.db and _G[E.db.general.messageRedirect] or _G.DEFAULT_CHAT_FRAME):AddMessage(strjoin('', '|cff00FF98Cata|r |cffA330C9Armory|r ', E.media.hexvaluecolor or '|cff16c3f2', module.Version, ':|r ', ...)) -- I put DEFAULT_CHAT_FRAME as a fail safe.
+	(E.db and _G[E.db.general.messageRedirect] or _G.DEFAULT_CHAT_FRAME):AddMessage(strjoin('', '|cff00FF98Reforged|r|cffA330C9Armory|r ', E.media.hexvaluecolor or '|cff16c3f2', module.Version, ':|r ', ...)) -- I put DEFAULT_CHAT_FRAME as a fail safe.
 end
 
 function module:Clamp(value, min, max)

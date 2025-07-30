@@ -8,7 +8,7 @@
 ## X-CleanTitle: ReforgedArmory
 ## X-Curse-Project-ID: 678586
 ## X-Wago-ID: e56nlmG9
-## IconTexture: Interface\AddOns\ElvUI_CataArmory\Logo
+## IconTexture: Interface\AddOns\ReforgedArmory\Logo
 
 Libs\Load_Libs.xml
 init.lua

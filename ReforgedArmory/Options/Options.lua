@@ -1,5 +1,5 @@
 local E, L, _, P = unpack(ElvUI)
-local module = E:GetModule('ElvUI_CataArmory')
+local module = E:GetModule('ReforgedArmory')
 local RRP = LibStub('RepoocReforged-1.0'):LoadMainCategory()
 local ACH = E.Libs.ACH
 local C
