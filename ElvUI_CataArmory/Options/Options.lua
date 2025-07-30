@@ -3,10 +3,13 @@ local module = E:GetModule('ElvUI_CataArmory')
 local RRP = LibStub('RepoocReforged-1.0'):LoadMainCategory()
 local ACH = E.Libs.ACH
 local C
+local _, Engine = ...
 
-local MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET = -15, 15
-local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = -10, 10
-local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = 2, 42
+local DurabilityConstants = Engine.Durability
+local DurabilityBarOffsets = DurabilityConstants.Bar.OffSets
+local MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET = DurabilityBarOffsets.MIN_BAR_EDGEOFFSET, DurabilityBarOffsets.MAX_BAR_EDGEOFFSET
+local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = DurabilityBarOffsets.MIN_BAR_LENGTHOFFSET, DurabilityBarOffsets.MAX_BAR_LENGTHOFFSET
+local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = DurabilityConstants.Bar.Thickness.MIN_BAR_THICKNESS, DurabilityConstants.Bar.Thickness.MAX_BAR_THICKNESS
 
 local AllPoints = {
 	BOTTOM = 'BOTTOM',

@@ -8,9 +8,81 @@ module.Title = GetAddOnMetadata('ElvUI_CataArmory', 'Title')
 module.CleanTitle = GetAddOnMetadata('ElvUI_CataArmory', 'X-CleanTitle')
 module.Version = GetAddOnMetadata('ElvUI_CataArmory', 'Version')
 module.Configs = {}
+
 Engine.EnchantsTable = {
 	UserReplaced = {},
 }
+Engine.Durability = {
+	Bar = {
+		OffSets = {
+			MIN_BAR_EDGEOFFSET = -15,
+			MAX_BAR_EDGEOFFSET = 15,
+			MIN_BAR_LENGTHOFFSET = -10,
+			MAX_BAR_LENGTHOFFSET = 10,
+		},
+		Thickness = {
+			MIN_BAR_THICKNESS = 2,
+			MAX_BAR_THICKNESS = 42
+		}
+	}
+}
+Engine.Values = {
+	SIDE_SLOTS_ANCHORPOINTS = {
+		BOTTOM = 'BOTTOM',
+		BOTTOMOUTSIDE = 'BOTTOMLEFT',
+		BOTTOMINSIDE = 'BOTTOMRIGHT',
+		CENTER = 'CENTER',
+		OUTSIDE = 'LEFT',
+		INSIDE = 'RIGHT',
+		TOP = 'TOP',
+		TOPOUTSIDE = 'TOPLEFT',
+		TOPINSIDE = 'TOPRIGHT',
+	},
+	MIRROR_ANCHORPOINT = {
+		BOTTOM = 'BOTTOM',
+		BOTTOMLEFT = 'BOTTOMRIGHT',
+		BOTTOMRIGHT = 'BOTTOMLEFT',
+		CENTER = 'CENTER',
+		LEFT = 'RIGHT',
+		RIGHT = 'LEFT',
+		TOP = 'TOP',
+		TOPLEFT = 'TOPRIGHT',
+		TOPRIGHT = 'TOPLEFT',
+	},
+	SIDE_SLOTS_DIRECTION_TO_POINT = {
+		LEFT = {
+			DOWN_INSIDE = 'TOPLEFT',
+			DOWN_OUTSIDE = 'TOPRIGHT',
+			UP_INSIDE = 'BOTTOMLEFT',
+			UP_OUTSIDE = 'BOTTOMRIGHT',
+			INSIDE_DOWN = 'TOPLEFT',
+			INSIDE_UP = 'BOTTOMLEFT',
+			OUTSIDE_DOWN = 'TOPRIGHT',
+			OUTSIDE_UP = 'BOTTOMRIGHT',
+		},
+		RIGHT = {
+			DOWN_INSIDE = 'TOPRIGHT',
+			DOWN_OUTSIDE = 'TOPLEFT',
+			UP_INSIDE = 'BOTTOMRIGHT',
+			UP_OUTSIDE = 'BOTTOMLEFT',
+			INSIDE_DOWN = 'TOPRIGHT',
+			INSIDE_UP = 'BOTTOMRIGHT',
+			OUTSIDE_DOWN = 'TOPLEFT',
+			OUTSIDE_UP = 'BOTTOMLEFT',
+		}
+	},
+	DIRECTION_TO_POINT = {
+		DOWN_RIGHT = 'TOPLEFT',
+		DOWN_LEFT = 'TOPRIGHT',
+		UP_RIGHT = 'BOTTOMLEFT',
+		UP_LEFT = 'BOTTOMRIGHT',
+		RIGHT_DOWN = 'TOPLEFT',
+		RIGHT_UP = 'BOTTOMLEFT',
+		LEFT_DOWN = 'TOPRIGHT',
+		LEFT_UP = 'BOTTOMRIGHT',
+	}
+}
+Engine.ScanTooltip = CreateFrame('GameTooltip', 'RA_ScanTooltip', UIParent, 'GameTooltipTemplate')
 
 local TooltipDataType = Enum.TooltipDataType
 local AddTooltipPostCall = TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall
@@ -24,6 +96,10 @@ end
 
 function module:Print(...)
 	(E.db and _G[E.db.general.messageRedirect] or _G.DEFAULT_CHAT_FRAME):AddMessage(strjoin('', '|cff00FF98Cata|r |cffA330C9Armory|r ', E.media.hexvaluecolor or '|cff16c3f2', module.Version, ':|r ', ...)) -- I put DEFAULT_CHAT_FRAME as a fail safe.
+end
+
+function module:Clamp(value, min, max)
+	return math.min(max, math.max(value, min))
 end
 
 local function GetOptions()

@@ -2,75 +2,22 @@ local E, L = unpack(ElvUI)
 local module = E:GetModule('ElvUI_CataArmory')
 local S = E:GetModule('Skins')
 local LSM = E.Libs.LSM
-local GetItemQualityColor = C_Item and C_Item.GetItemQualityColor
+local _, Engine = ...
 
-local values = {
-	SIDE_SLOTS_ANCHORPOINTS = {
-		BOTTOM = 'BOTTOM',
-		BOTTOMOUTSIDE = 'BOTTOMLEFT',
-		BOTTOMINSIDE = 'BOTTOMRIGHT',
-		CENTER = 'CENTER',
-		OUTSIDE = 'LEFT',
-		INSIDE = 'RIGHT',
-		TOP = 'TOP',
-		TOPOUTSIDE = 'TOPLEFT',
-		TOPINSIDE = 'TOPRIGHT',
-	},
-	MIRROR_ANCHORPOINT = {
-		BOTTOM = 'BOTTOM',
-		BOTTOMLEFT = 'BOTTOMRIGHT',
-		BOTTOMRIGHT = 'BOTTOMLEFT',
-		CENTER = 'CENTER',
-		LEFT = 'RIGHT',
-		RIGHT = 'LEFT',
-		TOP = 'TOP',
-		TOPLEFT = 'TOPRIGHT',
-		TOPRIGHT = 'TOPLEFT',
-	},
-	SIDE_SLOTS_DIRECTION_TO_POINT = {
-		LEFT = {
-			DOWN_INSIDE = 'TOPLEFT',
-			DOWN_OUTSIDE = 'TOPRIGHT',
-			UP_INSIDE = 'BOTTOMLEFT',
-			UP_OUTSIDE = 'BOTTOMRIGHT',
-			INSIDE_DOWN = 'TOPLEFT',
-			INSIDE_UP = 'BOTTOMLEFT',
-			OUTSIDE_DOWN = 'TOPRIGHT',
-			OUTSIDE_UP = 'BOTTOMRIGHT',
-		},
-		RIGHT = {
-			DOWN_INSIDE = 'TOPRIGHT',
-			DOWN_OUTSIDE = 'TOPLEFT',
-			UP_INSIDE = 'BOTTOMRIGHT',
-			UP_OUTSIDE = 'BOTTOMLEFT',
-			INSIDE_DOWN = 'TOPRIGHT',
-			INSIDE_UP = 'BOTTOMRIGHT',
-			OUTSIDE_DOWN = 'TOPLEFT',
-			OUTSIDE_UP = 'BOTTOMLEFT',
-		}
-	},
-	DIRECTION_TO_POINT = {
-		DOWN_RIGHT = 'TOPLEFT',
-		DOWN_LEFT = 'TOPRIGHT',
-		UP_RIGHT = 'BOTTOMLEFT',
-		UP_LEFT = 'BOTTOMRIGHT',
-		RIGHT_DOWN = 'TOPLEFT',
-		RIGHT_UP = 'BOTTOMLEFT',
-		LEFT_DOWN = 'TOPRIGHT',
-		LEFT_UP = 'BOTTOMRIGHT',
-	}
-}
+local GetItemQualityColor = C_Item and C_Item.GetItemQualityColor
 
 local GradientTexture = [[Interface\AddOns\ElvUI_CataArmory\Media\Gradient]]
 local WarningTexture = [[Interface\AddOns\ElvUI\Core\Media\Textures\Minimalist]]
 
+local DurabilityConstants = Engine.Durability
+local DurabilityBarOffsets = DurabilityConstants.Bar.OffSets
+local MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET = DurabilityBarOffsets.MIN_BAR_EDGEOFFSET, DurabilityBarOffsets.MAX_BAR_EDGEOFFSET
+local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = DurabilityBarOffsets.MIN_BAR_LENGTHOFFSET, DurabilityBarOffsets.MAX_BAR_LENGTHOFFSET
+local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = DurabilityConstants.Bar.Thickness.MIN_BAR_THICKNESS, DurabilityConstants.Bar.Thickness.MAX_BAR_THICKNESS
+
 local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
 }
-
-function module:Clamp(value, min, max)
-	return math.min(max, math.max(value, min))
-end
 
 local function SetDurabilityColor(bar, percent)
 	if not bar then return end
@@ -121,10 +68,6 @@ local function UpdateSlotDurabilityBar(bar, db, slotInfo)
 	end
 	bar:SetShown(db.enable)
 end
-
-local MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET = -15, 15
-local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = -10, 10
-local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = 2, 42
 
 local function CreateDurabilitySlot(slot)
 	if not slot then return end
@@ -352,15 +295,15 @@ function module:GetEnchantPoints(id, db)
 	local RangedSlot = db.enchant.RangedSlot
 
 	if id <= 5 or (id == 9 or id == 15) then						--* Left Side
-		return values.SIDE_SLOTS_DIRECTION_TO_POINT['LEFT'][db.enchant.growthDirection], values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint], x, y, spacing
+		return Engine.Values.SIDE_SLOTS_DIRECTION_TO_POINT['LEFT'][db.enchant.growthDirection], Engine.Values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint], x, y, spacing
 	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
-		return values.SIDE_SLOTS_DIRECTION_TO_POINT['RIGHT'][db.enchant.growthDirection], values.MIRROR_ANCHORPOINT[values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint]], -x, y, -spacing
+		return Engine.Values.SIDE_SLOTS_DIRECTION_TO_POINT['RIGHT'][db.enchant.growthDirection], Engine.Values.MIRROR_ANCHORPOINT[Engine.Values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint]], -x, y, -spacing
 	elseif id == 16 then											--* MainHandSlot
-		return values.DIRECTION_TO_POINT[MainHandSlot.growthDirection], MainHandSlot.anchorPoint, MainHandSlot.xOffset, MainHandSlot.yOffset, -spacing
+		return Engine.Values.DIRECTION_TO_POINT[MainHandSlot.growthDirection], MainHandSlot.anchorPoint, MainHandSlot.xOffset, MainHandSlot.yOffset, -spacing
 	elseif id == 17 then											--* SecondaryHandSlot
-		return values.DIRECTION_TO_POINT[SecondaryHandSlot.growthDirection], SecondaryHandSlot.anchorPoint, SecondaryHandSlot.xOffset, SecondaryHandSlot.yOffset, -spacing
+		return Engine.Values.DIRECTION_TO_POINT[SecondaryHandSlot.growthDirection], SecondaryHandSlot.anchorPoint, SecondaryHandSlot.xOffset, SecondaryHandSlot.yOffset, -spacing
 	else															--* RangedSlot
-		return values.DIRECTION_TO_POINT[RangedSlot.growthDirection], RangedSlot.anchorPoint, RangedSlot.xOffset, RangedSlot.yOffset, spacing
+		return Engine.Values.DIRECTION_TO_POINT[RangedSlot.growthDirection], RangedSlot.anchorPoint, RangedSlot.xOffset, RangedSlot.yOffset, spacing
 	end
 end
 
