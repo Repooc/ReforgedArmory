@@ -968,6 +968,9 @@ local function CharacterFrame_OnShow()
 			_G.CharacterModelScene.BackgroundBotRight:Hide()
 			_G.CharacterModelScene.backdrop:Hide()
 			_G.CharacterModelScene.BackgroundOverlay:Hide() --! Maybe use this over background images?
+
+			--* TODO: Make this an option
+			_G.CharacterModelScene.ControlFrame:Hide()
 		end
 
 		frame.BottomLeftCorner:ClearAllPoints()
