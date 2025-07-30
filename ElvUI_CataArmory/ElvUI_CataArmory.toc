@@ -1,11 +1,11 @@
 ﻿## Interface: 50500
-## Title: |cff00FF98MoP|r |cffA330C9Armory|r
+## Title: |cff00FF98Reforged|r|cffA330C9Armory|r
 ## Author: Repooc
 ## Version: 1.12
 ## RequiredDeps: ElvUI
 ## OptionalDeps: ElvUI_WrathArmory
 ## DefaultState: Enabled
-## X-CleanTitle: ElvUI_CataArmory
+## X-CleanTitle: ReforgedArmory
 ## X-Curse-Project-ID: 678586
 ## X-Wago-ID: e56nlmG9
 ## IconTexture: Interface\AddOns\ElvUI_CataArmory\Logo
