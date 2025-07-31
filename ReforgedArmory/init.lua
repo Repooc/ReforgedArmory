@@ -326,7 +326,7 @@ function module:Initialize()
 	module:ToggleItemLevelInfo(true)
 
 	--* In case I am to make this work for retail and classic/sod
-	-- if AddTooltipPostCall and not E.Cata then -- exists but doesn't work atm on Cata
+	-- if AddTooltipPostCall and not E.Mists then
 	-- 	AddTooltipPostCall(TooltipDataType.Item, module.GameTooltip_OnTooltipSetItem)
 	-- else
 		module:SecureHookScript(GameTooltip, 'OnTooltipSetItem', module.GameTooltip_OnTooltipSetItem)

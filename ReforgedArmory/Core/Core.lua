@@ -1,8 +1,8 @@
 local E, L = unpack(ElvUI)
+local _, Engine = ...
 local module = E:GetModule('ReforgedArmory')
 local S = E:GetModule('Skins')
 local LSM = E.Libs.LSM
-local _, Engine = ...
 
 local GetItemQualityColor = C_Item and C_Item.GetItemQualityColor
 
