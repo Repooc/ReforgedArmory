@@ -143,17 +143,19 @@ local function CheckProf(profession)
 	local profID = ProfessionIDs[profession]
 	if not profID then return false end
 
-	local prof1Name, prof1ID, prof2Name, prof2ID
 	local prof1, prof2 = GetProfessions()
+	if not prof1 and not prof2 then return false end
 
-	if prof1 then
-		prof1Name, _, _, _, _, _, prof1ID = GetProfessionInfo(prof1)
-	end
-	if prof2 then
-		prof2Name, _, _, _, _, _, prof2ID = GetProfessionInfo(prof2)
+	local prof1Name, _, _, _, _, _, prof1ID = prof1 and GetProfessionInfo(prof1)
+	local prof2Name, _, _, _, _, _, prof2ID = prof2 and GetProfessionInfo(prof2)
+
+	if prof1ID == profID then
+		return prof1Name
+	elseif prof2ID == profID then
+		return prof2Name
 	end
 
-	return ((prof1ID and prof1ID == profID) and prof1Name) or ((prof2ID and prof2ID == profID) and prof2Name) or false
+	return false
 end
 
 module.GearList = {
