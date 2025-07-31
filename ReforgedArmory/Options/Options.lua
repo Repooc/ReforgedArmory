@@ -11,29 +11,6 @@ local MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET = DurabilityBarOffsets.MIN_BAR_EDGE
 local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = DurabilityBarOffsets.MIN_BAR_LENGTHOFFSET, DurabilityBarOffsets.MAX_BAR_LENGTHOFFSET
 local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = DurabilityConstants.Bar.Thickness.MIN_BAR_THICKNESS, DurabilityConstants.Bar.Thickness.MAX_BAR_THICKNESS
 
-local AllPoints = {
-	BOTTOM = 'BOTTOM',
-	BOTTOMOUTSIDE = 'BOTTOMOUTSIDE',
-	BOTTOMINSIDE = 'BOTTOMINSIDE',
-	CENTER = 'CENTER',
-	OUTSIDE = 'LEFT',
-	INSIDE = 'RIGHT',
-	TOP = 'TOP',
-	TOPOUTSIDE = 'TOPOUTSIDE',
-	TOPINSIDE = 'TOPINSIDE',
-}
-
-local SideSlotGrowthDirection = {
-	DOWN_INSIDE = format(L["%s and then %s"], L["Down"], L["Inside"]),
-	DOWN_OUTSIDE = format(L["%s and then %s"], L["Down"], L["Outside"]),
-	UP_INSIDE = format(L["%s and then %s"], L["Up"], L["Inside"]),
-	UP_OUTSIDE = format(L["%s and then %s"], L["Up"], L["Outside"]),
-	INSIDE_DOWN = format(L["%s and then %s"], L["Inside"], L["Down"]),
-	INSIDE_UP = format(L["%s and then %s"], L["Inside"], L["Up"]),
-	OUTSIDE_DOWN = format(L["%s and then %s"], L["Outside"], L["Down"]),
-	OUTSIDE_UP = format(L["%s and then %s"], L["Outside"], L["Up"]),
-}
-
 local function actionPath(info, which, groupName, subPath, ...)
 	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel' or groupName == 'slotBackground' or groupName == 'durability'
 
@@ -105,7 +82,7 @@ local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 
 	config.args.frame = ACH:Group(L["Frame Options"], nil, 11, nil, function(info) return actionPath(info, which, groupName, 'frame') end, function(info, ...) actionPath(info, which, groupName, 'frame', ...) end)
 	config.args.frame.inline = true
-	config.args.frame.args.attachTo = ACH:Select(L["Attach To"], L["The object you want to attach to."], 11, module.AttachToObjects[unit])
+	config.args.frame.args.attachTo = ACH:Select(L["Attach To"], L["The object you want to attach to."], 11, Engine.AttachToObjects[unit])
 	config.args.frame.args.xOffset = ACH:Range(L["X-Offset"], nil, 12, { min = -300, max = 300, step = 1 })
 	config.args.frame.args.yOffset = ACH:Range(L["Y-Offset"], nil, 13, { min = -300, max = 300, step = 1 })
 	config.args.frame.args.spacer = ACH:Spacer(15, 'full')
@@ -150,8 +127,8 @@ local function GetOptionsTable_EnchantGroup(which, groupName)
 	config.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
 	config.args.fontSize = ACH:Range(L["Font Size"], nil, 4, C.Values.FontSize)
 	config.args.spacer2 = ACH:Spacer(5, 'full')
-	config.args.growthDirection = ACH:Select(L["Growth Direction"], nil, 8, SideSlotGrowthDirection)
-	config.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 9, AllPoints) --! Change terminology to reference slot instead of frame?
+	config.args.growthDirection = ACH:Select(L["Growth Direction"], nil, 8, Engine.Values.SideSlotGrowthDirection)
+	config.args.anchorPoint = ACH:Select(L["Anchor Point"], L["What point to anchor to the frame you set to attach to."], 9, Engine.Values.AllPoints) --! Change terminology to reference slot instead of frame?
 	config.args.qualityColor = ACH:Toggle(L["Quality Color"], L["Use the same color as the quality color of the equipped item."], 10)
 	config.args.color = ACH:Color(L["Color"], nil, 11, nil, nil, nil, nil, function() return E.db.cataarmory[which][groupName].qualityColor end)
 

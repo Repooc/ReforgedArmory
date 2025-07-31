@@ -127,7 +127,7 @@ function module:UpdateSlotDurability(slot)
 	local bar = slot.RA_DurabilityBar
 	local db = E.db.cataarmory.character.durability
 	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
-	local info = module.GearList[slotName]
+	local info = Engine.GearList[slotName]
 	local direction = info.direction
 
 	--! Attached to slot
@@ -192,7 +192,7 @@ function module:UpdateSlotBackground(which, slot)
 
 	local db = E.db.cataarmory[string.lower(which)]
 	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
-	local info = module.GearList[slotName]
+	local info = Engine.GearList[slotName]
 	local direction = info.direction
 	local color = db.slotBackground.color
 
@@ -339,7 +339,7 @@ function module:ClearPageInfo(frame, which)
 		frame.ReforgedArmory.AvgItemLevel.Text:SetText('')
 	end
 
-	for slotName, info in pairs(module.GearList) do
+	for slotName, info in pairs(Engine.GearList) do
 		local slot = _G[which..slotName]
 
 		if not info.ignored then
@@ -367,7 +367,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local db = E.db.cataarmory[string.lower(which)]
 	local missingBuckle, missingGem, missingEnchant, warningMsg = false, false, false, ''
 	local slotName = inspectItem:GetName():gsub('Character', ''):gsub('Inspect', '')
-	local info = module.GearList[slotName]
+	local info = Engine.GearList[slotName]
 	local canEnchant, direction = info.canEnchant, info.direction
 	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.inpsect
 
@@ -524,7 +524,7 @@ do
 		wipe(iLevelDB)
 
 		local waitForItems
-		for slotName, info in pairs(module.GearList) do
+		for slotName, info in pairs(Engine.GearList) do
 			local slot = _G[which..slotName]
 			if not info.ignored then
 				slot.ReforgedArmory.EnchantText:SetText('')
@@ -647,7 +647,7 @@ function module:CreateSlotStrings(frame, which)
 
 	CreateAvgItemLevel(frame, which)
 
-	for slotName, info in pairs(module.GearList) do
+	for slotName, info in pairs(Engine.GearList) do
 		local slot = _G[which..slotName]
 		slot.ReforgedArmory = slot.ReforgedArmory or {}
 
@@ -795,7 +795,7 @@ function module:UpdateInspectPageFonts(which, force)
 
 	local slot, quality, iLvlTextColor, enchantTextColor
 	local qualityColor = {}
-	for slotName, info in pairs(module.GearList) do
+	for slotName, info in pairs(Engine.GearList) do
 		slot = _G[which..slotName]
 		if slot then
 			if not info.ignored then
