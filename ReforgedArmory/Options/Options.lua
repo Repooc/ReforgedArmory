@@ -243,6 +243,13 @@ local function GetOptionsTable_LevelText(which, groupName)
 	return config
 end
 
+local function GetOptionsTable_Model(which, groupName)
+	local config = ACH:Group(L["Model"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end)
+	config.args.controlsDisplayMode = ACH:Select(L["Model Controls Display Mode"], nil, 0, { ['SHOW'] = L["Show"], ['HIDE'] = L["Hide"], ['MOUSEOVER'] = L["Mouseover"] })
+
+	return config
+end
+
 local function GetOptionsTable_SlotBackground(which, groupName)
 	local config = ACH:Group(L["Slot Background"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end)
 	config.args.enable = ACH:Toggle(L["Enable"], nil, 0)
@@ -298,6 +305,7 @@ local function configTable()
 	Character.args.gems = GetOptionsTable_Gems('character', 'gems')
 	Character.args.itemLevel = GetOptionsTable_ItemLevelGroup('character', 'itemLevel')
 	Character.args.levelText = GetOptionsTable_LevelText('character', 'levelText')
+	Character.args.model = GetOptionsTable_Model('character', 'model')
 	Character.args.slotBackground = GetOptionsTable_SlotBackground('character', 'slotBackground')
 	Character.args.warningIndicator = GetOptionsTable_WarningIndicator('character', 'warningIndicator')
 
