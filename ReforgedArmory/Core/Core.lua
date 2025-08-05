@@ -148,11 +148,11 @@ function module:ConfigDurabilityBar(which, slot)
 	--! Attached to slot
 	local barThickness = module:Clamp(barDB.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
 	local lengthOffset = module:Clamp(barDB.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
+	local myX, myY = barDB.xOffset, barDB.yOffset
 
 	bar:SetFrameStrata(db.frameStrata)
     bar:SetFrameLevel(db.frameLevel)
 
-	local myX, myY = barDB.xOffset, barDB.yOffset
 	bar.Holder:ClearAllPoints()
 	if barDB.anchorPoint == 'LEFT' then
 		--* All Slots
@@ -433,7 +433,8 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local missingBuckle, missingGem, missingEnchant, warningMsg = false, false, false, ''
 	local slotName = inspectItem:GetName():gsub('Character', ''):gsub('Inspect', '')
 	local info = Engine.GearList[slotName]
-	local canEnchant, direction = info.canEnchant, info.direction
+	local canEnchant = (which == 'Character' and info.isCharProf) or info.canEnchant
+	local direction = info.direction
 	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.inpsect
 
 	--* Slot Background

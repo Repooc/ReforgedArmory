@@ -195,12 +195,14 @@ Engine.GearList = {
 	},
 	Finger0Slot = {
 		slotID = 11,
-		canEnchant = CheckProf,
+		isCharProf = CheckProf,
+		canEnchant = false,
 		direction = 'RIGHT',
 	},
 	Finger1Slot = {
 		slotID = 12,
-		canEnchant = CheckProf,
+		isCharProf = CheckProf,
+		canEnchant = false,
 		direction = 'RIGHT',
 	},
 	Trinket0Slot = {
