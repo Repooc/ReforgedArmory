@@ -30,6 +30,8 @@ jobs:
       - name: Release Job
         id: releaseaddon
         uses: BigWigsMods/packager@master
+        with:
+          args: -n "{package-name}-{project-version}"
       - name: Notify Discord
         if: success()
         uses: repooc/djs-actions@my_changes

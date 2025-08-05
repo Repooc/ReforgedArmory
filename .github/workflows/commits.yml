@@ -31,3 +31,5 @@ jobs:
         embed: '{"title": "**{{ commit.title }}**","description": "{{ commit.description }}\u200B","author": {"name": "{{ commit.author.username }}","icon_url": "https://github.com/{{ commit.author.username }}.png","url": "https://github.com/{{ commit.author.username }}"},"image": {"url": "https://repository-images.githubusercontent.com/482364703/3140862c-8faf-45cd-bd5f-7f62968dbd23"},"fields": [{"name": "AddOn","value": "[{{ github.context.payload.repository.name}}]({{ github.context.payload.repository.html_url }})","inline": true},{"name": "Branch","value": "${{ env.branch }}","inline": true},{"name": "SHA","value": "[${{ env.sha_short }}]({{ commit.url }})","inline": true},{"name": "Diff","value": "[Show Diff]({{ github.context.payload.compare }})","inline": true}]}'
     - name: Package and release
       uses: BigWigsMods/packager@master
+      with:
+        args: -n "{package-name}-{project-version}"
