@@ -120,11 +120,9 @@ local function CreateDurabilityBar(which, slot)
 	end
 
 	local function OnLeave()
-		C_Timer.After(0.1, function()
-			if E.db.cataarmory.character.durability.mouseover and not bar:IsMouseOver() and not slot:IsMouseOver() then
-				bar:SetAlpha(0)
-			end
-		end)
+		if E.db.cataarmory.character.durability.mouseover and not bar:IsMouseOver() and not slot:IsMouseOver() then
+			bar:SetAlpha(0)
+		end
 	end
 
 	slot:HookScript('OnEnter', OnEnter)
