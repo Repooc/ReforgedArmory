@@ -77,15 +77,14 @@ P.cataarmory = {
 		avgItemLevel = CopyTable(AvgItemLevel),
 		durability = {
 			enable = true,
-			bar = {
-				edgeOffset = 0,
-				frameStrata = 'HIGH',
-				frameLevel = '5',
-				lengthOffset = 0,
-				mouseover = true,
-				position = 'TOP',
-				thickness = 5,
-			},
+			mouseover = true,
+			frameStrata = 'HIGH',	--! NYI
+			frameLevel = '5', 		--! NYI
+			anchorPoint = 'LEFT',
+			lengthOffset = 0,
+			xOffset = 0,
+			yOffset = 0,
+			thickness = 5,
 			text = {
 				enable = true,
 				font = 'PT Sans Narrow',
@@ -94,6 +93,54 @@ P.cataarmory = {
 				customColor = { r = 1, g = 1, b = 1 },
 				useCustomColor = false, --* Text shows as the color of durability if true, color settings if false
 				format = 'PERCENT', --* Valid options PERCENT, FULL, BOTH
+			},
+			MainHandSlot = {
+				anchorPoint = 'LEFT',
+				lengthOffset = 0,
+				xOffset = 0,
+				yOffset = 0,
+				thickness = 5,
+				text = {
+					enable = true,
+					font = 'PT Sans Narrow',
+					fontSize = 9,
+					fontOutline = 'OUTLINE',
+					customColor = { r = 1, g = 1, b = 1 },
+					useCustomColor = false, --* Text shows as the color of durability if true, color settings if false
+					format = 'PERCENT', --* Valid options PERCENT, FULL, BOTH
+				},
+			},
+			SecondaryHandSlot = {
+				anchorPoint = 'LEFT',
+				lengthOffset = 0,
+				xOffset = 0,
+				yOffset = 0,
+				thickness = 5,
+				text = {
+					enable = true,
+					font = 'PT Sans Narrow',
+					fontSize = 9,
+					fontOutline = 'OUTLINE',
+					customColor = { r = 1, g = 1, b = 1 },
+					useCustomColor = false, --* Text shows as the color of durability if true, color settings if false
+					format = 'PERCENT', --* Valid options PERCENT, FULL, BOTH
+				},
+			},
+			RangedSlot = {
+				anchorPoint = 'LEFT',
+				lengthOffset = 0,
+				xOffset = 0,
+				yOffset = 0,
+				thickness = 5,
+				text = {
+					enable = true,
+					font = 'PT Sans Narrow',
+					fontSize = 9,
+					fontOutline = 'OUTLINE',
+					customColor = { r = 1, g = 1, b = 1 },
+					useCustomColor = false, --* Text shows as the color of durability if true, color settings if false
+					format = 'PERCENT', --* Valid options PERCENT, FULL, BOTH
+				},
 			},
 		},
 		enchant = CopyTable(Enchant),

@@ -3,16 +3,36 @@ local _, Engine = ...
 
 Engine.Durability = {
 	Bar = {
+		Length = {
+			MIN_BAR_LENGTH = 10,
+			MAX_BAR_LENGTH = 120,
+		},
 		OffSets = {
-			MIN_BAR_EDGEOFFSET = -15,
-			MAX_BAR_EDGEOFFSET = 15,
 			MIN_BAR_LENGTHOFFSET = -10,
 			MAX_BAR_LENGTHOFFSET = 10,
 		},
 		Thickness = {
 			MIN_BAR_THICKNESS = 2,
 			MAX_BAR_THICKNESS = 42
-		}
+		},
+		SideSlotsValidAnchorPoints = {
+			SLOT = {
+				TOP				= 'TOP',
+				BOTTOM			= 'BOTTOM',
+				LEFT			= 'LEFT',
+				RIGHT			= 'RIGHT',
+				INSIDE			= 'INSIDE',
+				OUTSIDE			= 'OUTSIDE',
+			},
+		},
+		MHOHRangedSlotsValidAnchorPoints = {
+			SLOT = {
+				TOP				= 'TOP',
+				BOTTOM			= 'BOTTOM',
+				LEFT			= 'LEFT',
+				RIGHT			= 'RIGHT',
+			},
+		},
 	}
 }
 
@@ -200,14 +220,17 @@ Engine.GearList = {
 		slotID = 16,
 		canEnchant = true,
 		direction = 'RIGHT',
+		isBottomSlot = true,
 	},
 	SecondaryHandSlot = {
 		slotID = 17,
 		canEnchant = true,
+		isBottomSlot = true,
 	},
 	RangedSlot = {
 		slotID = 18,
 		direction = 'LEFT',
+		isBottomSlot = true,
 	},
 }
 

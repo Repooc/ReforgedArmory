@@ -12,7 +12,6 @@ local WarningTexture = [[Interface\AddOns\ElvUI\Core\Media\Textures\Minimalist]]
 
 local DurabilityConstants = Engine.Durability
 local DurabilityBarOffsets = DurabilityConstants.Bar.OffSets
-local MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET = DurabilityBarOffsets.MIN_BAR_EDGEOFFSET, DurabilityBarOffsets.MAX_BAR_EDGEOFFSET
 local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = DurabilityBarOffsets.MIN_BAR_LENGTHOFFSET, DurabilityBarOffsets.MAX_BAR_LENGTHOFFSET
 local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = DurabilityConstants.Bar.Thickness.MIN_BAR_THICKNESS, DurabilityConstants.Bar.Thickness.MAX_BAR_THICKNESS
 
@@ -58,7 +57,7 @@ local function UpdateSlotDurabilityBar(bar, db, slotInfo)
 		bar:SetMinMaxValues(0, max)
 		bar:SetValue(current)
 		SetDurabilityColor(bar, percent)
-		bar:SetAlpha(db.bar.mouseover and 0 or 1)
+		bar:SetAlpha(db.mouseover and 0 or 1)
 	else
 		if text then
 			text:SetText('')
@@ -70,34 +69,47 @@ local function UpdateSlotDurabilityBar(bar, db, slotInfo)
 	bar:SetShown(db.enable)
 end
 
-local function CreateDurabilitySlot(slot)
-	if not slot then return end
-	if slot.RA_DurabilityBar then return end
+local function GetDurabilityBarSlotDB(slotID)
+	if not slotID then module:Print('GetDurabilityBarSlotDB: No slotID provided') return end
+	if slotID <= 5 or (slotID == 9 or slotID == 15) or (slotID >= 6 and slotID <= 8) or (slotID >= 10 and slotID <= 14) then --* Left & Right Side
+		return E.db.cataarmory.character.durability
+	elseif slotID == 16 then																			--* MainHandSlot
+		return E.db.cataarmory.character.durability.MainHandSlot
+	elseif slotID == 17 then																			--* SecondaryHandSlot
+		return E.db.cataarmory.character.durability.SecondaryHandSlot
+	else																								--* RangedSlot
+		return E.db.cataarmory.character.durability.RangedSlot
+	end
+end
 
-	local db = E.db.cataarmory.character.durability
-	local bar = CreateFrame('StatusBar', '$parent_RA_DurabilityBar', slot)
+local function CreateDurabilityBar(which, slot)
+	if which and string.lower(which) ~= 'character' then return end
+	if not slot or slot.RA_DurabilityBar then return end
+
+	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
+	local info = Engine.GearList[slotName]
+
+	local bar = CreateFrame('StatusBar', '$parent.RA_DurabilityBar', slot)
 	slot.RA_DurabilityBar = bar
-
 	bar:Hide()
+
 	bar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
 	bar:SetFrameStrata('HIGH')
     bar:SetFrameLevel(5)
-	-- bar:CreateBackdrop()
-	bar:CreateBackdrop('Transparent')
+	bar:CreateBackdrop('Transparent', nil, true)
 
+	--! Disabled for now
 	bar.Text = bar:CreateFontString(nil, 'OVERLAY')
-	bar.Text:FontTemplate(LSM:Fetch('font', db.text.font), db.text.fontSize, db.text.fontOutline)
+	bar.Text:FontTemplate(LSM:Fetch('font', 'PT Sans Narrow'), 9, 'OUTLINE')
 	bar.Text:SetPoint('CENTER')
 	bar.Text:SetText('')
 
-	bar.bg = bar:CreateTexture(nil, 'BORDER')
-	bar.bg:SetAllPoints()
-	bar.bg:Show()
-
 	local holder = CreateFrame('Frame', nil, bar)
 	bar.Holder = holder
-	bar.Holder:SetSize(slot:GetWidth() - (E.Border * 2), 5)
-	bar.Holder:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
+	bar.Holder:Point('TOPLEFT', slot, 'TOPLEFT', 0, 0 - (E.Border * 2))
+	bar.Holder:Point('BOTTOMLEFT', slot, 'BOTTOMLEFT', 0, 0 + (E.Border * 2))
+	bar.Holder:Point('RIGHT', slot, 'LEFT', 5, 0)
+	bar:SetOrientation('VERTICAL')
 
 	bar:SetAllPoints(bar.Holder)
 
@@ -109,7 +121,7 @@ local function CreateDurabilitySlot(slot)
 
 	local function OnLeave()
 		C_Timer.After(0.1, function()
-			if db.bar.mouseover and not bar:IsMouseOver() and not slot:IsMouseOver() then
+			if E.db.cataarmory.character.durability.mouseover and not bar:IsMouseOver() and not slot:IsMouseOver() then
 				bar:SetAlpha(0)
 			end
 		end)
@@ -122,39 +134,91 @@ local function CreateDurabilitySlot(slot)
     bar:HookScript('OnLeave', OnLeave)
 end
 
-function module:UpdateSlotDurability(slot)
+function module:ConfigDurabilityBar(which, slot)
+	if which and string.lower(which) ~= 'character' then return end
 	if not slot or not slot.RA_DurabilityBar then return end
-	local bar = slot.RA_DurabilityBar
+
 	local db = E.db.cataarmory.character.durability
 	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
 	local info = Engine.GearList[slotName]
+	local bar = slot.RA_DurabilityBar
+	local barDB = GetDurabilityBarSlotDB(info.slotID)
 	local direction = info.direction
 
 	--! Attached to slot
-	local thickness = module:Clamp(db.bar.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
-	local edgeOffset, lengthOffset = module:Clamp(db.bar.edgeOffset or 0, MIN_BAR_EDGEOFFSET, MAX_BAR_EDGEOFFSET), module:Clamp(db.bar.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
+	local barThickness = module:Clamp(barDB.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
+	local lengthOffset = module:Clamp(barDB.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
 
-	bar:SetFrameStrata(db.bar.frameStrata)
-    bar:SetFrameLevel(db.bar.frameLevel)
+	bar:SetFrameStrata(db.frameStrata)
+    bar:SetFrameLevel(db.frameLevel)
 
+	local myX, myY = barDB.xOffset, barDB.yOffset
 	bar.Holder:ClearAllPoints()
-	if db.bar.position == 'TOP' or db.bar.position == 'BOTTOM' then
-		bar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
-		bar.Holder:SetPoint(db.bar.position, slot, db.bar.position, 0, edgeOffset)
-		bar:SetOrientation('HORIZONTAL')
-	elseif db.bar.position == 'LEFT' or db.bar.position == 'RIGHT' then
-		bar.Holder:SetSize(thickness, slot:GetHeight() - (E.Border * 2) + lengthOffset)
-		bar.Holder:SetPoint(db.bar.position, slot, db.bar.position, edgeOffset, 0)
-		bar:SetOrientation('VERTICAL')
+	if barDB.anchorPoint == 'LEFT' then
+		--* All Slots
+		--* Vertical Bar on LEFT
+		bar.Holder:Point('TOPLEFT', slot, 'TOPLEFT', 0 + E.Border + myX, 0 - E.Border + myY + lengthOffset)
+		bar.Holder:Point('BOTTOMLEFT', slot, 'BOTTOMLEFT', 0 + E.Border + myX, 0 + E.Border + myY - lengthOffset)
+		bar.Holder:Point('RIGHT', slot, 'LEFT', barThickness + myX, 0 + myY)
+	elseif barDB.anchorPoint == 'RIGHT' then
+		--* All Slots
+		--* Vertical Bar on RIGHT
+		bar.Holder:Point('TOPRIGHT', slot, 'TOPRIGHT', 0 - E.Border + myX, 0 - E.Border + myY + lengthOffset)
+		bar.Holder:Point('BOTTOMRIGHT', slot, 'BOTTOMRIGHT', 0 - E.Border + myX, 0 + E.Border + myY - lengthOffset)
+		bar.Holder:Point('LEFT', slot, 'RIGHT', - barThickness + myX, 0 + myY)
+	elseif barDB.anchorPoint == 'TOP' then
+		--* All Slots
+		--* Horizontal Bar on TOP
+		bar.Holder:Point('TOPLEFT', slot, 'TOPLEFT', 0 + E.Border + myX - lengthOffset, 0 - E.Border + myY)
+		bar.Holder:Point('TOPRIGHT', slot, 'TOPRIGHT', 0 - E.Border + myX + lengthOffset, 0 - E.Border + myY)
+		bar.Holder:Point('BOTTOM', slot, 'TOP', 0 + myX, - barThickness + myY)
+	elseif barDB.anchorPoint == 'BOTTOM' then
+		--* All Slots
+		--* Horizontal Bar on BOTTOM
+		bar.Holder:Point('BOTTOMLEFT', slot, 'BOTTOMLEFT', 0 + E.Border + myX - lengthOffset, 0 + E.Border + myY)
+		bar.Holder:Point('BOTTOMRIGHT', slot, 'BOTTOMRIGHT', 0 - E.Border + myX + lengthOffset, 0 + E.Border + myY)
+		bar.Holder:Point('TOP', slot, 'BOTTOM', 0 + myX, barThickness + myY)
+	elseif barDB.anchorPoint == 'INSIDE' then
+		--* Side Slots Only
+		--* Vertical Bar on INSIDE
+		if slot.IsLeftSide then
+			--* Left Slots (Vertical Bar on RIGHT Side)
+			bar.Holder:Point('TOPRIGHT', slot, 'TOPRIGHT', 0 - E.Border + myX, 0 - E.Border + myY + lengthOffset)
+			bar.Holder:Point('BOTTOMRIGHT', slot, 'BOTTOMRIGHT', 0 - E.Border + myX, 0 + E.Border + myY - lengthOffset)
+			bar.Holder:Point('LEFT', slot, 'RIGHT', - barThickness + myX, 0 + myY)
+		else
+			--* Right Slots (Vertical Bar on LEFT Side)
+			bar.Holder:Point('TOPLEFT', slot, 'TOPLEFT', 0 + E.Border - myX, 0 - E.Border + myY + lengthOffset)
+			bar.Holder:Point('BOTTOMLEFT', slot, 'BOTTOMLEFT', 0 + E.Border - myX, 0 + E.Border + myY - lengthOffset)
+			bar.Holder:Point('RIGHT', slot, 'LEFT', barThickness - myX, 0 + myY)
+		end
+	elseif barDB.anchorPoint == 'OUTSIDE' then
+		--* Side Slots Only
+		--* Vertical Bar on OUTSIDE
+		if slot.IsLeftSide then
+			--* Left Slots (Vertical Bar on LEFT Side)
+			bar.Holder:Point('TOPLEFT', slot, 'TOPLEFT', 0 + E.Border + myX, 0 - E.Border + myY + lengthOffset)
+			bar.Holder:Point('BOTTOMLEFT', slot, 'BOTTOMLEFT', 0 + E.Border + myX, 0 + E.Border + myY - lengthOffset)
+			bar.Holder:Point('RIGHT', slot, 'LEFT', barThickness + myX, 0 + myY)
+		else
+			--* Right Slots (Vertical Bar on RIGHT Side)
+			bar.Holder:Point('TOPRIGHT', slot, 'TOPRIGHT', 0 - E.Border - myX, 0 - E.Border + myY + lengthOffset)
+			bar.Holder:Point('BOTTOMRIGHT', slot, 'BOTTOMRIGHT', 0 - E.Border - myX, 0 + E.Border + myY - lengthOffset)
+			bar.Holder:Point('LEFT', slot, 'RIGHT', - barThickness - myX, 0 + myY)
+		end
 	else
-		print('Invalid position: ' .. tostring(db.bar.position))
-		bar.Holder:SetSize(slot:GetWidth() - (E.Border * 2) + lengthOffset, thickness)
-		bar.Holder:SetPoint('BOTTOM', slot, 'BOTTOM', 0, 0)
-		bar:SetOrientation('HORIZONTAL')
+		--* Fallback if invalid anchorPoint
+		bar.Holder:Point('TOPLEFT', slot, 'TOPLEFT', 0 + E.Border, 0 - E.Border + lengthOffset)
+		bar.Holder:Point('BOTTOMLEFT', slot, 'BOTTOMLEFT', 0 + E.Border, 0 + E.Border - lengthOffset)
+		bar.Holder:Point('RIGHT', slot, 'LEFT', barThickness, 0)
 	end
-	bar.Text:FontTemplate(LSM:Fetch('font', db.text.font), db.text.fontSize, db.text.fontOutline)
 
-	bar.Text:SetShown(db.text.enable)
+	local isBarHorizontal = barDB.anchorPoint == 'TOP' or barDB.anchorPoint == 'BOTTOM'
+	bar:SetOrientation(isBarHorizontal and 'HORIZONTAL' or 'VERTICAL')
+
+	bar.Text:FontTemplate(LSM:Fetch('font', barDB.text.font), barDB.text.fontSize, barDB.text.fontOutline)
+
+	bar.Text:SetShown(barDB.text.enable)
 	bar:SetShown(db.enable)
 end
 
@@ -227,64 +291,17 @@ end
 function module:CreateGemTexture(slot, point, relativePoint, x, y, gemStep, spacing)
 	local prevGem = gemStep - 1
 	local texture = slot:CreateTexture()
-	texture:SetPoint(point, (gemStep == 1 and slot) or slot['ReforgedArmory.GemSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
+	texture:SetPoint(point, (gemStep == 1 and slot) or slot['RA_GemSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
 	texture:SetTexCoord(unpack(E.TexCoords))
 	texture:Size(14)
 
-	local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['ReforgedArmory.GemSlotBackdrop'..prevGem])
+	local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['RA_GemSlot'..prevGem..'Backdrop'])
 	backdrop:SetTemplate(nil, nil, true)
 	backdrop:SetBackdropColor(0,0,0,0)
 	backdrop:SetOutside(texture)
 	backdrop:Hide()
 
 	return texture, backdrop
-end
-
-function module:GetSlotBackgroundPoints(id, db)
-	if not id or not db then return end
-	local x, y = db.slotBackground.xOffset, db.slotBackground.yOffset
-
-	if id <= 5 or (id == 9 or id == 15) then --* Left Side
-		return 'LEFT', 'LEFT', x, y
-	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) or id == 16 then	--* Right Side
-		return 'RIGHT', 'RIGHT', -x, y
-	else									 --* Left Side (RangedSlot)
-		return 'LEFT', 'LEFT', x, y
-	end
-end
-function module:GetGemPoints(id, db)
-	if not id or not db then return end
-	local x, y, spacing = db.gems.xOffset, db.gems.yOffset, db.gems.spacing
-	local mhX, mhY = db.gems.MainHandSlot.xOffset, db.gems.MainHandSlot.yOffset
-	local ohX, ohY = db.gems.SecondaryHandSlot.xOffset, db.gems.SecondaryHandSlot.yOffset
-	local rX, rY = db.gems.RangedSlot.xOffset, db.gems.RangedSlot.yOffset
-
-	if id <= 5 or (id == 9 or id == 15) then						--* Left Side
-		return 'BOTTOMLEFT', 'BOTTOMRIGHT', x, y, spacing
-	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
-		return 'BOTTOMRIGHT', 'BOTTOMLEFT', -x, y, -spacing
-	elseif id == 16 then											--* MainHandSlot
-		return 'BOTTOMRIGHT', 'BOTTOMLEFT', mhX, mhY, -spacing
-	elseif id == 17 then											--* SecondaryHandSlot
-		return 'BOTTOMRIGHT', 'TOPRIGHT', ohX, ohY, -spacing
-	else															--* RangedSlot
-		return 'BOTTOMLEFT', 'BOTTOMRIGHT', rX, rY, spacing
-	end
-end
-
-function module:GetWarningPoints(id, db)
-	if not id or not db then return end
-	if id <= 5 or (id == 9 or id == 15) then						--* Left Side
-		return 'TOPRIGHT', 'TOPLEFT', 'BOTTOMRIGHT', 'BOTTOMLEFT', 8, 0, E.Border, 0, -E.Border, 0
-	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
-		return 'TOPLEFT', 'TOPRIGHT', 'BOTTOMLEFT', 'BOTTOMRIGHT', 8, 0, E.Border, 0, -E.Border, 0
-	elseif id == 16 then											--* MainHandSlot
-		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
-	elseif id == 17 then											--* SecondaryHandSlot
-		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
-	else															--* RangedSlot
-		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
-	end
 end
 
 function module:GetEnchantPoints(id, db)
@@ -306,6 +323,54 @@ function module:GetEnchantPoints(id, db)
 		return Engine.Values.DIRECTION_TO_POINT[SecondaryHandSlot.growthDirection], SecondaryHandSlot.anchorPoint, SecondaryHandSlot.xOffset, SecondaryHandSlot.yOffset, -spacing
 	else															--* RangedSlot
 		return Engine.Values.DIRECTION_TO_POINT[RangedSlot.growthDirection], RangedSlot.anchorPoint, RangedSlot.xOffset, RangedSlot.yOffset, spacing
+	end
+end
+
+function module:GetGemPoints(id, db)
+	if not id or not db then return end
+	local x, y, spacing = db.gems.xOffset, db.gems.yOffset, db.gems.spacing
+	local mhX, mhY = db.gems.MainHandSlot.xOffset, db.gems.MainHandSlot.yOffset
+	local ohX, ohY = db.gems.SecondaryHandSlot.xOffset, db.gems.SecondaryHandSlot.yOffset
+	local rX, rY = db.gems.RangedSlot.xOffset, db.gems.RangedSlot.yOffset
+
+	if id <= 5 or (id == 9 or id == 15) then						--* Left Side
+		return 'BOTTOMLEFT', 'BOTTOMRIGHT', x, y, spacing
+	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
+		return 'BOTTOMRIGHT', 'BOTTOMLEFT', -x, y, -spacing
+	elseif id == 16 then											--* MainHandSlot
+		return 'BOTTOMRIGHT', 'BOTTOMLEFT', mhX, mhY, -spacing
+	elseif id == 17 then											--* SecondaryHandSlot
+		return 'BOTTOMRIGHT', 'TOPRIGHT', ohX, ohY, -spacing
+	else															--* RangedSlot
+		return 'BOTTOMLEFT', 'BOTTOMRIGHT', rX, rY, spacing
+	end
+end
+
+function module:GetSlotBackgroundPoints(id, db)
+	if not id or not db then return end
+	local x, y = db.slotBackground.xOffset, db.slotBackground.yOffset
+
+	if id <= 5 or (id == 9 or id == 15) then --* Left Side
+		return 'LEFT', 'LEFT', x, y
+	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) or id == 16 then	--* Right Side
+		return 'RIGHT', 'RIGHT', -x, y
+	else									 --* Left Side (RangedSlot)
+		return 'LEFT', 'LEFT', x, y
+	end
+end
+
+function module:GetWarningPoints(id, db)
+	if not id or not db then return end
+	if id <= 5 or (id == 9 or id == 15) then						--* Left Side
+		return 'TOPRIGHT', 'TOPLEFT', 'BOTTOMRIGHT', 'BOTTOMLEFT', 8, 0, E.Border, 0, -E.Border, 0
+	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
+		return 'TOPLEFT', 'TOPRIGHT', 'BOTTOMLEFT', 'BOTTOMRIGHT', 8, 0, E.Border, 0, -E.Border, 0
+	elseif id == 16 then											--* MainHandSlot
+		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
+	elseif id == 17 then											--* SecondaryHandSlot
+		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
+	else															--* RangedSlot
+		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
 	end
 end
 
@@ -348,8 +413,8 @@ function module:ClearPageInfo(frame, which)
 			slot.ReforgedArmory.Warning:Hide()
 
 			for y = 1, 5 do
-				slot['ReforgedArmory.GemSlot'..y]:SetTexture()
-				slot['ReforgedArmory.GemSlotBackdrop'..y]:Hide()
+				slot['RA_GemSlot'..y]:SetTexture()
+				slot['RA_GemSlot'..y..'Backdrop']:Hide()
 			end
 		end
 		if slot.ReforgedArmory.SlotBackground then
@@ -454,12 +519,12 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 		local point, relativePoint, x, y, spacing = module:GetGemPoints(i, db)
 		local gemStep = 1
 		for index = 1, 5 do
-			local texture = inspectItem['ReforgedArmory.GemSlot'..index]
+			local texture = inspectItem['RA_GemSlot'..index]
 			texture:Size(db.gems.size)
 			texture:ClearAllPoints()
-			texture:SetPoint(point, (index == 1 and inspectItem) or inspectItem['ReforgedArmory.GemSlot'..(index-1)], relativePoint, index == 1 and x or spacing, index == 1 and y or 0)
+			texture:SetPoint(point, (index == 1 and inspectItem) or inspectItem['RA_GemSlot'..(index-1)], relativePoint, index == 1 and x or spacing, index == 1 and y or 0)
 
-			local backdrop = inspectItem['ReforgedArmory.GemSlotBackdrop'..index]
+			local backdrop = inspectItem['RA_GemSlot'..index..'Backdrop']
 			local gem = slotInfo.gems and slotInfo.gems[gemStep]
 			if gem then
 				texture:SetTexture(gem)
@@ -693,14 +758,14 @@ function module:CreateSlotStrings(frame, which)
 			do
 				local point, relativePoint, x, y, spacing = module:GetGemPoints(info.slotID, db)
 				for u = 1, 5 do
-					slot['ReforgedArmory.GemSlot'..u], slot['ReforgedArmory.GemSlotBackdrop'..u] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
+					slot['RA_GemSlot'..u], slot['RA_GemSlot'..u..'Backdrop'] = module:CreateGemTexture(slot, point, relativePoint, x, y, u, spacing)
 				end
 			end
 
-			--* Durability Bar
 			if which == 'Character' then
-				CreateDurabilitySlot(slot)
-				module:UpdateSlotDurability(slot)
+				--* Durability Bar
+				CreateDurabilityBar(which, slot)
+				module:ConfigDurabilityBar(which, slot)
 			end
 		end
 
@@ -826,7 +891,7 @@ function module:UpdateInspectPageFonts(which, force)
 
 			if force then
 				module:UpdateSlotBackground(which, slot)
-				module:UpdateSlotDurability(slot)
+				module:ConfigDurabilityBar(which, slot)
 			end
 		end
 	end
