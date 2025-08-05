@@ -106,21 +106,7 @@ local function DisableElvUIInfo(which, db)
 		module:Print(format('ElvUI\'s %sDisplay %s Info|r option was |cffFF3300DISABLED|r automatically to prevent conflict with our module.', E.media.hexvaluecolor or '|cff16c3f2', gsub(which, '^%l', string.upper)))
 	end
 end
-local function HandleTabs()
-	--* Using ElvUI function with offsets adjusted
-	local lastTab
-	for index, tab in next, { _G.CharacterFrameTab1, HasPetUI() and _G.CharacterFrameTab2 or nil, _G.CharacterFrameTab3, _G.CharacterFrameTab4, _G.CharacterFrameTab5 } do
-		tab:ClearAllPoints()
 
-		if index == 1 then
-			tab:Point('TOPLEFT', _G.CharacterFrame, 'BOTTOMLEFT', -10, -25)
-		else
-			tab:Point('TOPLEFT', lastTab, 'TOPRIGHT', -19, 0)
-		end
-
-		lastTab = tab
-	end
-end
 function module:Initialize()
 	EP:RegisterPlugin(AddOnName, GetOptions)
 	E:AddLib('GetEnchantList', 'LibGetEnchant-1.0-ReforgedArmory')
@@ -149,11 +135,6 @@ function module:Initialize()
 	-- end
 
 	module:SecureHook('PaperDollFrame_SetLevel', module.PaperDollFrame_SetLevel)
-	module:SecureHook(CharacterFrame, 'UpdateTabBounds', function()
-		if not E.db.cataarmory.character.enable then return end
-		if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.character then return end
-		HandleTabs()
-	end)
 	module:SecureHook(E, 'UpdateDB', module.UpdateOptions)
 end
 

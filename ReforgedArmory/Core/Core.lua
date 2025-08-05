@@ -1091,6 +1091,24 @@ local function CharacterFrame_OnShow()
 	HandleCharacterFrameExpand()
 end
 
+local function HandleTabs()
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.character then return end
+
+	--* Using ElvUI function with offsets adjusted
+	local lastTab
+	for index, tab in next, { _G.CharacterFrameTab1, HasPetUI() and _G.CharacterFrameTab2 or nil, _G.CharacterFrameTab3, _G.CharacterFrameTab4, _G.CharacterFrameTab5 } do
+		tab:ClearAllPoints()
+
+		if index == 1 then
+			tab:Point('TOPLEFT', _G.CharacterFrame, 'BOTTOMLEFT', -10, -25)
+		else
+			tab:Point('TOPLEFT', lastTab, 'TOPRIGHT', -19, 0)
+		end
+
+		lastTab = tab
+	end
+end
+
 function module:ToggleItemLevelInfo(setupCharacterPage)
 	if setupCharacterPage then
 		module:CreateSlotStrings(_G.CharacterFrame, 'Character')
@@ -1100,12 +1118,16 @@ function module:ToggleItemLevelInfo(setupCharacterPage)
 		module:RegisterEvent('PLAYER_EQUIPMENT_CHANGED', 'UpdateCharacterInfo')
 		module:RegisterEvent('UPDATE_INVENTORY_DURABILITY', 'UpdateCharacterInfo')
 		module:RegisterEvent('PLAYER_AVG_ITEM_LEVEL_UPDATE', 'UpdateCharacterItemLevel')
+		module:RegisterEvent('COMPANION_UPDATE', HandleTabs)
 
 		if not module:IsHooked(_G.CharacterFrame, 'OnShow') then
 			module:SecureHookScript(_G.CharacterFrame, 'OnShow', CharacterFrame_OnShow)
 		end
 		if not module:IsHooked(_G.CharacterFrame, 'ShowSubFrame') then
 			module:SecureHook(_G.CharacterFrame, 'ShowSubFrame', HandleCharacterFrameExpand)
+		end
+		if not module:IsHooked(_G.CharacterFrame, 'UpdateTabBounds') then
+			module:SecureHook(_G.CharacterFrame, 'UpdateTabBounds', HandleTabs)
 		end
 
 		if not setupCharacterPage then
@@ -1115,11 +1137,16 @@ function module:ToggleItemLevelInfo(setupCharacterPage)
 		module:UnregisterEvent('PLAYER_EQUIPMENT_CHANGED')
 		module:UnregisterEvent('UPDATE_INVENTORY_DURABILITY')
 		module:UnregisterEvent('PLAYER_AVG_ITEM_LEVEL_UPDATE')
+		module:UnregisterEvent('COMPANION_UPDATE')
+
 		if module:IsHooked(_G.CharacterFrame, 'OnShow') then
 			module:Unhook(_G.CharacterFrame, 'OnShow')
 		end
 		if not module:IsHooked(_G.CharacterFrame, 'ShowSubFrame') then
 			module:Unhook(_G.CharacterFrame, 'ShowSubFrame')
+		end
+		if not module:IsHooked(_G.CharacterFrame, 'UpdateTabBounds') then
+			module:Unhook(_G.CharacterFrame, 'UpdateTabBounds')
 		end
 		module:ClearPageInfo(_G.CharacterFrame, 'Character')
 	end
