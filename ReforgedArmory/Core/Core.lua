@@ -431,7 +431,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local missingBuckle, missingGem, missingEnchant, warningMsg = false, false, false, ''
 	local slotName = inspectItem:GetName():gsub('Character', ''):gsub('Inspect', '')
 	local info = Engine.GearList[slotName]
-	local canEnchant = (which == 'Character' and info.isCharProf) or info.canEnchant
+	local canEnchant = (which == 'Character' and info.isCharProf and info.isCharProf('Enchanting')) or info.canEnchant
 	local direction = info.direction
 	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.inpsect
 
@@ -451,7 +451,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 			inspectItem.ReforgedArmory.EnchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
 
 			if itemLink then
-				if slotInfo.enchantText == '' and (canEnchant and (canEnchant == true or canEnchant('Enchanting'))) then
+				if slotInfo.enchantText == '' and canEnchant then
 					missingEnchant = true
 					warningMsg = strjoin('', warningMsg, '|cffff0000', L["Not Enchanted"], '|r\n')
 				end
