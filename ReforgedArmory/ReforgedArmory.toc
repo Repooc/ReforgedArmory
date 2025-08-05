@@ -3,7 +3,7 @@
 ## Author: Repooc
 ## Version: 1.12
 ## RequiredDeps: ElvUI
-## OptionalDeps: ElvUI_WrathArmory
+## OptionalDeps: ElvUI_WrathArmory, ElvUI_CataArmory
 ## DefaultState: Enabled
 ## X-CleanTitle: ReforgedArmory
 ## X-Curse-Project-ID: 678586
