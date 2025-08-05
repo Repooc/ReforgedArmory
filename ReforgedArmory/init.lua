@@ -150,6 +150,7 @@ function module:Initialize()
 
 	module:SecureHook('PaperDollFrame_SetLevel', module.PaperDollFrame_SetLevel)
 	module:SecureHook(CharacterFrame, 'UpdateTabBounds', function()
+		if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.character then return end
 		if not E.db.cataarmory.character.enable then return end
 		HandleTabs()
 	end)
