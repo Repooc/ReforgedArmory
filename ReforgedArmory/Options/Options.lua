@@ -274,13 +274,24 @@ end
 
 local EnchantIDSelected = ''
 
-local function HandleReplacement(value)
-	local default = E.Libs.GetEnchantList.LibGetEnchantDB[tonumber(EnchantIDSelected)]
+local function HandleReplacement(newEnchantString)
+	if not EnchantIDSelected or EnchantIDSelected == '' then return module:Print('No enchant id selected.') end
+	local defaultEnchantString = E.Libs.GetEnchantList.LibGetEnchantDB[tonumber(EnchantIDSelected)]
 
-	if (value and value ~= '') and default ~= value then
-		E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] = value
-	else
+	if newEnchantString and newEnchantString ~= '' then
+		if defaultEnchantString then
+			if defaultEnchantString ~= newEnchantString then
+				E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] = newEnchantString
+			else
+				E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] = nil
+				EnchantIDSelected = nil
+			end
+		else
+			E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] = newEnchantString
+		end
+	elseif E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] then
 		E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] = nil
+		EnchantIDSelected = nil
 	end
 
 	module:UpdateOptions(nil, true)
@@ -326,9 +337,10 @@ local function configTable()
 	local StringReplacement = ACH:Group(L["Enchant Strings"], nil, 2)
 	Armory.args.stringReplacement = StringReplacement
 	StringReplacement.args.header3 = ACH:Header(L["Direct Enchant String Replacement"], 21)
-	StringReplacement.args.desc = ACH:Description(L["This is the |cff00fc00recommended|r method to keep performance impact to a minimum.\nEnter the |cffFFD100EnchantID|r in the |cffFFD100EnchantID|r input box below. You can obtain the |cffFFD100EnchantID|r in the tooltip of the item."], 22, 'medium')
-	StringReplacement.args.selectID = ACH:Input(L["EnchantID"], L["Mouseover an item that has an enchant to view the id in the tooltip. \n|cffFFD100Hint:|r If you do not see it listed, make sure you have the option enabled and that the item even has the enchant on it."], 23, nil, nil, function() return EnchantIDSelected--[[get]] end, function(info, value) EnchantIDSelected = value  --[[set func]] end, nil, nil, --[[function(_, value) if value and E.Libs.GetEnchantList.LibGetEnchantDB[tonumber(value)] then return true else return false end end]] nil)
-	StringReplacement.args.string = ACH:Input(function() return EnchantIDSelected and EnchantIDSelected ~= '' and format(L["|cFFCA3C3CDefault String|r: |cff00fc00%s|r"], E.Libs.GetEnchantList.LibGetEnchantDB[tonumber(EnchantIDSelected)]) or L["No EnchantID Selected"] end, function() return EnchantIDSelected and EnchantIDSelected ~= '' and format(L["|cFFCA3C3CEnchantID:|r |cffFFD100%s|r|n|cFFCA3C3CModified String:|r |cff00fc00%s|r"], EnchantIDSelected, E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] or L["Not Modified"]) or '' end, 24, nil, 'full', function() return EnchantIDSelected and EnchantIDSelected ~= '' and (E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] or E.Libs.GetEnchantList.LibGetEnchantDB[tonumber(EnchantIDSelected)]) or nil end, function(_, value) HandleReplacement(value) end, function() if not EnchantIDSelected or EnchantIDSelected == '' then return true end return false end, nil, nil)
+	StringReplacement.args.desc = ACH:Description(L["This is the |cff00fc00recommended|r method to keep performance impact to a minimum.\nEnter the |cffFFD100EnchantID|r in the |cffFFD100EnchantID|r input box below. You can obtain the |cffFFD100EnchantID|r in the tooltip of the item.\n\n|cffFFD100Notice|r: You can use this if you find an enchant not in the database currently. This will keep you from having to wait for a new update."], 22, 'medium')
+	StringReplacement.args.spacer1 = ACH:Spacer(24, 'full')
+	StringReplacement.args.selectID = ACH:Input(L["EnchantID"], L["Mouseover an item that has an enchant to view the id in the tooltip. \n|cffFFD100Hint:|r If you do not see it listed, make sure you have the option enabled and that the item even has the enchant on it."], 25, nil, nil, function() return EnchantIDSelected end, function(info, value) EnchantIDSelected = value end)
+	StringReplacement.args.string = ACH:Input(function() local enchantName = EnchantIDSelected and EnchantIDSelected ~= '' and E.Libs.GetEnchantList.LibGetEnchantDB[tonumber(EnchantIDSelected)] if EnchantIDSelected and EnchantIDSelected ~= '' then return format(L["|cFFCA3C3CDefault String|r: |cff00fc00%s|r"], enchantName or 'Not In Database') else return L["No EnchantID Selected"] end end, function() if EnchantIDSelected and EnchantIDSelected ~= '' then return format(L["|cFFCA3C3CEnchantID:|r |cffFFD100%s|r|n|cFFCA3C3CModified String:|r |cff00fc00%s|r"], EnchantIDSelected, E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] or L["Not Modified"]) end return '' end, 26, nil, 'full', function() return EnchantIDSelected and EnchantIDSelected ~= '' and (E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] or E.Libs.GetEnchantList.LibGetEnchantDB[tonumber(EnchantIDSelected)]) or nil end, function(_, value) HandleReplacement(value) end, function() if not EnchantIDSelected or EnchantIDSelected == '' then return true end return false end)
 end
 
 tinsert(module.Configs, configTable)
