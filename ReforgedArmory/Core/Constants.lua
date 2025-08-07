@@ -222,17 +222,14 @@ Engine.GearList = {
 		slotID = 16,
 		canEnchant = true,
 		direction = 'RIGHT',
-		isBottomSlot = true,
 	},
 	SecondaryHandSlot = {
 		slotID = 17,
 		canEnchant = true,
-		isBottomSlot = true,
 	},
 	RangedSlot = {
 		slotID = 18,
 		direction = 'LEFT',
-		isBottomSlot = true,
 	},
 }
 
