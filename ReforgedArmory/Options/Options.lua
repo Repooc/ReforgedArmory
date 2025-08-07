@@ -351,7 +351,7 @@ local function configTable()
 	StringReplacement.args.abbreviations.inline = true
 	StringReplacement.args.abbreviations.args = {}
 	for key, value in pairs(E.global.cataarmory.enchantStrings.Abbreviations) do
-		StringReplacement.args.abbreviations.args[key] = ACH:Input(key, nil, 36, nil, 'full', function() return E.global.cataarmory.enchantStrings.Abbreviations[key] end, function(_, value) E.global.cataarmory.enchantStrings.Abbreviations[key] = value module:UpdateOptions(nil, true) end, nil, nil, function(info, value) print(info, info[#info], value) return true end)
+		StringReplacement.args.abbreviations.args[key] = ACH:Input(key, nil, 36, nil, 'full', function() return E.global.cataarmory.enchantStrings.Abbreviations[key] end, function(_, value) E.global.cataarmory.enchantStrings.Abbreviations[key] = value module:UpdateOptions(nil, true) end, nil, nil, function(info, value) local abbreviations = E.global.cataarmory.enchantStrings.Abbreviations for k in pairs(abbreviations) do if string.lower(k) == string.lower(value) then return false end end return true end)
 	end
 end
 
