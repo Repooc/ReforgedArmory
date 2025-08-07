@@ -86,14 +86,15 @@ function module:GameTooltip_OnTooltipSetItem()
 	local unit = string.match(ownerName, 'Character') or string.match(ownerName, 'Inspect')
 	if not unit then return end
 	unit = string.lower(unit)
-	if not E.db.cataarmory[unit].enchant.enchantID.enable then return end
+	local db = E.db.cataarmory[unit].enchant.enchantID
+	if not db.enable then return end
 
 	local GetItem = GetDisplayedItem or self.GetItem
 	if GetItem then
 		local name, link = GetItem(self)
 		if not link then return end
 		local enchantID = tonumber(string.match(link, 'item:%d+:(%d+):'))
-		if not enchantID or (E.db.cataarmory[unit].enchant.enchantID.missingOnly and E.Libs.GetEnchantList.GetEnchant(enchantID)) then return end
+		if not enchantID or (db.missingOnly and E.Libs.GetEnchantList.GetEnchant(enchantID)) then return end
 
 		self:AddLine(format('|cFFCA3C3C%s:|r %s', 'Enchant ID', enchantID))
 	end
