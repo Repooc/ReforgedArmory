@@ -989,13 +989,37 @@ function module:GetGearSlotInfo(unit, slot)
 		end
 	end
 
-	local enchantText = E.global.cataarmory.enchantStrings.UserReplaced[enchantID] or E.Libs.GetEnchantList.GetEnchant(enchantID)
-	if enchantID and not enchantText and not missingIDs[enchantID] then
+	if not enchantID then
+		slotInfo.enchantText = ''
+		tt:Hide()
+		return slotInfo
+	end
+
+	local userText = E.global.cataarmory.enchantStrings.UserReplaced[enchantID]
+	local libText = E.Libs.GetEnchantList.GetEnchant(enchantID)
+	if userText and userText ~= '' then
+		slotInfo.enchantText = userText
+	elseif libText then
+		if E.db.cataarmory.enchant.abbreviate then
+			local abbreviations = E.global.cataarmory.enchantStrings.Abbreviations
+			local processedText = libText
+
+			for key, value in pairs(abbreviations) do
+				if value and value ~= '' and not abbreviations[value] then
+					processedText = gsub(processedText, key, value)
+				end
+			end
+
+			libText = processedText
+		end
+
+		slotInfo.enchantText = libText
+	elseif not missingIDs[enchantID] then
+		missingIDs[enchantID] = true
 		local msg = format('The enchant id, *%s|r, seems to be missing from our database. Please open a ticket at |cff16c3f2[|r*|Hurl:'..githubURL..'|h'..githubURL..'|h|r|cff16c3f2]|r with the missing id and name of the enchant and/or provide screenshot mousing over the item with enchant that was found on %s. |cffFF0000If you do not provide the info or post a duplicate ticket, it will be closed without a response.|r', enchantID, itemLink):gsub('*', E.InfoColor)
 		module:Print(msg)
-		missingIDs[enchantID] = true
+		slotInfo.enchantText = ''
 	end
-	slotInfo.enchantText = enchantText or ''
 
 	tt:Hide()
 

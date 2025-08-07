@@ -11,7 +11,7 @@ local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = DurabilityBarOffsets.MIN_BAR_
 local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = DurabilityConstants.Bar.Thickness.MIN_BAR_THICKNESS, DurabilityConstants.Bar.Thickness.MAX_BAR_THICKNESS
 
 local function actionPath(info, which, groupName, subPath, ...)
-	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel' or groupName == 'slotBackground' or groupName == 'durability'
+	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel' or groupName == 'slotBackground' or groupName == 'durability' or which == 'enchant'
 
 	-- Split the path into keys
 	local path = {strsplit(',', subPath or '')}
@@ -48,7 +48,7 @@ local function actionPath(info, which, groupName, subPath, ...)
 		end
 	end
 
-	local unit = which:gsub('^%l', string.upper)
+	local unit = which ~= 'enchant' and which:gsub('^%l', string.upper) or nil
 	module:UpdateOptions(unit, force)
 end
 
@@ -341,6 +341,18 @@ local function configTable()
 	StringReplacement.args.spacer1 = ACH:Spacer(24, 'full')
 	StringReplacement.args.selectID = ACH:Input(L["EnchantID"], L["Mouseover an item that has an enchant to view the id in the tooltip. \n|cffFFD100Hint:|r If you do not see it listed, make sure you have the option enabled and that the item even has the enchant on it."], 25, nil, nil, function() return EnchantIDSelected end, function(info, value) EnchantIDSelected = value end)
 	StringReplacement.args.string = ACH:Input(function() local enchantName = EnchantIDSelected and EnchantIDSelected ~= '' and E.Libs.GetEnchantList.LibGetEnchantDB[tonumber(EnchantIDSelected)] if EnchantIDSelected and EnchantIDSelected ~= '' then return format(L["|cFFCA3C3CDefault String|r: |cff00fc00%s|r"], enchantName or 'Not In Database') else return L["No EnchantID Selected"] end end, function() if EnchantIDSelected and EnchantIDSelected ~= '' then return format(L["|cFFCA3C3CEnchantID:|r |cffFFD100%s|r|n|cFFCA3C3CModified String:|r |cff00fc00%s|r"], EnchantIDSelected, E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] or L["Not Modified"]) end return '' end, 26, nil, 'full', function() return EnchantIDSelected and EnchantIDSelected ~= '' and (E.global.cataarmory.enchantStrings.UserReplaced[tonumber(EnchantIDSelected)] or E.Libs.GetEnchantList.LibGetEnchantDB[tonumber(EnchantIDSelected)]) or nil end, function(_, value) HandleReplacement(value) end, function() if not EnchantIDSelected or EnchantIDSelected == '' then return true end return false end)
+
+	StringReplacement.args.header4 = ACH:Header(L["Enchant Abbreviations"], 30)
+	StringReplacement.args.desc2 = ACH:Description(L["This is the |cffFF0000NOT|r recommended method if keeping performance impact to a minimum is a priority.\n\n|cffFFD100Notice|r: This will not work for enchant strings being replaced by the user already with the \"Direct Enchant String Replacement\" method above since the text is being directly replaced and will reduce the performance impact."], 31, 'medium')
+	StringReplacement.args.spacer2 = ACH:Spacer(32, 'full')
+	StringReplacement.args.abbreviate = ACH:Toggle(L["Abbreviate"], L["Abbreviate the enchant strings."], 33, nil, nil, nil, function() return E.db.cataarmory.enchant.abbreviate end, function(info, value) E.db.cataarmory.enchant.abbreviate = value module:UpdateOptions(nil, true) end)
+	StringReplacement.args.spacer3 = ACH:Spacer(34, 'full')
+	StringReplacement.args.abbreviations = ACH:Group(L["Abbreviations"], nil, 35, nil, function(info) return actionPath(info, 'enchant', 'abbreviations') end, function(info, ...) actionPath(info, 'enchant', 'abbreviations', nil, ...) end)
+	StringReplacement.args.abbreviations.inline = true
+	StringReplacement.args.abbreviations.args = {}
+	for key, value in pairs(E.global.cataarmory.enchantStrings.Abbreviations) do
+		StringReplacement.args.abbreviations.args[key] = ACH:Input(key, nil, 36, nil, 'full', function() return E.global.cataarmory.enchantStrings.Abbreviations[key] end, function(_, value) E.global.cataarmory.enchantStrings.Abbreviations[key] = value module:UpdateOptions(nil, true) end, nil, nil, function(info, value) print(info, info[#info], value) return true end)
+	end
 end
 
 tinsert(module.Configs, configTable)

@@ -67,6 +67,9 @@ local SharedGemOptions = {
 }
 
 P.cataarmory = {
+	enchant = {
+		abbreviate = true,
+	},
 	character = {
 		enable = true,
 		levelText = {
