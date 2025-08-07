@@ -1027,14 +1027,13 @@ function module:GetGearSlotInfo(unit, slot)
 end
 
 local function HandleCharacterFrameExpand()
-	local frame = _G.CharacterFrame
-	local showStatus = E.db.cataarmory.character.expandButton.autoExpand
+	local db = E.db.cataarmory.character.expandButton
 	if _G.PaperDollFrame:IsVisible() or _G.PetPaperDollFrame:IsVisible() then
-		if _G.CharacterStatsPane:IsShown() ~= showStatus then
+		if _G.CharacterStatsPane:IsShown() ~= db.autoExpand then
 			_G.CharacterFrameExpandButton:Click()
 		end
 	end
-	_G.CharacterFrameExpandButton:SetShown(not E.db.cataarmory.character.expandButton.hide)
+	_G.CharacterFrameExpandButton:SetShown(not db.hide)
 end
 
 local function ControlFrame_OnShow(frame)
