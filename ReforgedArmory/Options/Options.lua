@@ -10,6 +10,18 @@ local DurabilityBarOffsets = DurabilityConstants.Bar.OffSets
 local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = DurabilityBarOffsets.MIN_BAR_LENGTHOFFSET, DurabilityBarOffsets.MAX_BAR_LENGTHOFFSET
 local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = DurabilityConstants.Bar.Thickness.MIN_BAR_THICKNESS, DurabilityConstants.Bar.Thickness.MAX_BAR_THICKNESS
 
+local function GetDB(which, groupName, subPath)
+	local path = {strsplit(',', subPath or '')}
+	local db = E.db.cataarmory[which][groupName]
+	for i = 1, #path do
+		if path[i] ~= '' then
+			db = db[path[i]]
+		end
+	end
+
+	return db
+end
+
 local function actionPath(info, which, groupName, subPath, ...)
 	local force = groupName == 'gems' or groupName == 'warningIndicator' or groupName == 'avgItemLevel' or groupName == 'slotBackground' or groupName == 'durability' or which == 'enchant'
 
@@ -92,6 +104,22 @@ local function GetOptionsTable_AvgItemLevelGroup(which, groupName)
 	return config
 end
 
+local function GetOptionsTable_DurabilityTextGroup(which, groupName, order, subPath)
+	local text = ACH:Group(L["Text Options"], nil, order, nil, function(info) return actionPath(info, which, groupName, subPath) end, function(info, ...) actionPath(info, which, groupName, subPath, ...) end)
+	text.inline = true
+	text.args.enable = ACH:Toggle(L["Enable"], nil, 0)
+	text.args.spacer1 = ACH:Spacer(1, 'full')
+	text.args.useCustomColor = ACH:Toggle(L["Use Custom Color"], nil, 2)
+	text.args.color = ACH:Color(L["Color"], nil, 3, nil, nil, nil, nil, function() local db = GetDB(which, groupName, subPath) return not db.useCustomColor end)
+	text.args.spacer2 = ACH:Spacer(5, 'full')
+	text.args.font = ACH:SharedMediaFont(L["Font"], nil, 6)
+	text.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 7)
+	text.args.fontSize = ACH:Range(L["Font Size"], nil, 8, C.Values.FontSize)
+	text.args.spacer3 = ACH:Spacer(10, 'full')
+
+	return text
+end
+
 local function GetOptionsTable_DurabilityGroup(which, groupName)
 	local config = ACH:Group(L["Durability"], nil, 5, 'tab', function(info) return actionPath(info, which, groupName) end, function(info, ...) actionPath(info, which, groupName, nil, ...) end, function(info) return disableCheck(info, which, groupName) end)
 	config.args.header1 = ACH:Header(L["Effects All Slots"], 0)
@@ -106,6 +134,8 @@ local function GetOptionsTable_DurabilityGroup(which, groupName)
 	config.args.lengthOffset = ACH:Range(L["Length Offset"], L["This will allow you to adjust the length of the durability bar on the frame you have it attached to so it can fit better with the border of the equipment slot."], 16, { min = MIN_BAR_LENGTHOFFSET, max = MAX_BAR_LENGTHOFFSET, step = 1 })
 	config.args.thickness = ACH:Range(L["Thickness"], L["This will be how thick the bar is."], 16, { min = MIN_BAR_THICKNESS, max = MAX_BAR_THICKNESS, step = 1 })
 	config.args.spacer3 = ACH:Spacer(20, 'full')
+	config.args.text = GetOptionsTable_DurabilityTextGroup(which, groupName, 21, 'text')
+	config.args.spacer4 = ACH:Spacer(25, 'full')
 
 	--* Main Hand Slot
 	local MainHandSlot = ACH:Group(L["Main Hand Slot"], nil, 30, nil, function(info) return actionPath(info, which, groupName, 'MainHandSlot') end, function(info, ...) actionPath(info, which, groupName, 'MainHandSlot', ...) end)
@@ -118,6 +148,8 @@ local function GetOptionsTable_DurabilityGroup(which, groupName)
 	MainHandSlot.args.lengthOffset = ACH:Range(L["Length Offset"], L["This will allow you to adjust the length of the durability bar on the frame you have it attached to so it can fit better with the border of the equipment slot."], 16, { min = MIN_BAR_LENGTHOFFSET, max = MAX_BAR_LENGTHOFFSET, step = 1 })
 	MainHandSlot.args.thickness = ACH:Range(L["Thickness"], L["This will be how thick the bar is."], 17, { min = MIN_BAR_THICKNESS, max = MAX_BAR_THICKNESS, step = 1 })
 
+	MainHandSlot.args.text = GetOptionsTable_DurabilityTextGroup(which, groupName, 20,'MainHandSlot,text')
+
 	--* Secondary Hand Slot
 	local SecondaryHandSlot = ACH:Group(L["Secondary Hand Slot"], nil, 35, nil, function(info) return actionPath(info, which, groupName, 'SecondaryHandSlot') end, function(info, ...) actionPath(info, which, groupName, 'SecondaryHandSlot', ...) end)
 	config.args.SecondaryHandSlot = SecondaryHandSlot
@@ -129,6 +161,8 @@ local function GetOptionsTable_DurabilityGroup(which, groupName)
 	SecondaryHandSlot.args.lengthOffset = ACH:Range(L["Length Offset"], L["This will allow you to adjust the length of the durability bar on the frame you have it attached to so it can fit better with the border of the equipment slot."], 16, { min = MIN_BAR_LENGTHOFFSET, max = MAX_BAR_LENGTHOFFSET, step = 1 })
 	SecondaryHandSlot.args.thickness = ACH:Range(L["Thickness"], L["This will be how thick the bar is."], 17, { min = MIN_BAR_THICKNESS, max = MAX_BAR_THICKNESS, step = 1 })
 
+	SecondaryHandSlot.args.text = GetOptionsTable_DurabilityTextGroup(which, groupName, 20, 'SecondaryHandSlot,text')
+
 	--* Ranged Slot
 	local RangedSlot = ACH:Group(L["Ranged Slot"], nil, 40, nil, function(info) return actionPath(info, which, groupName, 'RangedSlot') end, function(info, ...) actionPath(info, which, groupName, 'RangedSlot', ...) end)
 	config.args.RangedSlot = RangedSlot
@@ -139,6 +173,8 @@ local function GetOptionsTable_DurabilityGroup(which, groupName)
 	RangedSlot.args.spacer3 = ACH:Spacer(15, 'full')
 	RangedSlot.args.lengthOffset = ACH:Range(L["Length Offset"], L["This will allow you to adjust the length of the durability bar on the frame you have it attached to so it can fit better with the border of the equipment slot."], 16, { min = MIN_BAR_LENGTHOFFSET, max = MAX_BAR_LENGTHOFFSET, step = 1 })
 	RangedSlot.args.thickness = ACH:Range(L["Thickness"], L["This will be how thick the bar is."], 17, { min = MIN_BAR_THICKNESS, max = MAX_BAR_THICKNESS, step = 1 })
+
+	RangedSlot.args.text = GetOptionsTable_DurabilityTextGroup(which, groupName, 20, 'RangedSlot,text')
 
 	return config
 end

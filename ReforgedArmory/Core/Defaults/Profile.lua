@@ -66,6 +66,16 @@ local SharedGemOptions = {
 	},
 }
 
+local SharedDurabilityTextOptions = {
+	enable = true,
+	font = 'PT Sans Narrow',
+	fontSize = 9,
+	fontOutline = 'OUTLINE',
+	color = { r = 1, g = 1, b = 1 },
+	useCustomColor = false, --* Text shows as the color of durability if true, color settings if false
+	format = 'PERCENT', --* Valid options PERCENT, FULL, BOTH
+}
+
 P.cataarmory = {
 	enchant = {
 		abbreviate = true,
@@ -88,30 +98,14 @@ P.cataarmory = {
 			xOffset = 0,
 			yOffset = 0,
 			thickness = 5,
-			text = {
-				enable = true,
-				font = 'PT Sans Narrow',
-				fontSize = 9,
-				fontOutline = 'OUTLINE',
-				customColor = { r = 1, g = 1, b = 1 },
-				useCustomColor = false, --* Text shows as the color of durability if true, color settings if false
-				format = 'PERCENT', --* Valid options PERCENT, FULL, BOTH
-			},
+			text = CopyTable(SharedDurabilityTextOptions),
 			MainHandSlot = {
 				anchorPoint = 'LEFT',
 				lengthOffset = 0,
 				xOffset = 0,
 				yOffset = 0,
 				thickness = 5,
-				text = {
-					enable = true,
-					font = 'PT Sans Narrow',
-					fontSize = 9,
-					fontOutline = 'OUTLINE',
-					customColor = { r = 1, g = 1, b = 1 },
-					useCustomColor = false, --* Text shows as the color of durability if true, color settings if false
-					format = 'PERCENT', --* Valid options PERCENT, FULL, BOTH
-				},
+				text = CopyTable(SharedDurabilityTextOptions),
 			},
 			SecondaryHandSlot = {
 				anchorPoint = 'LEFT',
@@ -119,15 +113,7 @@ P.cataarmory = {
 				xOffset = 0,
 				yOffset = 0,
 				thickness = 5,
-				text = {
-					enable = true,
-					font = 'PT Sans Narrow',
-					fontSize = 9,
-					fontOutline = 'OUTLINE',
-					customColor = { r = 1, g = 1, b = 1 },
-					useCustomColor = false, --* Text shows as the color of durability if true, color settings if false
-					format = 'PERCENT', --* Valid options PERCENT, FULL, BOTH
-				},
+				text = CopyTable(SharedDurabilityTextOptions),
 			},
 			RangedSlot = {
 				anchorPoint = 'LEFT',
@@ -135,15 +121,7 @@ P.cataarmory = {
 				xOffset = 0,
 				yOffset = 0,
 				thickness = 5,
-				text = {
-					enable = true,
-					font = 'PT Sans Narrow',
-					fontSize = 9,
-					fontOutline = 'OUTLINE',
-					customColor = { r = 1, g = 1, b = 1 },
-					useCustomColor = false, --* Text shows as the color of durability if true, color settings if false
-					format = 'PERCENT', --* Valid options PERCENT, FULL, BOTH
-				},
+				text = CopyTable(SharedDurabilityTextOptions),
 			},
 		},
 		enchant = CopyTable(Enchant),

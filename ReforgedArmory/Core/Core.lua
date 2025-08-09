@@ -19,11 +19,12 @@ local whileOpenEvents = {
 	UPDATE_INVENTORY_DURABILITY = true,
 }
 
-local function SetDurabilityColor(bar, percent)
+local function SetDurabilityColor(bar)
 	if not bar then return end
 	local text = bar.Text
-	local db = E.db.cataarmory.character.durability
+	local db = bar.barDB
 
+	local percent = bar.percent
 	percent = math.min(math.max(percent * 0.01, 0), 1)
 
 	-- RGB gradient: green → yellow → red
@@ -31,11 +32,11 @@ local function SetDurabilityColor(bar, percent)
 	bar:SetStatusBarColor(r, g, b)
 
 	if text then
-		if not db.text.useCustomColor then
-			text:SetTextColor(r, g, b)
+		if db.text.useCustomColor then
+			local color = db.text.color
+			text:SetTextColor(color.r, color.g, color.b)
 		else
-			local customColor = db.text.customColor
-			text:SetTextColor(customColor.r, customColor.g, customColor.b)
+			text:SetTextColor(r, g, b)
 		end
 	end
 end
@@ -56,7 +57,7 @@ local function UpdateSlotDurabilityBar(bar, db, slotInfo)
 
 		bar:SetMinMaxValues(0, max)
 		bar:SetValue(current)
-		SetDurabilityColor(bar, percent)
+		SetDurabilityColor(bar)
 		bar:SetAlpha(db.mouseover and 0 or 1)
 	else
 		if text then
@@ -141,6 +142,8 @@ function module:ConfigDurabilityBar(which, slot)
 	local info = Engine.GearList[slotName]
 	local bar = slot.RA_DurabilityBar
 	local barDB = GetDurabilityBarSlotDB(info.slotID)
+	bar.db, bar.barDB = db, barDB
+
 	local direction = info.direction
 
 	--! Attached to slot
