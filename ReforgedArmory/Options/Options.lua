@@ -111,6 +111,7 @@ local function GetOptionsTable_DurabilityTextGroup(which, groupName, order, subP
 	text.args.spacer1 = ACH:Spacer(1, 'full')
 	text.args.useCustomColor = ACH:Toggle(L["Use Custom Color"], nil, 2)
 	text.args.color = ACH:Color(L["Color"], nil, 3, nil, nil, nil, nil, function() local db = GetDB(which, groupName, subPath) return not db.useCustomColor end)
+	text.args.rotation = ACH:Range(L["Rotation"], nil, 4, { min = -180, max = 180, step = 1 })
 	text.args.spacer2 = ACH:Spacer(5, 'full')
 	text.args.font = ACH:SharedMediaFont(L["Font"], nil, 6)
 	text.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 7)

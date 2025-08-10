@@ -218,6 +218,7 @@ function module:ConfigDurabilityBar(which, slot)
 	bar:SetOrientation(isBarHorizontal and 'HORIZONTAL' or 'VERTICAL')
 
 	bar.Text:FontTemplate(LSM:Fetch('font', barDB.text.font), barDB.text.fontSize, barDB.text.fontOutline)
+	bar.Text:SetRotation(math.rad(barDB.text.rotation))
 
 	bar.Text:SetShown(barDB.text.enable)
 	bar:SetShown(db.enable)

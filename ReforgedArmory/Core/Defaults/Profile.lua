@@ -74,6 +74,7 @@ local SharedDurabilityTextOptions = {
 	color = { r = 1, g = 1, b = 1 },
 	useCustomColor = false, --* Text shows as the color of durability if true, color settings if false
 	format = 'PERCENT', --* Valid options PERCENT, FULL, BOTH
+	rotation = 45,
 }
 
 P.cataarmory = {
