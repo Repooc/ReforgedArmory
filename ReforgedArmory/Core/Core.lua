@@ -93,7 +93,6 @@ local function CreateDurabilityBar(which, slot)
 	local bar = CreateFrame('StatusBar', '$parent.RA_DurabilityBar', slot)
 	slot.RA_DurabilityBar = bar
 	bar:Hide()
-
 	bar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
 	bar:SetFrameStrata('HIGH')
     bar:SetFrameLevel(5)
@@ -320,7 +319,7 @@ function module:UpdateSlotBackground(which, slot)
 	local info = Engine.GearList[slotName]
 	local direction = info.direction
 
-	if direction then
+	if direction and not info.ignored then
 		local showWarning = slot.ReforgedArmory.Warning.showWarning
 		local warnColor = (showWarning and db.slotBackground.warning.enable) and db.slotBackground.warning.color or db.slotBackground.color
 		slot.ReforgedArmory.SlotBackground:SetVertexColor(warnColor.r, warnColor.g, warnColor.b)
@@ -515,9 +514,6 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 			local showWarning = db.warningIndicator.enable and inspectItem.ReforgedArmory.Warning.showWarning
 
 			--* Slot Background Warning Color
-			if not isCharPage then
-				module:ConfigureSlotBackground(which, inspectItem)
-			end
 			module:UpdateSlotBackground(which, inspectItem)
 
 			inspectItem.ReforgedArmory.Warning:SetShown(showWarning)
@@ -937,11 +933,13 @@ function module:UpdateInspectPageFonts(which, force)
 				if force then
 					--* Durability Bar
 					module:ConfigDurabilityBar(which, slot)
-
-					--* Slot Background
-					module:ConfigureSlotBackground(which, slot)
-					module:UpdateSlotBackground(which, slot)
 				end
+			end
+
+			if force then
+				--* Slot Background
+				module:ConfigureSlotBackground(which, slot)
+				module:UpdateSlotBackground(which, slot)
 			end
 		end
 	end
