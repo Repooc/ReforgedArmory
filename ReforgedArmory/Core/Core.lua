@@ -321,7 +321,7 @@ function module:UpdateSlotBackground(which, slot)
 	local direction = info.direction
 
 	if direction then
-		local showWarning = slot.ReforgedArmory.Warning.ShowWarning
+		local showWarning = slot.ReforgedArmory.Warning.showWarning
 		local warnColor = (showWarning and db.slotBackground.warning.enable) and db.slotBackground.warning.color or db.slotBackground.color
 		slot.ReforgedArmory.SlotBackground:SetVertexColor(warnColor.r, warnColor.g, warnColor.b)
 	end
@@ -509,10 +509,10 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 					missingBuckle = true
 					warningMsg = strjoin('', warningMsg, '|cffff0000', L["Missing Belt Buckle"], '|r\n')
 				end
-				inspectItem.ReforgedArmory.Warning.Reason = warningMsg
-				inspectItem.ReforgedArmory.Warning.ShowWarning = missingEnchant or missingGem or missingBuckle or false
+				inspectItem.ReforgedArmory.Warning.reason = warningMsg
+				inspectItem.ReforgedArmory.Warning.showWarning = missingEnchant or missingGem or missingBuckle or false
 			end
-			local showWarning = db.warningIndicator.enable and inspectItem.ReforgedArmory.Warning.ShowWarning
+			local showWarning = db.warningIndicator.enable and inspectItem.ReforgedArmory.Warning.showWarning
 
 			--* Slot Background Warning Color
 			if not isCharPage then
@@ -724,9 +724,9 @@ local function CreateAvgItemLevel(frame, which)
 end
 
 local function Warning_OnEnter(frame)
-	if frame.Reason then
+	if frame.reason then
 		_G.GameTooltip:SetOwner(frame, 'ANCHOR_RIGHT')
-		_G.GameTooltip:AddLine(frame.Reason, 1, 1, 1)
+		_G.GameTooltip:AddLine(frame.reason, 1, 1, 1)
 		_G.GameTooltip:Show()
 	end
 end
