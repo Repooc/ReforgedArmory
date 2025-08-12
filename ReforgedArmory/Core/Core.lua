@@ -253,17 +253,21 @@ function module:UpdateAvgItemLevel(which)
 	frame.ReforgedArmory.AvgItemLevel.Text:SetPoint('CENTER', frame.ReforgedArmory.AvgItemLevel, 'CENTER', textOptions.xOffset, textOptions.yOffset)
 end
 
-function module:UpdateSlotBackground(which, slot)
-	if not which or not slot.ReforgedArmory.SlotBackground then return end
+function module:CreateSlotBackground(which, slot)
+	if not which or not slot then return end
+	if slot.ReforgedArmory.SlotBackground then return end
 
-	local db = E.db.cataarmory[string.lower(which)]
+	slot.ReforgedArmory.SlotBackground = slot:CreateTexture(nil, 'BACKGROUND')
+
+	local db = E.db.cataarmory[string.lower(which)].slotBackground
 	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
 	local info = Engine.GearList[slotName]
 	local direction = info.direction
-	local color = db.slotBackground.color
 
-	local point, relativePoint, x, y = module:GetSlotBackgroundPoints(info.slotID, db)
 	if direction then
+		local color = db.color
+		local point, relativePoint, x, y = module:GetSlotBackgroundPoints(info.slotID, db)
+
 		slot.ReforgedArmory.SlotBackground:ClearAllPoints()
 		slot.ReforgedArmory.SlotBackground:SetPoint(point, slot, relativePoint, x, y)
 		slot.ReforgedArmory.SlotBackground:Size(132, 41)
@@ -275,7 +279,51 @@ function module:UpdateSlotBackground(which, slot)
 			slot.ReforgedArmory.SlotBackground:SetTexCoord(1, 0, 0, 1)
 		end
 
-		slot.ReforgedArmory.SlotBackground:SetShown(db.slotBackground.enable)
+		slot.ReforgedArmory.SlotBackground:Hide()
+	end
+end
+
+function module:ConfigureSlotBackground(which, slot)
+	if not which or not slot then return end
+	if not slot.ReforgedArmory.SlotBackground then return end
+
+	local db = E.db.cataarmory[string.lower(which)].slotBackground
+	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
+	local info = Engine.GearList[slotName]
+	local direction = info.direction
+
+	if direction then
+		local color = db.color
+		local point, relativePoint, x, y = module:GetSlotBackgroundPoints(info.slotID, db)
+
+		slot.ReforgedArmory.SlotBackground:ClearAllPoints()
+		slot.ReforgedArmory.SlotBackground:SetPoint(point, slot, relativePoint, x, y)
+		slot.ReforgedArmory.SlotBackground:Size(132, 41)
+		slot.ReforgedArmory.SlotBackground:SetTexture(GradientTexture)
+		slot.ReforgedArmory.SlotBackground:SetVertexColor(color.r, color.g, color.b)
+		if direction == 'LEFT' then
+			slot.ReforgedArmory.SlotBackground:SetTexCoord(0, 1, 0, 1)
+		else
+			slot.ReforgedArmory.SlotBackground:SetTexCoord(1, 0, 0, 1)
+		end
+
+		slot.ReforgedArmory.SlotBackground:SetShown(db.enable)
+	end
+end
+
+function module:UpdateSlotBackground(which, slot)
+	if not which or not slot then return end
+	if not slot.ReforgedArmory.SlotBackground then return end
+
+	local db = E.db.cataarmory[string.lower(which)]
+	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
+	local info = Engine.GearList[slotName]
+	local direction = info.direction
+
+	if direction then
+		local showWarning = slot.ReforgedArmory.Warning.ShowWarning
+		local warnColor = (showWarning and db.slotBackground.warning.enable) and db.slotBackground.warning.color or db.slotBackground.color
+		slot.ReforgedArmory.SlotBackground:SetVertexColor(warnColor.r, warnColor.g, warnColor.b)
 	end
 end
 
@@ -350,7 +398,7 @@ end
 
 function module:GetSlotBackgroundPoints(id, db)
 	if not id or not db then return end
-	local x, y = db.slotBackground.xOffset, db.slotBackground.yOffset
+	local x, y = db.xOffset, db.yOffset
 
 	if id <= 5 or (id == 9 or id == 15) then --* Left Side
 		return 'LEFT', 'LEFT', x, y
@@ -429,6 +477,7 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	iLevelDB[i] = slotInfo.itemLevel
 	local frame = _G[which..'Frame']
 	local unit = (which == 'Character' and 'player') or frame.unit or 'target'
+	local isCharPage = which == 'Character'
 
 	local itemLink = GetInventoryItemLink(unit, i)
 	local db = E.db.cataarmory[string.lower(which)]
@@ -438,11 +487,6 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 	local canEnchant = (which == 'Character' and info.isCharProf and info.isCharProf('Enchanting')) or info.canEnchant
 	local direction = info.direction
 	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.inpsect
-
-	--* Slot Background
-	if direction then
-		module:UpdateSlotBackground(which, inspectItem)
-	end
 
 	if not info.ignored then
 		do
@@ -466,15 +510,19 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 					warningMsg = strjoin('', warningMsg, '|cffff0000', L["Missing Belt Buckle"], '|r\n')
 				end
 				inspectItem.ReforgedArmory.Warning.Reason = warningMsg
+				inspectItem.ReforgedArmory.Warning.ShowWarning = missingEnchant or missingGem or missingBuckle or false
 			end
+			local showWarning = db.warningIndicator.enable and inspectItem.ReforgedArmory.Warning.ShowWarning
 
-			local showWarning = missingEnchant or missingGem or missingBuckle or false
-			if direction and inspectItem.ReforgedArmory.SlotBackground then
-				local warnColor = (showWarning and db.slotBackground.warning.enable) and db.slotBackground.warning.color or db.slotBackground.color
-				inspectItem.ReforgedArmory.SlotBackground:SetVertexColor(warnColor.r, warnColor.g, warnColor.b)
+			--* Slot Background Warning Color
+			if not isCharPage then
+				module:ConfigureSlotBackground(which, inspectItem)
 			end
-			inspectItem.ReforgedArmory.Warning:SetShown(db.warningIndicator.enable and showWarning)
+			module:UpdateSlotBackground(which, inspectItem)
 
+			inspectItem.ReforgedArmory.Warning:SetShown(showWarning)
+
+			--* Enchant Text
 			inspectItem.ReforgedArmory.EnchantText:SetText(slotInfo.enchantText)
 			inspectItem.ReforgedArmory.EnchantText:SetShown(db.enchant.enable)
 			local enchantTextColor = (db.enchant.qualityColor and slotInfo.itemQualityColors) or db.enchant.color
@@ -771,10 +819,8 @@ function module:CreateSlotStrings(frame, which)
 
 		--* Slot Background
 		if info.direction then
-			if not slot.ReforgedArmory.SlotBackground then
-				slot.ReforgedArmory.SlotBackground = slot:CreateTexture(nil, 'BACKGROUND')
-			end
-			module:UpdateSlotBackground(which, slot)
+			module:CreateSlotBackground(which, slot)
+			module:ConfigureSlotBackground(which, slot)
 		end
 	end
 end
@@ -887,11 +933,15 @@ function module:UpdateInspectPageFonts(which, force)
 					slot.ReforgedArmory.EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
 				end
 				slot.ReforgedArmory.EnchantText:SetShown(enchant.enable)
-			end
 
-			if force then
-				module:UpdateSlotBackground(which, slot)
-				module:ConfigDurabilityBar(which, slot)
+				if force then
+					--* Durability Bar
+					module:ConfigDurabilityBar(which, slot)
+
+					--* Slot Background
+					module:ConfigureSlotBackground(which, slot)
+					module:UpdateSlotBackground(which, slot)
+				end
 			end
 		end
 	end
