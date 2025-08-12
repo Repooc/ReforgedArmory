@@ -441,9 +441,6 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 
 	--* Slot Background
 	if direction then
-		if not inspectItem.ReforgedArmory.SlotBackground then
-			inspectItem.ReforgedArmory.SlotBackground = inspectItem:CreateTexture(nil, 'BACKGROUND')
-		end
 		module:UpdateSlotBackground(which, inspectItem)
 	end
 
