@@ -16,76 +16,76 @@ local MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET = DurabilityBarOffsets.MIN_BAR_
 local MIN_BAR_THICKNESS, MAX_BAR_THICKNESS = DurabilityConstants.Bar.Thickness.MIN_BAR_THICKNESS, DurabilityConstants.Bar.Thickness.MAX_BAR_THICKNESS
 
 local whileOpenEvents = {
-	UPDATE_INVENTORY_DURABILITY = true,
+    UPDATE_INVENTORY_DURABILITY = true,
 }
 
 local function SetDurabilityColor(bar)
-	if not bar then return end
-	local text = bar.Text
-	local db = bar.barDB
+    if not bar then return end
+    local text = bar.Text
+    local db = bar.barDB
 
-	local percent = bar.percent
-	percent = math.min(math.max(percent * 0.01, 0), 1)
+    local percent = bar.percent
+    percent = math.min(math.max(percent * 0.01, 0), 1)
 
-	-- RGB gradient: green → yellow → red
-	local r, g, b = E:ColorGradient(percent, 1, 0.1, 0.1, 1, 1, 0.1, 0.1, 1, 0.1)
-	bar:SetStatusBarColor(r, g, b)
+    -- RGB gradient: green → yellow → red
+    local r, g, b = E:ColorGradient(percent, 1, 0.1, 0.1, 1, 1, 0.1, 0.1, 1, 0.1)
+    bar:SetStatusBarColor(r, g, b)
 
-	if text then
-		if db.text.useCustomColor then
-			local color = db.text.color
-			text:SetTextColor(color.r, color.g, color.b)
-		else
-			text:SetTextColor(r, g, b)
-		end
-	end
+    if text then
+        if db.text.useCustomColor then
+            local color = db.text.color
+            text:SetTextColor(color.r, color.g, color.b)
+        else
+            text:SetTextColor(r, g, b)
+        end
+    end
 end
 
 local function UpdateSlotDurabilityBar(bar, db, slotInfo)
-	if not bar then return end
+    if not bar then return end
 
-	local text = bar.Text
-	local durability = slotInfo.durability
-	local current, max, percent = durability.current, durability.max, durability.percent
+    local text = bar.Text
+    local durability = slotInfo.durability
+    local current, max, percent = durability.current, durability.max, durability.percent
 
-	bar.current = current
-	bar.max = max
-	bar.percent = percent
+    bar.current = current
+    bar.max = max
+    bar.percent = percent
 
-	if current and max and max > 0 then
-		text:SetFormattedText('%d%%', percent)
+    if current and max and max > 0 then
+        text:SetFormattedText('%d%%', percent)
 
-		bar:SetMinMaxValues(0, max)
-		bar:SetValue(current)
-		SetDurabilityColor(bar)
-		bar:SetAlpha(db.mouseover and 0 or 1)
-	else
-		if text then
-			text:SetText('')
-		end
+        bar:SetMinMaxValues(0, max)
+        bar:SetValue(current)
+        SetDurabilityColor(bar)
+        bar:SetAlpha(db.mouseover and 0 or 1)
+    else
+        if text then
+            text:SetText('')
+        end
 
-		bar:SetValue(0)
-		bar:SetAlpha(0)
-	end
-	bar:SetShown(db.enable)
+        bar:SetValue(0)
+        bar:SetAlpha(0)
+    end
+    bar:SetShown(db.enable)
 end
 
 local function GetDurabilityBarSlotDB(slotID)
-	if not slotID then module:Print('GetDurabilityBarSlotDB: No slotID provided') return end
-	if slotID <= 5 or (slotID == 9 or slotID == 15) or (slotID >= 6 and slotID <= 8) or (slotID >= 10 and slotID <= 14) then --* Left & Right Side
-		return E.db.cataarmory.character.durability
-	elseif slotID == 16 then																			--* MainHandSlot
-		return E.db.cataarmory.character.durability.MainHandSlot
-	elseif slotID == 17 then																			--* SecondaryHandSlot
-		return E.db.cataarmory.character.durability.SecondaryHandSlot
-	else																								--* RangedSlot
-		return E.db.cataarmory.character.durability.RangedSlot
-	end
+    if not slotID then module:Print('GetDurabilityBarSlotDB: No slotID provided') return end
+    if slotID <= 5 or (slotID == 9 or slotID == 15) or (slotID >= 6 and slotID <= 8) or (slotID >= 10 and slotID <= 14) then --* Left & Right Side
+        return E.db.cataarmory.character.durability
+    elseif slotID == 16 then																			--* MainHandSlot
+        return E.db.cataarmory.character.durability.MainHandSlot
+    elseif slotID == 17 then																			--* SecondaryHandSlot
+        return E.db.cataarmory.character.durability.SecondaryHandSlot
+    else																								--* RangedSlot
+        return E.db.cataarmory.character.durability.RangedSlot
+    end
 end
 
 local function CreateDurabilityBar(which, slot)
-	if which and string.lower(which) ~= 'character' then return end
-	if not slot or slot.RA_DurabilityBar then return end
+    if which and string.lower(which) ~= 'character' then return end
+    if not slot or slot.RA_DurabilityBar then return end
 
 	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
 	local info = Engine.GearList[slotName]
@@ -133,22 +133,22 @@ local function CreateDurabilityBar(which, slot)
 end
 
 function module:ConfigDurabilityBar(which, slot)
-	if which and string.lower(which) ~= 'character' then return end
-	if not slot or not slot.RA_DurabilityBar then return end
+    if which and string.lower(which) ~= 'character' then return end
+    if not slot or not slot.RA_DurabilityBar then return end
 
-	local db = E.db.cataarmory.character.durability
-	local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
-	local info = Engine.GearList[slotName]
-	local bar = slot.RA_DurabilityBar
-	local barDB = GetDurabilityBarSlotDB(info.slotID)
-	bar.db, bar.barDB = db, barDB
+    local db = E.db.cataarmory.character.durability
+    local slotName = slot:GetName():gsub('Character', ''):gsub('Inspect', '')
+    local info = Engine.GearList[slotName]
+    local bar = slot.RA_DurabilityBar
+    local barDB = GetDurabilityBarSlotDB(info.slotID)
+    bar.db, bar.barDB = db, barDB
 
-	local direction = info.direction
+    local direction = info.direction
 
-	--! Attached to slot
-	local barThickness = module:Clamp(barDB.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
-	local lengthOffset = module:Clamp(barDB.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
-	local myX, myY = barDB.xOffset, barDB.yOffset
+    --! Attached to slot
+    local barThickness = module:Clamp(barDB.thickness or MIN_BAR_THICKNESS, MIN_BAR_THICKNESS, MAX_BAR_THICKNESS)
+    local lengthOffset = module:Clamp(barDB.lengthOffset or 0, MIN_BAR_LENGTHOFFSET, MAX_BAR_LENGTHOFFSET)
+    local myX, myY = barDB.xOffset, barDB.yOffset
 
 	bar:SetFrameStrata(db.frameStrata)
     bar:SetFrameLevel(db.frameLevel)
@@ -327,52 +327,52 @@ function module:UpdateSlotBackground(which, slot)
 end
 
 function module:UpdateItemLevelText(which, slot)
-	if not which or not slot.ReforgedArmory.ItemLevelText then return end
+    if not which or not slot.ReforgedArmory.ItemLevelText then return end
 
-	local db = E.db.cataarmory[string.lower(which)]
+    local db = E.db.cataarmory[string.lower(which)]
 
-	slot.ReforgedArmory.ItemLevelText:ClearAllPoints()
-	slot.ReforgedArmory.ItemLevelText:SetPoint('BOTTOM', slot, db.itemLevel.xOffset, db.itemLevel.yOffset)
-	slot.ReforgedArmory.ItemLevelText:FontTemplate(LSM:Fetch('font', db.itemLevel.font), db.itemLevel.fontSize, db.itemLevel.fontOutline)
-	slot.ReforgedArmory.ItemLevelText:SetShown(db.itemLevel.enable)
+    slot.ReforgedArmory.ItemLevelText:ClearAllPoints()
+    slot.ReforgedArmory.ItemLevelText:SetPoint('BOTTOM', slot, db.itemLevel.xOffset, db.itemLevel.yOffset)
+    slot.ReforgedArmory.ItemLevelText:FontTemplate(LSM:Fetch('font', db.itemLevel.font), db.itemLevel.fontSize, db.itemLevel.fontOutline)
+    slot.ReforgedArmory.ItemLevelText:SetShown(db.itemLevel.enable)
 end
 
 function module:CreateGemTexture(slot, point, relativePoint, x, y, gemStep, spacing)
-	local prevGem = gemStep - 1
-	local texture = slot:CreateTexture()
-	texture:SetPoint(point, (gemStep == 1 and slot) or slot['RA_GemSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
-	texture:SetTexCoord(unpack(E.TexCoords))
-	texture:Size(14)
+    local prevGem = gemStep - 1
+    local texture = slot:CreateTexture()
+    texture:SetPoint(point, (gemStep == 1 and slot) or slot['RA_GemSlot'..prevGem], relativePoint, (gemStep == 1 and x) or spacing, (gemStep == 1 and x) or y)
+    texture:SetTexCoord(unpack(E.TexCoords))
+    texture:Size(14)
 
-	local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['RA_GemSlot'..prevGem..'Backdrop'])
-	backdrop:SetTemplate(nil, nil, true)
-	backdrop:SetBackdropColor(0,0,0,0)
-	backdrop:SetOutside(texture)
-	backdrop:Hide()
+    local backdrop = CreateFrame('Frame', nil, (gemStep == 1 and slot) or slot['RA_GemSlot'..prevGem..'Backdrop'])
+    backdrop:SetTemplate(nil, nil, true)
+    backdrop:SetBackdropColor(0,0,0,0)
+    backdrop:SetOutside(texture)
+    backdrop:Hide()
 
-	return texture, backdrop
+    return texture, backdrop
 end
 
 function module:GetEnchantPoints(id, db)
-	if not id or not db then return end
-	local x, y = db.enchant.xOffset, db.enchant.yOffset
-	local spacing = db.enchant.spacing or 0
+    if not id or not db then return end
+    local x, y = db.enchant.xOffset, db.enchant.yOffset
+    local spacing = db.enchant.spacing or 0
 
-	local MainHandSlot = db.enchant.MainHandSlot
-	local SecondaryHandSlot = db.enchant.SecondaryHandSlot
-	local RangedSlot = db.enchant.RangedSlot
+    local MainHandSlot = db.enchant.MainHandSlot
+    local SecondaryHandSlot = db.enchant.SecondaryHandSlot
+    local RangedSlot = db.enchant.RangedSlot
 
-	if id <= 5 or (id == 9 or id == 15) then						--* Left Side
-		return Engine.Values.SIDE_SLOTS_DIRECTION_TO_POINT['LEFT'][db.enchant.growthDirection], Engine.Values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint], x, y, spacing
-	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
-		return Engine.Values.SIDE_SLOTS_DIRECTION_TO_POINT['RIGHT'][db.enchant.growthDirection], Engine.Values.MIRROR_ANCHORPOINT[Engine.Values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint]], -x, y, -spacing
-	elseif id == 16 then											--* MainHandSlot
-		return Engine.Values.DIRECTION_TO_POINT[MainHandSlot.growthDirection], MainHandSlot.anchorPoint, MainHandSlot.xOffset, MainHandSlot.yOffset, -spacing
-	elseif id == 17 then											--* SecondaryHandSlot
-		return Engine.Values.DIRECTION_TO_POINT[SecondaryHandSlot.growthDirection], SecondaryHandSlot.anchorPoint, SecondaryHandSlot.xOffset, SecondaryHandSlot.yOffset, -spacing
-	else															--* RangedSlot
-		return Engine.Values.DIRECTION_TO_POINT[RangedSlot.growthDirection], RangedSlot.anchorPoint, RangedSlot.xOffset, RangedSlot.yOffset, spacing
-	end
+    if id <= 5 or (id == 9 or id == 15) then						--* Left Side
+        return Engine.Values.SIDE_SLOTS_DIRECTION_TO_POINT['LEFT'][db.enchant.growthDirection], Engine.Values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint], x, y, spacing
+    elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
+        return Engine.Values.SIDE_SLOTS_DIRECTION_TO_POINT['RIGHT'][db.enchant.growthDirection], Engine.Values.MIRROR_ANCHORPOINT[Engine.Values.SIDE_SLOTS_ANCHORPOINTS[db.enchant.anchorPoint]], -x, y, -spacing
+    elseif id == 16 then											--* MainHandSlot
+        return Engine.Values.DIRECTION_TO_POINT[MainHandSlot.growthDirection], MainHandSlot.anchorPoint, MainHandSlot.xOffset, MainHandSlot.yOffset, -spacing
+    elseif id == 17 then											--* SecondaryHandSlot
+        return Engine.Values.DIRECTION_TO_POINT[SecondaryHandSlot.growthDirection], SecondaryHandSlot.anchorPoint, SecondaryHandSlot.xOffset, SecondaryHandSlot.yOffset, -spacing
+    else															--* RangedSlot
+        return Engine.Values.DIRECTION_TO_POINT[RangedSlot.growthDirection], RangedSlot.anchorPoint, RangedSlot.xOffset, RangedSlot.yOffset, spacing
+    end
 end
 
 function module:GetGemPoints(id, db)
@@ -409,40 +409,40 @@ function module:GetSlotBackgroundPoints(id, db)
 end
 
 function module:GetWarningPoints(id, db)
-	if not id or not db then return end
-	if id <= 5 or (id == 9 or id == 15) then						--* Left Side
-		return 'TOPRIGHT', 'TOPLEFT', 'BOTTOMRIGHT', 'BOTTOMLEFT', 8, 0, E.Border, 0, -E.Border, 0
-	elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
-		return 'TOPLEFT', 'TOPRIGHT', 'BOTTOMLEFT', 'BOTTOMRIGHT', 8, 0, E.Border, 0, -E.Border, 0
-	elseif id == 16 then											--* MainHandSlot
-		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
-	elseif id == 17 then											--* SecondaryHandSlot
-		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
-	else															--* RangedSlot
-		return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
-	end
+    if not id or not db then return end
+    if id <= 5 or (id == 9 or id == 15) then						--* Left Side
+        return 'TOPRIGHT', 'TOPLEFT', 'BOTTOMRIGHT', 'BOTTOMLEFT', 8, 0, E.Border, 0, -E.Border, 0
+    elseif (id >= 6 and id <= 8) or (id >= 10 and id <= 14) then	--* Right Side
+        return 'TOPLEFT', 'TOPRIGHT', 'BOTTOMLEFT', 'BOTTOMRIGHT', 8, 0, E.Border, 0, -E.Border, 0
+    elseif id == 16 then											--* MainHandSlot
+        return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
+    elseif id == 17 then											--* SecondaryHandSlot
+        return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
+    else															--* RangedSlot
+        return 'TOPLEFT', 'BOTTOMLEFT', 'TOPRIGHT', 'BOTTOMRIGHT', 8, 0, 0, 0, 0, 0
+    end
 end
 
 function module:UpdateInspectInfo(_, arg1)
-	if not _G.InspectFrame then return end
+    if not _G.InspectFrame then return end
 
-	E:Delay(0.75, function()
-		if _G.InspectFrame and _G.InspectFrame:IsVisible() then
-			module:UpdatePageInfo(_G.InspectFrame, 'Inspect', arg1)
-		end
-	end)
-	module:UpdatePageInfo(_G.InspectFrame, 'Inspect', arg1)
+    E:Delay(0.75, function()
+        if _G.InspectFrame and _G.InspectFrame:IsVisible() then
+            module:UpdatePageInfo(_G.InspectFrame, 'Inspect', arg1)
+        end
+    end)
+    module:UpdatePageInfo(_G.InspectFrame, 'Inspect', arg1)
 end
 
 function module:UpdateCharacterInfo(event)
-	if (not E.db.cataarmory.character.enable)
-	or (whileOpenEvents[event] and not _G.CharacterFrame:IsShown()) then return end
+    if (not E.db.cataarmory.character.enable)
+    or (whileOpenEvents[event] and not _G.CharacterFrame:IsShown()) then return end
 
-	module:UpdatePageInfo(_G.CharacterFrame, 'Character')
+    module:UpdatePageInfo(_G.CharacterFrame, 'Character')
 end
 
 function module:UpdateCharacterItemLevel()
-	module:UpdateAverageString(_G.CharacterFrame, 'Character')
+    module:UpdateAverageString(_G.CharacterFrame, 'Character')
 end
 
 function module:ClearPageInfo(frame, which)
@@ -588,40 +588,40 @@ function module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
 end
 
 function module:UpdateAverageString(frame, which, iLevelDB)
-	if not iLevelDB or not frame then return end
+    if not iLevelDB or not frame then return end
 
-	local db = E.db.cataarmory[string.lower(which)]
-	local textOptions, frameOptions = db.avgItemLevel.text, db.avgItemLevel.frame
-	local isCharPage, avgItemLevel, avgTotal = which == 'Character'
+    local db = E.db.cataarmory[string.lower(which)]
+    local textOptions, frameOptions = db.avgItemLevel.text, db.avgItemLevel.frame
+    local isCharPage, avgItemLevel, avgTotal = which == 'Character'
 
-	if isCharPage then
-		--* Option to show one or the other or both?
-		avgTotal, avgItemLevel = E:GetPlayerItemLevel() -- rounded average, rounded equipped
-	else
-		avgItemLevel = E:CalculateAverageItemLevel(iLevelDB, frame.unit or 'target')
-	end
+    if isCharPage then
+        --* Option to show one or the other or both?
+        avgTotal, avgItemLevel = E:GetPlayerItemLevel() -- rounded average, rounded equipped
+    else
+        avgItemLevel = E:CalculateAverageItemLevel(iLevelDB, frame.unit or 'target')
+    end
 
-	if avgItemLevel then
-		frame.ReforgedArmory.AvgItemLevel.Text:SetText(avgItemLevel)
-		frame.ReforgedArmory.AvgItemLevel.Text:SetTextColor(textOptions.color.r, textOptions.color.g, textOptions.color.b)
-	else
-		frame.ReforgedArmory.AvgItemLevel.Text:SetText('')
-	end
+    if avgItemLevel then
+        frame.ReforgedArmory.AvgItemLevel.Text:SetText(avgItemLevel)
+        frame.ReforgedArmory.AvgItemLevel.Text:SetTextColor(textOptions.color.r, textOptions.color.g, textOptions.color.b)
+    else
+        frame.ReforgedArmory.AvgItemLevel.Text:SetText('')
+    end
 
-	frame.ReforgedArmory.AvgItemLevel:SetHeight(textOptions.fontSize + 6)
-	frame.ReforgedArmory.AvgItemLevel:SetShown(db.avgItemLevel.enable)
+    frame.ReforgedArmory.AvgItemLevel:SetHeight(textOptions.fontSize + 6)
+    frame.ReforgedArmory.AvgItemLevel:SetShown(db.avgItemLevel.enable)
 end
 
 function module:TryGearAgain(frame, which, i, iLevelDB, inspectItem)
-	E:Delay(0.05, function()
-		if which == 'Inspect' and (not frame or not frame.unit) then return end
+    E:Delay(0.05, function()
+        if which == 'Inspect' and (not frame or not frame.unit) then return end
 
-		local unit = (which == 'Character' and 'player') or frame.unit
-		local slotInfo = module:GetGearSlotInfo(unit, i)
-		if slotInfo == 'tooSoon' then return end
+        local unit = (which == 'Character' and 'player') or frame.unit
+        local slotInfo = module:GetGearSlotInfo(unit, i)
+        if slotInfo == 'tooSoon' then return end
 
-		module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
-	end)
+        module:UpdatePageStrings(i, iLevelDB, inspectItem, slotInfo, which)
+    end)
 end
 
 do
@@ -732,19 +732,19 @@ local function Warning_OnLeave()
 end
 
 function module:PaperDollFrame_SetLevel()
-	local db = E.db.cataarmory.character.levelText
-	if not db.enable then return end
+    local db = E.db.cataarmory.character.levelText
+    if not db.enable then return end
 
-	_G.CharacterLevelText:ClearAllPoints()
-	_G.CharacterLevelText:SetPoint('TOP', _G.CharacterFrameTitleText, 'BOTTOM', db.xOffset, db.yOffset)
+    _G.CharacterLevelText:ClearAllPoints()
+    _G.CharacterLevelText:SetPoint('TOP', _G.CharacterFrameTitleText, 'BOTTOM', db.xOffset, db.yOffset)
 end
 
 function module:InspectPaperDollFrame_SetLevel()
-	local db = E.db.cataarmory.inspect.levelText
-	if not db.enable or not InspectLevelText then return end
+    local db = E.db.cataarmory.inspect.levelText
+    if not db.enable or not InspectLevelText then return end
 
-	_G.InspectLevelText:ClearAllPoints()
-	_G.InspectLevelText:SetPoint('TOP', _G.InspectNameText, 'BOTTOM', db.xOffset, db.yOffset)
+    _G.InspectLevelText:ClearAllPoints()
+    _G.InspectLevelText:SetPoint('TOP', _G.InspectNameText, 'BOTTOM', db.xOffset, db.yOffset)
 end
 
 function module:CreateSlotStrings(frame, which)
@@ -873,120 +873,120 @@ function module:InspectFrame_OnShow()
 end
 
 function module:SetupInspectPageInfo()
-	local frame = _G.InspectFrame
-	if frame then
-		module:CreateSlotStrings(frame, 'Inspect')
-	end
+    local frame = _G.InspectFrame
+    if frame then
+        module:CreateSlotStrings(frame, 'Inspect')
+    end
 end
 
 function module:UpdateInspectPageFonts(which, force)
-	if not which then return end
-	local frame = _G[which..'Frame']
-	if not frame then return end
-	if not frame:IsShown() then return end
+    if not which then return end
+    local frame = _G[which..'Frame']
+    if not frame then return end
+    if not frame:IsShown() then return end
 
-	local unit = (which == 'Character' and 'player') or frame.unit
-	local isCharPage = which == 'Character'
-	local db = E.db.cataarmory[string.lower(which)]
-	local itemLevel, enchant, durability = db.itemLevel, db.enchant, db.durability
+    local unit = (which == 'Character' and 'player') or frame.unit
+    local isCharPage = which == 'Character'
+    local db = E.db.cataarmory[string.lower(which)]
+    local itemLevel, enchant, durability = db.itemLevel, db.enchant, db.durability
 
-	module:UpdateAvgItemLevel(which)
-	if isCharPage then
-		local controlsDisplayMode = db.model.controlsDisplayMode
-		if controlsDisplayMode == 'SHOW' then
-			_G.CharacterModelScene.ControlFrame:Show()
-		else
-			_G.CharacterModelScene.ControlFrame:Hide()
-		end
-	end
+    module:UpdateAvgItemLevel(which)
+    if isCharPage then
+        local controlsDisplayMode = db.model.controlsDisplayMode
+        if controlsDisplayMode == 'SHOW' then
+            _G.CharacterModelScene.ControlFrame:Show()
+        else
+            _G.CharacterModelScene.ControlFrame:Hide()
+        end
+    end
 
-	local slot, quality, iLvlTextColor, enchantTextColor
-	local qualityColor = {}
-	for slotName, info in pairs(Engine.GearList) do
-		slot = _G[which..slotName]
-		if slot then
-			if not info.ignored then
-				quality = GetInventoryItemQuality(unit, info.slotID)
-				if quality then
-					qualityColor.r, qualityColor.g, qualityColor.b = GetItemQualityColor(quality)
-				end
+    local slot, quality, iLvlTextColor, enchantTextColor
+    local qualityColor = {}
+    for slotName, info in pairs(Engine.GearList) do
+        slot = _G[which..slotName]
+        if slot then
+            if not info.ignored then
+                quality = GetInventoryItemQuality(unit, info.slotID)
+                if quality then
+                    qualityColor.r, qualityColor.g, qualityColor.b = GetItemQualityColor(quality)
+                end
 
-				module:UpdateItemLevelText(which, slot)
-				iLvlTextColor = (itemLevel.qualityColor and qualityColor) or itemLevel.color
-				if iLvlTextColor and next(iLvlTextColor) then
-					slot.ReforgedArmory.ItemLevelText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
-				end
+                module:UpdateItemLevelText(which, slot)
+                iLvlTextColor = (itemLevel.qualityColor and qualityColor) or itemLevel.color
+                if iLvlTextColor and next(iLvlTextColor) then
+                    slot.ReforgedArmory.ItemLevelText:SetTextColor(iLvlTextColor.r, iLvlTextColor.g, iLvlTextColor.b)
+                end
 
-				do
-					local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
-					slot.ReforgedArmory.EnchantText:ClearAllPoints()
-					slot.ReforgedArmory.EnchantText:SetPoint(point, slot, relativePoint, x, y)
-				end
+                do
+                    local point, relativePoint, x, y = module:GetEnchantPoints(info.slotID, db)
+                    slot.ReforgedArmory.EnchantText:ClearAllPoints()
+                    slot.ReforgedArmory.EnchantText:SetPoint(point, slot, relativePoint, x, y)
+                end
 
-				slot.ReforgedArmory.EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
-				enchantTextColor = (enchant.qualityColor and qualityColor) or enchant.color
-				if enchantTextColor and next(enchantTextColor) then
-					slot.ReforgedArmory.EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
-				end
-				slot.ReforgedArmory.EnchantText:SetShown(enchant.enable)
+                slot.ReforgedArmory.EnchantText:FontTemplate(LSM:Fetch('font', enchant.font), enchant.fontSize, enchant.fontOutline)
+                enchantTextColor = (enchant.qualityColor and qualityColor) or enchant.color
+                if enchantTextColor and next(enchantTextColor) then
+                    slot.ReforgedArmory.EnchantText:SetTextColor(enchantTextColor.r, enchantTextColor.g, enchantTextColor.b)
+                end
+                slot.ReforgedArmory.EnchantText:SetShown(enchant.enable)
 
-				if force then
-					--* Durability Bar
-					module:ConfigDurabilityBar(which, slot)
-				end
-			end
+                if force then
+                    --* Durability Bar
+                    module:ConfigDurabilityBar(which, slot)
+                end
+            end
 
-			if force then
-				--* Slot Background
-				module:ConfigureSlotBackground(which, slot)
-				module:UpdateSlotBackground(which, slot)
-			end
-		end
-	end
+            if force then
+                --* Slot Background
+                module:ConfigureSlotBackground(which, slot)
+                module:UpdateSlotBackground(which, slot)
+            end
+        end
+    end
 
-	if force then
-		module:UpdatePageInfo(frame, which, unit)
-	end
+    if force then
+        module:UpdatePageInfo(frame, which, unit)
+    end
 end
 
 --* Makes a table with Blizzards locale of the empty gem sockets which is used to help determine if missing a socket from a belt buckle
 local socketNames, socketTypes = {}, { EMPTY_SOCKET_META, EMPTY_SOCKET_BLUE, EMPTY_SOCKET_RED, EMPTY_SOCKET_YELLOW, EMPTY_SOCKET_NO_COLOR, EMPTY_SOCKET_PRISMATIC, EMPTY_SOCKET_COGWHEEL, EMPTY_SOCKET_HYDRAULIC }
 for _, socketName in pairs(socketTypes) do
-	socketNames[socketName] = true
+    socketNames[socketName] = true
 end
 
 local temp = {}
 temp.gems, temp.emptySockets, temp.filledSockets, temp.baseSocketCount = {}, {}, {}, 0
 function module:AcquireGemInfo(itemLink)
-	wipe(temp.gems)
-	wipe(temp.emptySockets)
-	wipe(temp.filledSockets)
-	temp.baseSocketCount = 0
+    wipe(temp.gems)
+    wipe(temp.emptySockets)
+    wipe(temp.filledSockets)
+    temp.baseSocketCount = 0
 
-	local tt = E.ScanTooltip
-	for x = 1, tt:NumLines() do
-		local line = _G['ElvUI_ScanTooltipTextLeft'..x]
-		if line then
-			local lineText = line:GetText()
-			if x == 1 and lineText == RETRIEVING_ITEM_INFO then break end
-			if socketNames[lineText] then
-				temp.baseSocketCount = temp.baseSocketCount + 1
-				tinsert(temp.emptySockets, lineText)
-			end
-		end
-	end
+    local tt = E.ScanTooltip
+    for x = 1, tt:NumLines() do
+        local line = _G['ElvUI_ScanTooltipTextLeft'..x]
+        if line then
+            local lineText = line:GetText()
+            if x == 1 and lineText == RETRIEVING_ITEM_INFO then break end
+            if socketNames[lineText] then
+                temp.baseSocketCount = temp.baseSocketCount + 1
+                tinsert(temp.emptySockets, lineText)
+            end
+        end
+    end
 
-	for i = 1, 4 do
-		local tex = _G['ElvUI_ScanTooltipTexture'..i]
-		local texture = tex and tex:IsShown() and tex:GetTexture()
-		if texture then temp.gems[i] = texture end
-		if itemLink then
-			local gemName, gemLink = GetItemGem(itemLink, i)
-			if gemName then tinsert(temp.filledSockets, gemLink) end
-		end
-	end
+    for i = 1, 4 do
+        local tex = _G['ElvUI_ScanTooltipTexture'..i]
+        local texture = tex and tex:IsShown() and tex:GetTexture()
+        if texture then temp.gems[i] = texture end
+        if itemLink then
+            local gemName, gemLink = GetItemGem(itemLink, i)
+            if gemName then tinsert(temp.filledSockets, gemLink) end
+        end
+    end
 
-	return temp.gems, temp.emptySockets, temp.filledSockets, temp.baseSocketCount
+    return temp.gems, temp.emptySockets, temp.filledSockets, temp.baseSocketCount
 end
 
 local githubURL = 'https://github.com/Repooc/ReforgedArmory/issues'
@@ -1076,164 +1076,164 @@ function module:GetGearSlotInfo(unit, slot)
 end
 
 local function HandleCharacterFrameExpand()
-	local db = E.db.cataarmory.character.expandButton
-	if _G.PaperDollFrame:IsVisible() or _G.PetPaperDollFrame:IsVisible() then
-		if _G.CharacterStatsPane:IsShown() ~= db.autoExpand then
-			_G.CharacterFrameExpandButton:Click()
-		end
-	end
-	_G.CharacterFrameExpandButton:SetShown(not db.hide)
+    local db = E.db.cataarmory.character.expandButton
+    if _G.PaperDollFrame:IsVisible() or _G.PetPaperDollFrame:IsVisible() then
+        if _G.CharacterStatsPane:IsShown() ~= db.autoExpand then
+            _G.CharacterFrameExpandButton:Click()
+        end
+    end
+    _G.CharacterFrameExpandButton:SetShown(not db.hide)
 end
 
 local function ControlFrame_OnShow(frame)
-	local db = E.db.cataarmory.character.model
-	local controlsDisplayMode = db.controlsDisplayMode
-	if controlsDisplayMode == 'SHOW' then
-		frame:Show()
-	elseif controlsDisplayMode == 'HIDE' then
-		frame:Hide()
-	end
+    local db = E.db.cataarmory.character.model
+    local controlsDisplayMode = db.controlsDisplayMode
+    if controlsDisplayMode == 'SHOW' then
+        frame:Show()
+    elseif controlsDisplayMode == 'HIDE' then
+        frame:Hide()
+    end
 end
 
 local function ControlFrame_OnEnter(frame)
-	local db = E.db.cataarmory.character.model
-	local controlsDisplayMode = db.controlsDisplayMode
-	if controlsDisplayMode == 'HIDE' then
-		frame:Hide()
-	end
+    local db = E.db.cataarmory.character.model
+    local controlsDisplayMode = db.controlsDisplayMode
+    if controlsDisplayMode == 'HIDE' then
+        frame:Hide()
+    end
 
 end
 
 local function ControlFrame_OnLeave()
-	local db = E.db.cataarmory.character.model
-	local controlsDisplayMode = db.controlsDisplayMode
-	if controlsDisplayMode == 'SHOW' then
-		_G.CharacterModelScene.ControlFrame:Show()
-	end
+    local db = E.db.cataarmory.character.model
+    local controlsDisplayMode = db.controlsDisplayMode
+    if controlsDisplayMode == 'SHOW' then
+        _G.CharacterModelScene.ControlFrame:Show()
+    end
 end
 
 local function CharacterFrame_OnShow()
-	module.UpdateCharacterInfo()
-	local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
+    module.UpdateCharacterInfo()
+    local isSkinned = E.private.skins.blizzard.enable and E.private.skins.blizzard.character
 
-	local frame = _G.CharacterFrame
-	if isSkinned then
-		CharacterMainHandSlot:ClearAllPoints()
-		CharacterMainHandSlot:SetPoint('BOTTOMLEFT', _G.PaperDollItemsFrame, 'BOTTOMLEFT', 106, -5)
+    local frame = _G.CharacterFrame
+    if isSkinned then
+        CharacterMainHandSlot:ClearAllPoints()
+        CharacterMainHandSlot:SetPoint('BOTTOMLEFT', _G.PaperDollItemsFrame, 'BOTTOMLEFT', 106, -5)
 
-		if frame.BottomRightCorner then
-			frame.BottomRightCorner:ClearAllPoints()
-			frame.BottomRightCorner:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, -20)
-		end
-		if frame.BottomLeftCorner then
-			frame.BottomLeftCorner:ClearAllPoints()
-			frame.BottomLeftCorner:SetPoint('BOTTOMLEFT', frame, 'BOTTOMLEFT', 0, -20)
-		end
-		CharacterFrameTab1:ClearAllPoints()
-		CharacterFrameTab1:SetPoint('TOPLEFT', frame, 'BOTTOMLEFT', -10, -24)
+        if frame.BottomRightCorner then
+            frame.BottomRightCorner:ClearAllPoints()
+            frame.BottomRightCorner:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, -20)
+        end
+        if frame.BottomLeftCorner then
+            frame.BottomLeftCorner:ClearAllPoints()
+            frame.BottomLeftCorner:SetPoint('BOTTOMLEFT', frame, 'BOTTOMLEFT', 0, -20)
+        end
+        CharacterFrameTab1:ClearAllPoints()
+        CharacterFrameTab1:SetPoint('TOPLEFT', frame, 'BOTTOMLEFT', -10, -24)
 
-		if not frame.ReforgedArmory_Hooked then
-			_G.CharacterModelScene.BackgroundTopLeft:Hide()
-			_G.CharacterModelScene.BackgroundTopRight:Hide()
-			_G.CharacterModelScene.BackgroundBotLeft:Hide()
-			_G.CharacterModelScene.BackgroundBotRight:Hide()
-			_G.CharacterModelScene.backdrop:Hide()
-			_G.CharacterModelScene.BackgroundOverlay:Hide() --! Maybe use this over background images?
-			_G.CharacterModelScene.ControlFrame:HookScript('OnEnter', ControlFrame_OnEnter)
-			_G.CharacterModelScene.ControlFrame:HookScript('OnLeave', ControlFrame_OnLeave)
-			_G.CharacterModelScene.ControlFrame:HookScript('OnShow', ControlFrame_OnShow)
-			_G.CharacterModelScene:HookScript('OnLeave', ControlFrame_OnLeave)
-		end
+        if not frame.ReforgedArmory_Hooked then
+            _G.CharacterModelScene.BackgroundTopLeft:Hide()
+            _G.CharacterModelScene.BackgroundTopRight:Hide()
+            _G.CharacterModelScene.BackgroundBotLeft:Hide()
+            _G.CharacterModelScene.BackgroundBotRight:Hide()
+            _G.CharacterModelScene.backdrop:Hide()
+            _G.CharacterModelScene.BackgroundOverlay:Hide() --! Maybe use this over background images?
+            _G.CharacterModelScene.ControlFrame:HookScript('OnEnter', ControlFrame_OnEnter)
+            _G.CharacterModelScene.ControlFrame:HookScript('OnLeave', ControlFrame_OnLeave)
+            _G.CharacterModelScene.ControlFrame:HookScript('OnShow', ControlFrame_OnShow)
+            _G.CharacterModelScene:HookScript('OnLeave', ControlFrame_OnLeave)
+        end
 
-		local controlsDisplayMode = E.db.cataarmory.character.model.controlsDisplayMode
-		if controlsDisplayMode == 'SHOW' then
-			_G.CharacterModelScene.ControlFrame:Show()
-		else
-			_G.CharacterModelScene.ControlFrame:Hide()
-		end
+        local controlsDisplayMode = E.db.cataarmory.character.model.controlsDisplayMode
+        if controlsDisplayMode == 'SHOW' then
+            _G.CharacterModelScene.ControlFrame:Show()
+        else
+            _G.CharacterModelScene.ControlFrame:Hide()
+        end
 
-		frame.BottomLeftCorner:ClearAllPoints()
-		frame.BottomLeftCorner:SetPoint('BOTTOMLEFT', frame, 'BOTTOMLEFT', 0, -26)
-		frame.BottomRightCorner:ClearAllPoints()
-		frame.BottomRightCorner:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, -26)
+        frame.BottomLeftCorner:ClearAllPoints()
+        frame.BottomLeftCorner:SetPoint('BOTTOMLEFT', frame, 'BOTTOMLEFT', 0, -26)
+        frame.BottomRightCorner:ClearAllPoints()
+        frame.BottomRightCorner:SetPoint('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', 0, -26)
 
-		frame.ReforgedArmory_Hooked = true
-	end
+        frame.ReforgedArmory_Hooked = true
+    end
 
-	HandleCharacterFrameExpand()
+    HandleCharacterFrameExpand()
 end
 
 local function HandleTabs()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.character then return end
+    if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.character then return end
 
-	--* Using ElvUI function with offsets adjusted
-	local lastTab
-	for index, tab in next, { _G.CharacterFrameTab1, HasPetUI() and _G.CharacterFrameTab2 or nil, _G.CharacterFrameTab3, _G.CharacterFrameTab4, _G.CharacterFrameTab5 } do
-		tab:ClearAllPoints()
+    --* Using ElvUI function with offsets adjusted
+    local lastTab
+    for index, tab in next, { _G.CharacterFrameTab1, HasPetUI() and _G.CharacterFrameTab2 or nil, _G.CharacterFrameTab3, _G.CharacterFrameTab4, _G.CharacterFrameTab5 } do
+        tab:ClearAllPoints()
 
-		if index == 1 then
-			tab:Point('TOPLEFT', _G.CharacterFrame, 'BOTTOMLEFT', -10, -25)
-		else
-			tab:Point('TOPLEFT', lastTab, 'TOPRIGHT', -19, 0)
-		end
+        if index == 1 then
+            tab:Point('TOPLEFT', _G.CharacterFrame, 'BOTTOMLEFT', -10, -25)
+        else
+            tab:Point('TOPLEFT', lastTab, 'TOPRIGHT', -19, 0)
+        end
 
-		lastTab = tab
-	end
+        lastTab = tab
+    end
 end
 
 function module:ToggleItemLevelInfo(setupCharacterPage)
-	if setupCharacterPage then
-		module:CreateSlotStrings(_G.CharacterFrame, 'Character')
-	end
+    if setupCharacterPage then
+        module:CreateSlotStrings(_G.CharacterFrame, 'Character')
+    end
 
-	if E.db.cataarmory.character.enable then
-		module:RegisterEvent('PLAYER_EQUIPMENT_CHANGED', 'UpdateCharacterInfo')
-		module:RegisterEvent('UPDATE_INVENTORY_DURABILITY', 'UpdateCharacterInfo')
-		module:RegisterEvent('PLAYER_AVG_ITEM_LEVEL_UPDATE', 'UpdateCharacterItemLevel')
-		module:RegisterEvent('COMPANION_UPDATE', HandleTabs)
+    if E.db.cataarmory.character.enable then
+        module:RegisterEvent('PLAYER_EQUIPMENT_CHANGED', 'UpdateCharacterInfo')
+        module:RegisterEvent('UPDATE_INVENTORY_DURABILITY', 'UpdateCharacterInfo')
+        module:RegisterEvent('PLAYER_AVG_ITEM_LEVEL_UPDATE', 'UpdateCharacterItemLevel')
+        module:RegisterEvent('COMPANION_UPDATE', HandleTabs)
 
-		if not module:IsHooked(_G.CharacterFrame, 'OnShow') then
-			module:SecureHookScript(_G.CharacterFrame, 'OnShow', CharacterFrame_OnShow)
-		end
-		if not module:IsHooked(_G.CharacterFrame, 'ShowSubFrame') then
-			module:SecureHook(_G.CharacterFrame, 'ShowSubFrame', HandleCharacterFrameExpand)
-		end
-		if not module:IsHooked(_G.CharacterFrame, 'UpdateTabBounds') then
-			module:SecureHook(_G.CharacterFrame, 'UpdateTabBounds', HandleTabs)
-		end
+        if not module:IsHooked(_G.CharacterFrame, 'OnShow') then
+            module:SecureHookScript(_G.CharacterFrame, 'OnShow', CharacterFrame_OnShow)
+        end
+        if not module:IsHooked(_G.CharacterFrame, 'ShowSubFrame') then
+            module:SecureHook(_G.CharacterFrame, 'ShowSubFrame', HandleCharacterFrameExpand)
+        end
+        if not module:IsHooked(_G.CharacterFrame, 'UpdateTabBounds') then
+            module:SecureHook(_G.CharacterFrame, 'UpdateTabBounds', HandleTabs)
+        end
 
-		if not setupCharacterPage then
-			module:UpdateCharacterInfo()
-		end
-	else
-		module:UnregisterEvent('PLAYER_EQUIPMENT_CHANGED')
-		module:UnregisterEvent('UPDATE_INVENTORY_DURABILITY')
-		module:UnregisterEvent('PLAYER_AVG_ITEM_LEVEL_UPDATE')
-		module:UnregisterEvent('COMPANION_UPDATE')
+        if not setupCharacterPage then
+            module:UpdateCharacterInfo()
+        end
+    else
+        module:UnregisterEvent('PLAYER_EQUIPMENT_CHANGED')
+        module:UnregisterEvent('UPDATE_INVENTORY_DURABILITY')
+        module:UnregisterEvent('PLAYER_AVG_ITEM_LEVEL_UPDATE')
+        module:UnregisterEvent('COMPANION_UPDATE')
 
-		if module:IsHooked(_G.CharacterFrame, 'OnShow') then
-			module:Unhook(_G.CharacterFrame, 'OnShow')
-		end
-		if not module:IsHooked(_G.CharacterFrame, 'ShowSubFrame') then
-			module:Unhook(_G.CharacterFrame, 'ShowSubFrame')
-		end
-		if not module:IsHooked(_G.CharacterFrame, 'UpdateTabBounds') then
-			module:Unhook(_G.CharacterFrame, 'UpdateTabBounds')
-		end
-		module:ClearPageInfo(_G.CharacterFrame, 'Character')
-	end
+        if module:IsHooked(_G.CharacterFrame, 'OnShow') then
+            module:Unhook(_G.CharacterFrame, 'OnShow')
+        end
+        if not module:IsHooked(_G.CharacterFrame, 'ShowSubFrame') then
+            module:Unhook(_G.CharacterFrame, 'ShowSubFrame')
+        end
+        if not module:IsHooked(_G.CharacterFrame, 'UpdateTabBounds') then
+            module:Unhook(_G.CharacterFrame, 'UpdateTabBounds')
+        end
+        module:ClearPageInfo(_G.CharacterFrame, 'Character')
+    end
 
-	if E.db.cataarmory.inspect.enable then
-		module:RegisterEvent('INSPECT_READY', 'UpdateInspectInfo')
-		if IsAddOnLoaded('Blizzard_InspectUI') and not module:IsHooked(_G.InspectFrame, 'OnShow') then
-			module:SecureHookScript(_G.InspectFrame, 'OnShow', module.InspectFrame_OnShow)
-		end
-		module:UpdateInspectInfo()
-	else
-		module:UnregisterEvent('INSPECT_READY')
-		if IsAddOnLoaded('Blizzard_InspectUI') and module:IsHooked(_G.InspectFrame, 'OnShow') then
-			module:Unhook(_G.InspectFrame, 'OnShow')
-		end
-		module:ClearPageInfo(_G.InspectFrame, 'Inspect')
-	end
+    if E.db.cataarmory.inspect.enable then
+        module:RegisterEvent('INSPECT_READY', 'UpdateInspectInfo')
+        if IsAddOnLoaded('Blizzard_InspectUI') and not module:IsHooked(_G.InspectFrame, 'OnShow') then
+            module:SecureHookScript(_G.InspectFrame, 'OnShow', module.InspectFrame_OnShow)
+        end
+        module:UpdateInspectInfo()
+    else
+        module:UnregisterEvent('INSPECT_READY')
+        if IsAddOnLoaded('Blizzard_InspectUI') and module:IsHooked(_G.InspectFrame, 'OnShow') then
+            module:Unhook(_G.InspectFrame, 'OnShow')
+        end
+        module:ClearPageInfo(_G.InspectFrame, 'Inspect')
+    end
 end
