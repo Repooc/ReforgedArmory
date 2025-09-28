@@ -991,88 +991,110 @@ end
 
 local githubURL = 'https://github.com/Repooc/ReforgedArmory/issues'
 local missingIDs = {}
+local UPGRADE_PATTERN = '^' .. gsub(ITEM_UPGRADE_TOOLTIP_FORMAT, '%%d', '(%%d+)')
 function module:GetGearSlotInfo(unit, slot)
-	local tt = E.ScanTooltip
-	tt:SetOwner(_G.UIParent, 'ANCHOR_NONE')
-	tt:SetInventoryItem(unit, slot)
-	tt:Show()
+    local tt = E.ScanTooltip
+    tt:SetOwner(WorldFrame, 'ANCHOR_NONE')
+    tt:SetInventoryItem(unit, slot)
+    tt:Show()
 
-	local slotInfo = {}
-	local itemLink = GetInventoryItemLink(unit, slot)
-	slotInfo.gems, slotInfo.emptySockets, slotInfo.filledSockets, slotInfo.baseSocketCount = module:AcquireGemInfo(itemLink)
-	slotInfo.itemQualityColors = {}
-	slotInfo.missingBeltBuckle = false
-	slotInfo.durability = {}
+    local slotInfo = {}
+    local itemLink = GetInventoryItemLink(unit, slot)
+    slotInfo.gems, slotInfo.emptySockets, slotInfo.filledSockets, slotInfo.baseSocketCount = module:AcquireGemInfo(itemLink)
+    slotInfo.itemQualityColors = {}
+    slotInfo.missingBeltBuckle = false
+    slotInfo.durability = {}
 
-	local enchantID
+    local enchantID
 
-	if itemLink then
-		if UnitLevel(unit) >= 70 and slot == 6 and (#slotInfo.filledSockets + #slotInfo.emptySockets <= slotInfo.baseSocketCount) then
-			slotInfo.missingBeltBuckle = true
-		end
+    if itemLink then
+        if UnitLevel(unit) >= 70 and slot == 6 and (#slotInfo.filledSockets + #slotInfo.emptySockets <= slotInfo.baseSocketCount) then
+            slotInfo.missingBeltBuckle = true
+        end
 
-		--* Get Item Quality Info
-		local quality = GetInventoryItemQuality(unit, slot)
-		if quality then
-			slotInfo.itemQualityColors.r, slotInfo.itemQualityColors.g, slotInfo.itemQualityColors.b = GetItemQualityColor(quality)
-		end
+        --* Get Item Quality Info
+        local quality = GetInventoryItemQuality(unit, slot)
+        if quality then
+            slotInfo.itemQualityColors.r, slotInfo.itemQualityColors.g, slotInfo.itemQualityColors.b = GetItemQualityColor(quality)
+        end
 
-		--* Get Item Level Info
-		local itemLevel = GetDetailedItemLevelInfo(itemLink)
-		slotInfo.itemLevel = tonumber(itemLevel)
-		enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
+        --* Get Item Level Info
+        if unit == 'player' then
+            local location = ItemLocation and ItemLocation:CreateFromEquipmentSlot(slot)
+            if location:IsValid() then
+                slotInfo.itemLevel = C_Item.GetCurrentItemLevel(location)
+            end
+        else
+            local upgradeLvl = 0
+            local textLines = {tt:GetRegions()}
+            for _, region in ipairs(textLines) do
+                if region:GetObjectType() == 'FontString' then
+                    local text = region:GetText()
+                    if text and text ~= '' then
+                        local currentLevel, maxLevel = strmatch(text, UPGRADE_PATTERN)
+                        if currentLevel then
+                            upgradeLvl = tonumber(currentLevel)
+                            break
+                        end
+                    end
+                end
+            end
+            slotInfo.itemLevel = slotInfo.itemLevel + upgradeLvl * 4
+        end
 
-		do
-			--* Get Durability Info
-			local current, max = GetInventoryItemDurability(slot)
-			if current and max and max > 0 then
-				local percent = current / max * 100
-				slotInfo.durability.current = current
-				slotInfo.durability.max = max
-				slotInfo.durability.percent = percent
-			else
-				slotInfo.durability.current = 0
-				slotInfo.durability.max = 0
-				slotInfo.durability.percent = 0
-			end
-		end
-	end
+        enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
 
-	if not enchantID then
-		slotInfo.enchantText = ''
-		tt:Hide()
-		return slotInfo
-	end
+        do
+            --* Get Durability Info
+            local current, max = GetInventoryItemDurability(slot)
+            if current and max and max > 0 then
+                local percent = current / max * 100
+                slotInfo.durability.current = current
+                slotInfo.durability.max = max
+                slotInfo.durability.percent = percent
+            else
+                slotInfo.durability.current = 0
+                slotInfo.durability.max = 0
+                slotInfo.durability.percent = 0
+            end
+        end
+    end
 
-	local userText = E.global.cataarmory.enchantStrings.UserReplaced[enchantID]
-	local libText = E.Libs.GetEnchantList.GetEnchant(enchantID)
-	if userText and userText ~= '' then
-		slotInfo.enchantText = userText
-	elseif libText then
-		if E.db.cataarmory.enchant.abbreviate then
-			local abbreviations = E.global.cataarmory.enchantStrings.Abbreviations
-			local processedText = libText
+    if not enchantID then
+        slotInfo.enchantText = ''
+        tt:Hide()
+        return slotInfo
+    end
 
-			for key, value in pairs(abbreviations) do
-				if value and value ~= '' and not abbreviations[value] then
-					processedText = gsub(processedText, key, value)
-				end
-			end
+    local userText = E.global.cataarmory.enchantStrings.UserReplaced[enchantID]
+    local libText = E.Libs.GetEnchantList.GetEnchant(enchantID)
+    if userText and userText ~= '' then
+        slotInfo.enchantText = userText
+    elseif libText then
+        if E.db.cataarmory.enchant.abbreviate then
+            local abbreviations = E.global.cataarmory.enchantStrings.Abbreviations
+            local processedText = libText
 
-			libText = processedText
-		end
+            for key, value in pairs(abbreviations) do
+                if value and value ~= '' and not abbreviations[value] then
+                    processedText = gsub(processedText, key, value)
+                end
+            end
 
-		slotInfo.enchantText = libText
-	elseif not missingIDs[enchantID] then
-		missingIDs[enchantID] = true
-		local msg = format('The enchant id, *%s|r, seems to be missing from our database. Please open a ticket at |cff16c3f2[|r*|Hurl:'..githubURL..'|h'..githubURL..'|h|r|cff16c3f2]|r with the missing id and name of the enchant and/or provide screenshot mousing over the item with enchant that was found on %s. |cffFF0000If you do not provide the info or post a duplicate ticket, it will be closed without a response.|r', enchantID, itemLink):gsub('*', E.InfoColor)
-		module:Print(msg)
-		slotInfo.enchantText = ''
-	end
+            libText = processedText
+        end
 
-	tt:Hide()
+        slotInfo.enchantText = libText
+    elseif not missingIDs[enchantID] then
+        missingIDs[enchantID] = true
+        local msg = format('The enchant id, *%s|r, seems to be missing from our database. Please open a ticket at |cff16c3f2[|r*|Hurl:'..githubURL..'|h'..githubURL..'|h|r|cff16c3f2]|r with the missing id and name of the enchant and/or provide screenshot mousing over the item with enchant that was found on %s. |cffFF0000If you do not provide the info or post a duplicate ticket, it will be closed without a response.|r', enchantID, itemLink):gsub('*', E.InfoColor)
+        module:Print(msg)
+        slotInfo.enchantText = ''
+    end
 
-	return slotInfo
+    tt:Hide()
+
+    return slotInfo
 end
 
 local function HandleCharacterFrameExpand()
