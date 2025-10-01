@@ -999,23 +999,15 @@ MATCH_ITEM_UPGRADE = MATCH_ITEM_UPGRADE:gsub("%%%%d", "(%%d+)")
 function module:GetGearSlotInfo(unit, slot, deepScan)
 	local tt = E.ScanTooltip
 	tt:SetOwner(WorldFrame, 'ANCHOR_NONE')
-	-- tt:SetInventoryItem(unit, slot)
 
 	if not tt.slotInfo then tt.slotInfo = {} else wipe(tt.slotInfo) end
 	local slotInfo = tt.slotInfo
-
-	local itemLink = GetInventoryItemLink(unit, slot)
-	slotInfo.gems, slotInfo.emptySockets, slotInfo.filledSockets, slotInfo.baseSocketCount = module:AcquireGemInfo(itemLink)
+	slotInfo.durability = {}
 	slotInfo.itemQualityColors = {}
 	slotInfo.missingBeltBuckle = false
-	slotInfo.durability = {}
 
-	local enchantID
+	local itemLink = GetInventoryItemLink(unit, slot)
 	if not itemLink then return slotInfo end
-
-	if UnitLevel(unit) >= 70 and slot == 6 and (#slotInfo.filledSockets + #slotInfo.emptySockets <= slotInfo.baseSocketCount) then
-		slotInfo.missingBeltBuckle = true
-	end
 
 	--* Get Item Quality Info
 	local quality = GetInventoryItemQuality(unit, slot)
@@ -1023,8 +1015,14 @@ function module:GetGearSlotInfo(unit, slot, deepScan)
 		slotInfo.itemQualityColors.r, slotInfo.itemQualityColors.g, slotInfo.itemQualityColors.b = GetItemQualityColor(quality)
 	end
 
-	--* Get Item Level Info
 	local hasItem = tt:SetInventoryItem(unit, slot)
+	slotInfo.gems, slotInfo.emptySockets, slotInfo.filledSockets, slotInfo.baseSocketCount = module:AcquireGemInfo(itemLink)
+	
+	if UnitLevel(unit) >= 70 and slot == 6 and (#slotInfo.filledSockets + #slotInfo.emptySockets <= slotInfo.baseSocketCount) then
+		slotInfo.missingBeltBuckle = true
+	end
+	
+	--* Get Item Level Info
 	local info = hasItem and tt:GetTooltipData()
 	if info then
 		local firstLine = info.lines[1]
@@ -1054,8 +1052,6 @@ function module:GetGearSlotInfo(unit, slot, deepScan)
 		end
 	end
 
-	enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
-
 	--* Get Durability Info
 	do
 		local current, max = GetInventoryItemDurability(slot)
@@ -1071,6 +1067,7 @@ function module:GetGearSlotInfo(unit, slot, deepScan)
 		end
 	end
 
+	local enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
 	if not enchantID then
 		slotInfo.enchantText = ''
 		return slotInfo
